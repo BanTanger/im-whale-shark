@@ -1,0 +1,16 @@
+im:
+  tcpPort: 9001
+  webSocketPort: 19001
+  bossThreadSize: 1
+  workThreadSize: 8
+
+  redis:
+    mode: single # 单机模式:single 哨兵式:sentinel 集群模式:cluster
+    database: 0
+    password:
+    timeout: 3000 # 超时时间
+    poolMinIdle: 4 #最小空闲数
+    poolConnTimeout: 3000 # 连接超时时间(秒)
+    poolSize: 10 # 连接池大小
+    single: #redis单机配置
+      address: 127.0.0.1:6379
