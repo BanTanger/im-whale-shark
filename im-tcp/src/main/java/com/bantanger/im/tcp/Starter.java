@@ -2,7 +2,7 @@ package com.bantanger.im.tcp;
 
 import com.bantanger.im.codec.config.ImBootstrapConfig;
 import com.bantanger.im.service.redis.RedisManager;
-import com.bantanger.im.service.commandstrategy.factory.CommandFactoryConfig;
+import com.bantanger.im.service.strategy.command.factory.CommandFactoryConfig;
 import com.bantanger.im.tcp.server.ImServer;
 import com.bantanger.im.tcp.server.ImWebSocketServer;
 import org.yaml.snakeyaml.Yaml;

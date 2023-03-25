@@ -1,4 +1,4 @@
-package com.bantanger.im.service.commandstrategy;
+package com.bantanger.im.service.strategy.command;
 
 /**
  * @author BanTanger 半糖

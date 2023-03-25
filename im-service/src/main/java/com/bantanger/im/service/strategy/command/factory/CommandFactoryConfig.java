@@ -1,8 +1,9 @@
-package com.bantanger.im.service.commandstrategy.factory;
+package com.bantanger.im.service.strategy.command.factory;
 
 import com.bantanger.im.common.enums.command.ImSystemCommand;
-import com.bantanger.im.service.commandstrategy.CommandStrategy;
-import com.bantanger.im.service.commandstrategy.impl.LoginCommand;
+import com.bantanger.im.service.strategy.command.CommandStrategy;
+import com.bantanger.im.service.strategy.command.impl.LoginCommand;
+import com.bantanger.im.service.strategy.command.impl.LogoutCommand;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,6 +21,7 @@ public class CommandFactoryConfig {
 
     public static void init() {
         commandStrategyMap.put(ImSystemCommand.COMMAND_LOGIN.getCode(), new LoginCommand());
+        commandStrategyMap.put(ImSystemCommand.COMMAND_LOGIN.getCode(), new LogoutCommand());
     }
 
 }

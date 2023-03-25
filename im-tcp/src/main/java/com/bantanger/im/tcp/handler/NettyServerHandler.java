@@ -1,8 +1,8 @@
 package com.bantanger.im.tcp.handler;
 
 import com.bantanger.im.codec.proto.Message;
-import com.bantanger.im.service.commandstrategy.CommandStrategy;
-import com.bantanger.im.service.commandstrategy.factory.CommandFactory;
+import com.bantanger.im.service.strategy.command.CommandStrategy;
+import com.bantanger.im.service.strategy.command.factory.CommandFactory;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 

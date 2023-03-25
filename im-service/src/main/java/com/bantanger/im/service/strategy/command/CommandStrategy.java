@@ -1,4 +1,4 @@
-package com.bantanger.im.service.commandstrategy;
+package com.bantanger.im.service.strategy.command;
 
 import com.bantanger.im.codec.proto.Message;
 import io.netty.channel.ChannelHandlerContext;
