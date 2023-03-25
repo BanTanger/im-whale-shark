@@ -4,22 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b7e0d6ee-1aec-4bc7-8da2-cb381ddaba4a" name="Changes" comment="feat: 用户登出逻辑，调整包结构">
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/PingCommand.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/HostHolder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/HeartBeatHandler.java" afterDir="false" />
+    <list default="true" id="b7e0d6ee-1aec-4bc7-8da2-cb381ddaba4a" name="Changes" comment="feat: 心跳检测实现用户切后台逻辑">
+      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/rabbitmq/listener/MqMessageListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/rabbitmq/publish/MqMessageProducer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/MqFactory.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/config/ImBootstrapConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/config/ImBootstrapConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/comstant/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/comstant/Constants.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/command/ImSystemCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/command/ImSystemCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LoginCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LoginCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LogoutCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LogoutCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/SessionSocketHolder.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/SessionSocketHolder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-tcp/src/main/resources/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/resources/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,6 +83,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.bantanger.im.codec.config" />
       <recent name="com.bantanger.im.tcp.handler" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -130,7 +125,7 @@
       <workItem from="1679642510660" duration="20572000" />
       <workItem from="1679675273836" duration="12670000" />
       <workItem from="1679717581118" duration="2930000" />
-      <workItem from="1679725532442" duration="11314000" />
+      <workItem from="1679725532442" duration="16630000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 采用策略模式重构命令执行逻辑">
       <created>1679715761283</created>
@@ -146,7 +141,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679722985575</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="feat: 心跳检测实现用户切后台逻辑">
+      <created>1679740719750</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1679740719750</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -168,7 +170,8 @@
     <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="feat: 采用策略模式重构命令执行逻辑" />
     <MESSAGE value="feat: 用户登出逻辑，调整包结构" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: 用户登出逻辑，调整包结构" />
+    <MESSAGE value="feat: 心跳检测实现用户切后台逻辑" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: 心跳检测实现用户切后台逻辑" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

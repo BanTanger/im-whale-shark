@@ -15,3 +15,10 @@ im:
     poolSize: 10 # 连接池大小
     single: #redis单机配置
       address: 127.0.0.1:6379
+
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    virtualHost: /
+    userName: admin
+    password: admin

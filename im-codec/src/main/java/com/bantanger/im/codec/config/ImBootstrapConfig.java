@@ -51,6 +51,11 @@ public class ImBootstrapConfig {
          * redis配置
          */
         private RedisConfig redis;
+
+        /**
+         * rabbitmq 配置
+         */
+        private Rabbitmq rabbitmq;
     }
 
     @Data
@@ -105,6 +110,30 @@ public class ImBootstrapConfig {
          * 地址
          */
         private String address;
+    }
+
+    @Data
+    public static class Rabbitmq {
+        /**
+         * 主机地址
+         */
+        private String host;
+        /**
+         * 端口号
+         */
+        private Integer port;
+        /**
+         * 虚拟主机地址
+         */
+        private String virtualHost;
+        /**
+         * 用户名
+         */
+        private String userName;
+        /**
+         * 密码
+         */
+        private String password;
     }
 
 }
