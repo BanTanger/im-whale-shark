@@ -1,4 +1,4 @@
-package com.bantanger.im.service.commandstrategy.impl;
+package com.bantanger.im.service.strategy.command.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -7,9 +7,10 @@ import com.bantanger.im.codec.pack.LoginPack;
 import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.common.comstant.Constants;
 import com.bantanger.im.common.enums.connect.ImSystemConnectState;
+import com.bantanger.im.common.model.UserClientDto;
 import com.bantanger.im.common.model.UserSession;
 import com.bantanger.im.service.redis.RedisManager;
-import com.bantanger.im.service.commandstrategy.BaseCommandStrategy;
+import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
 import com.bantanger.im.service.utils.SessionSocketHolder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -30,10 +31,18 @@ public class LoginCommand extends BaseCommandStrategy {
                 new TypeReference<LoginPack>() {
 
                 }.getType());
+        UserClientDto userClientDto = new UserClientDto();
+        userClientDto.setUserId(loginPack.getUserId());
+        userClientDto.setAppId(msg.getMessageHeader().getAppId());
+        userClientDto.setClientType(msg.getMessageHeader().getClientType());
+
         // channel 设置属性
-        ctx.channel().attr(AttributeKey.valueOf("userId")).set(loginPack.getUserId());
+        ctx.channel().attr(AttributeKey.valueOf(Constants.UserClientConstants.UserId)).set(userClientDto.getUserId());
+        ctx.channel().attr(AttributeKey.valueOf(Constants.UserClientConstants.AppId)).set(userClientDto.getAppId());
+        ctx.channel().attr(AttributeKey.valueOf(Constants.UserClientConstants.ClientType)).set(userClientDto.getClientType());
+
         // 将 channel 存起来
-        SessionSocketHolder.put(loginPack.getUserId(), (NioSocketChannel) ctx.channel());
+        SessionSocketHolder.put(userClientDto, (NioSocketChannel) ctx.channel());
 
         // Redisson 高速存储用户 Session
         UserSession userSession = new UserSession();

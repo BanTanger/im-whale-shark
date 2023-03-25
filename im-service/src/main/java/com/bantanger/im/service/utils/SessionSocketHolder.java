@@ -1,5 +1,6 @@
 package com.bantanger.im.service.utils;
 
+import com.bantanger.im.common.model.UserClientDto;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.util.Map;
@@ -11,14 +12,26 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SessionSocketHolder {
 
-    private static final Map<String, NioSocketChannel> CHANNELS = new ConcurrentHashMap<String, NioSocketChannel>();
+    private static final Map<UserClientDto, NioSocketChannel> CHANNELS = new ConcurrentHashMap<>();
+    private UserClientDto userClientDto = new UserClientDto();
 
-    public static void put(String userId, NioSocketChannel channel) {
-        CHANNELS.put(userId, channel);
+    public static void put(UserClientDto userClientDto, NioSocketChannel channel) {
+        CHANNELS.put(userClientDto, channel);
     }
 
-    public static NioSocketChannel get(String userId) {
-        return CHANNELS.get(userId);
+    public static NioSocketChannel get(UserClientDto userClientDto) {
+        return CHANNELS.get(userClientDto);
     }
+
+    public static void remove(UserClientDto userClientDto) {
+        CHANNELS.remove(userClientDto);
+    }
+
+    public static void remove(NioSocketChannel channel) {
+        CHANNELS.entrySet().stream().filter(entitiy -> entitiy.getValue() == channel)
+                .forEach(entry -> CHANNELS.remove(entry.getKey()));
+    }
+
+
 
 }
