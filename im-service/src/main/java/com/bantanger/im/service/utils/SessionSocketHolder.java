@@ -1,4 +1,4 @@
-package com.bantanger.im.tcp.utils;
+package com.bantanger.im.service.utils;
 
 import io.netty.channel.socket.nio.NioSocketChannel;
 

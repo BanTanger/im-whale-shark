@@ -1,4 +1,4 @@
-package com.bantanger.im.tcp.redis;
+package com.bantanger.im.service.redis;
 
 import com.bantanger.im.codec.config.ImBootstrapConfig;
 import org.redisson.api.RedissonClient;

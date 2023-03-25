@@ -1,7 +1,8 @@
 package com.bantanger.im.tcp;
 
 import com.bantanger.im.codec.config.ImBootstrapConfig;
-import com.bantanger.im.tcp.redis.RedisManager;
+import com.bantanger.im.service.redis.RedisManager;
+import com.bantanger.im.service.commandstrategy.factory.CommandFactoryConfig;
 import com.bantanger.im.tcp.server.ImServer;
 import com.bantanger.im.tcp.server.ImWebSocketServer;
 import org.yaml.snakeyaml.Yaml;
@@ -32,6 +33,7 @@ public class Starter {
 
             // redisson 在系统启动之初就初始化
             RedisManager.init(config);
+            CommandFactoryConfig.init();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
