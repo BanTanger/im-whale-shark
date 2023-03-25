@@ -19,6 +19,7 @@ import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 
 /**
+ * 用户登录逻辑
  * @author BanTanger 半糖
  * @Date 2023/3/25 9:52
  */
@@ -37,9 +38,9 @@ public class LoginCommand extends BaseCommandStrategy {
         userClientDto.setClientType(msg.getMessageHeader().getClientType());
 
         // channel 设置属性
-        ctx.channel().attr(AttributeKey.valueOf(Constants.UserClientConstants.UserId)).set(userClientDto.getUserId());
-        ctx.channel().attr(AttributeKey.valueOf(Constants.UserClientConstants.AppId)).set(userClientDto.getAppId());
-        ctx.channel().attr(AttributeKey.valueOf(Constants.UserClientConstants.ClientType)).set(userClientDto.getClientType());
+        ctx.channel().attr(AttributeKey.valueOf(Constants.ChannelConstants.UserId)).set(userClientDto.getUserId());
+        ctx.channel().attr(AttributeKey.valueOf(Constants.ChannelConstants.AppId)).set(userClientDto.getAppId());
+        ctx.channel().attr(AttributeKey.valueOf(Constants.ChannelConstants.ClientType)).set(userClientDto.getClientType());
 
         // 将 channel 存起来
         SessionSocketHolder.put(userClientDto, (NioSocketChannel) ctx.channel());

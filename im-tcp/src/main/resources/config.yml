@@ -3,6 +3,7 @@ im:
   webSocketPort: 19001
   bossThreadSize: 1
   workThreadSize: 8
+  heartBeatTime: 3000 # 心跳超时时间 单位毫秒
 
   redis:
     mode: single # 单机模式:single 哨兵式:sentinel 集群模式:cluster

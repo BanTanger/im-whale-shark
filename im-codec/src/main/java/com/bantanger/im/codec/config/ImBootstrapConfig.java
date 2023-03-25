@@ -43,6 +43,11 @@ public class ImBootstrapConfig {
         private Integer workThreadSize;
 
         /**
+         * 心跳超时时间
+         */
+        private Long heartBeatTime;
+
+        /**
          * redis配置
          */
         private RedisConfig redis;

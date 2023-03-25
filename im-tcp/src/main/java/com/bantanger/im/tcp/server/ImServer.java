@@ -2,6 +2,7 @@ package com.bantanger.im.tcp.server;
 
 import com.bantanger.im.codec.MessageDecoderHandler;
 import com.bantanger.im.codec.config.ImBootstrapConfig;
+import com.bantanger.im.tcp.handler.HeartBeatHandler;
 import com.bantanger.im.tcp.handler.NettyServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -9,6 +10,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +47,13 @@ public class ImServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
+                        // 消息编解码
                         ch.pipeline().addLast(new MessageDecoderHandler());
+                        // 心跳检测 保活
+                        ch.pipeline().addLast(new IdleStateHandler(
+                                0, 0, 1));
+                        ch.pipeline().addLast(new HeartBeatHandler(config.getHeartBeatTime()));
+                        // 用户逻辑执行
                         ch.pipeline().addLast(new NettyServerHandler());
                     }
                 });
