@@ -1,14 +1,21 @@
 package com.bantanger.im.tcp;
 
 import com.bantanger.im.codec.config.ImBootstrapConfig;
+import com.bantanger.im.service.rabbitmq.listener.MqMessageListener;
 import com.bantanger.im.service.redis.RedisManager;
 import com.bantanger.im.service.strategy.command.factory.CommandFactoryConfig;
+import com.bantanger.im.service.utils.MqFactory;
+import com.bantanger.im.service.zookeeper.ZkManager;
+import com.bantanger.im.service.zookeeper.ZkRegistry;
 import com.bantanger.im.tcp.server.ImServer;
 import com.bantanger.im.tcp.server.ImWebSocketServer;
+import org.I0Itec.zkclient.ZkClient;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * @author BanTanger 半糖
@@ -33,13 +40,34 @@ public class Starter {
 
             // redisson 在系统启动之初就初始化
             RedisManager.init(config);
+            // 策略工厂初始化
             CommandFactoryConfig.init();
-
-        } catch (FileNotFoundException e) {
+            // MQ 工厂初始化
+            MqFactory.init(config.getIm().getRabbitmq());
+            // MQ 监听器初始化
+            MqMessageListener.init();
+            // 每个服务器都注册 Zk
+            registerZk(config);
+        } catch (FileNotFoundException | UnknownHostException e) {
             e.printStackTrace();
             // 程序退出
             System.exit(500);
         }
+    }
+
+    /**
+     * 对于每一个 IP 地址，都开启一个线程去启动 Zk
+     * @param config
+     * @throws UnknownHostException
+     */
+    public static void registerZk(ImBootstrapConfig config) throws UnknownHostException {
+        String hostAddress = InetAddress.getLocalHost().getHostAddress();
+        ZkClient zkClient = new ZkClient(config.getIm().getZkConfig().getZkAddr(),
+                config.getIm().getZkConfig().getZkConnectTimeOut());
+        ZkManager zkManager = new ZkManager(zkClient);
+        ZkRegistry zkRegistry = new ZkRegistry(zkManager, hostAddress, config.getIm());
+        Thread thread = new Thread(zkRegistry);
+        thread.start();
     }
 
 }

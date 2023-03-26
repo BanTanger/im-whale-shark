@@ -9,7 +9,7 @@ import com.bantanger.im.service.strategy.command.CommandStrategy;
 public class CommandFactory extends CommandFactoryConfig {
 
     public CommandStrategy getCommandStrategy(Integer command) {
-        return CommandFactoryConfig.commandStrategyMap.get(command);
+        return commandStrategyMap.get(command);
     }
 
 }

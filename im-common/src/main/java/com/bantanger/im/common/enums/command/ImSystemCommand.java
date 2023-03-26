@@ -8,6 +8,10 @@ import com.bantanger.im.common.enums.CodeAdapter;
  */
 public enum ImSystemCommand implements CodeAdapter {
     /**
+     * 心跳 9999 --> 0x270f
+     */
+    COMMAND_PING(0x270f),
+    /**
      * 登录 9000 --> 0x2328
      */
     COMMAND_LOGIN(0x2328),

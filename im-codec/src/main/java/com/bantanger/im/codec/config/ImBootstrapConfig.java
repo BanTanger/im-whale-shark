@@ -41,11 +41,24 @@ public class ImBootstrapConfig {
          * work 线程数
          */
         private Integer workThreadSize;
-
+        /**
+         * 心跳超时时间
+         */
+        private Long heartBeatTime;
         /**
          * redis配置
          */
         private RedisConfig redis;
+
+        /**
+         * rabbitmq 配置
+         */
+        private Rabbitmq rabbitmq;
+
+        /**
+         * zk 配置
+         */
+        private ZkConfig zkConfig;
     }
 
     @Data
@@ -100,6 +113,42 @@ public class ImBootstrapConfig {
          * 地址
          */
         private String address;
+    }
+
+    @Data
+    public static class Rabbitmq {
+        /**
+         * 主机地址
+         */
+        private String host;
+        /**
+         * 端口号
+         */
+        private Integer port;
+        /**
+         * 虚拟主机地址
+         */
+        private String virtualHost;
+        /**
+         * 用户名
+         */
+        private String userName;
+        /**
+         * 密码
+         */
+        private String password;
+    }
+
+    @Data
+    public static class ZkConfig {
+        /**
+         * zk 连接地址
+         */
+        private String zkAddr;
+        /**
+         * zk 连接超时时间
+         */
+        private Integer zkConnectTimeOut;
     }
 
 }
