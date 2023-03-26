@@ -11,10 +11,8 @@ import com.bantanger.im.common.model.UserClientDto;
 import com.bantanger.im.common.model.UserSession;
 import com.bantanger.im.service.redis.RedisManager;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
-import com.bantanger.im.service.utils.SessionSocketHolder;
+import com.bantanger.im.service.utils.UserChannelRepository;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.AttributeKey;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 
@@ -37,13 +35,10 @@ public class LoginCommand extends BaseCommandStrategy {
         userClientDto.setAppId(msg.getMessageHeader().getAppId());
         userClientDto.setClientType(msg.getMessageHeader().getClientType());
 
-        // channel 设置属性
-        ctx.channel().attr(AttributeKey.valueOf(Constants.ChannelConstants.UserId)).set(userClientDto.getUserId());
-        ctx.channel().attr(AttributeKey.valueOf(Constants.ChannelConstants.AppId)).set(userClientDto.getAppId());
-        ctx.channel().attr(AttributeKey.valueOf(Constants.ChannelConstants.ClientType)).set(userClientDto.getClientType());
+        String userChannelKey = UserChannelRepository.parseUserClientDto(userClientDto);
 
-        // 将 channel 存起来
-        SessionSocketHolder.put(userClientDto, (NioSocketChannel) ctx.channel());
+        // 双向绑定
+        UserChannelRepository.bind(userChannelKey, ctx.channel());
 
         // Redisson 高速存储用户 Session
         UserSession userSession = new UserSession();

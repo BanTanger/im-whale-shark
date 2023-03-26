@@ -23,6 +23,8 @@ public class Constants {
          * channel 绑定的读写时间
          */
         public static final String ReadTime = "readTime";
+
+        public static final String UserChannelKey = AppId + ":" + UserId + ":" + ClientType;
     }
 
     public static class RedisConstants {

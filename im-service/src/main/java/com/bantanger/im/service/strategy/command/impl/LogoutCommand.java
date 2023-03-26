@@ -2,9 +2,8 @@ package com.bantanger.im.service.strategy.command.impl;
 
 import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
-import com.bantanger.im.service.utils.SessionSocketHolder;
+import com.bantanger.im.service.utils.UserChannelRepository;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.socket.nio.NioSocketChannel;
 
 /**
  * 用户登出逻辑
@@ -15,7 +14,7 @@ public class LogoutCommand extends BaseCommandStrategy {
 
     @Override
     public void doStrategy(ChannelHandlerContext ctx, Message msg) {
-        SessionSocketHolder.removeUserSession((NioSocketChannel) ctx.channel());
+        UserChannelRepository.remove(ctx.channel());
     }
 
 }
