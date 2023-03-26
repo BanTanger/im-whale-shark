@@ -57,4 +57,13 @@ public class Constants {
 
     }
 
+    public static class ZkConstants {
+
+        public static final String ImCoreZkRoot = "/im-coreRoot";
+
+        public static final String ImCoreZkRootTcp = "/tcp";
+
+        public static final String ImCoreZkRootWeb = "/web";
+    }
+
 }

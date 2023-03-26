@@ -8,7 +8,6 @@ import com.bantanger.im.service.redis.RedisManager;
 import io.netty.channel.Channel;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date 2023/3/26 8:06
  */
 @Slf4j
-public class UserChannelRepository {
+public class UserChannelRepository extends Constants {
 
     private static ChannelGroup CHANNEL_GROUP = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     private static Map<String, Channel> USER_CHANNEL = new ConcurrentHashMap<>();
@@ -51,7 +50,7 @@ public class UserChannelRepository {
 
             // 双向绑定
             // channel -> userChannelKey
-            AttributeKey<String> key = AttributeKey.valueOf(Constants.ChannelConstants.UserChannelKey);
+            AttributeKey<String> key = AttributeKey.valueOf(ChannelConstants.UserChannelKey);
             channel.attr(key).set(userChannelKey);
 
             // userChannelKey -> channel
@@ -65,7 +64,7 @@ public class UserChannelRepository {
      * @return
      */
     public static String getUserChannelKey(Channel channel) {
-        AttributeKey<String> key = AttributeKey.valueOf(Constants.ChannelConstants.UserChannelKey);
+        AttributeKey<String> key = AttributeKey.valueOf(ChannelConstants.UserChannelKey);
         return channel.attr(key).get();
     }
 
@@ -89,7 +88,7 @@ public class UserChannelRepository {
             // 预处理 userChannelKey
             String[] split = userChannelKey.split(":");
             RedissonClient redissonClient = RedisManager.getRedissonClient();
-            RMap<String, String> map = redissonClient.getMap(split[1] + Constants.RedisConstants.UserSessionConstants + split[0]);
+            RMap<String, String> map = redissonClient.getMap(split[1] + RedisConstants.UserSessionConstants + split[0]);
             // 删除 Hash 里的 key，key 存放用户的 Session
             map.remove(split[2]);
 
@@ -127,7 +126,7 @@ public class UserChannelRepository {
     }
 
     public static boolean isBind(Channel channel) {
-        AttributeKey<String> key = AttributeKey.valueOf(Constants.ChannelConstants.UserChannelKey);
+        AttributeKey<String> key = AttributeKey.valueOf(ChannelConstants.UserChannelKey);
         String userChannelKey = channel.attr(key).get();
         return !ObjectUtils.isEmpty(userChannelKey) &&
                 !ObjectUtils.isEmpty(USER_CHANNEL.get(userChannelKey));
@@ -138,7 +137,7 @@ public class UserChannelRepository {
         String[] split = userChannelKey.split(":");
         if (!ObjectUtils.isEmpty(channel)) {
             RedissonClient redissonClient = RedisManager.getRedissonClient();
-            RMap<String, String> map = redissonClient.getMap(split[1] + Constants.RedisConstants.UserSessionConstants + split[0]);
+            RMap<String, String> map = redissonClient.getMap(split[1] + RedisConstants.UserSessionConstants + split[0]);
             String sessionStr = map.get(split[2]);
 
             if (!StringUtils.isBlank(sessionStr)) {
@@ -152,7 +151,7 @@ public class UserChannelRepository {
     }
 
     public static void forceOffLine(Channel channel) {
-        AttributeKey<String> key = AttributeKey.valueOf(Constants.ChannelConstants.UserChannelKey);
+        AttributeKey<String> key = AttributeKey.valueOf(ChannelConstants.UserChannelKey);
         String userChannelKey = channel.attr(key).get();
         try {
             forceOffLine(userChannelKey);
