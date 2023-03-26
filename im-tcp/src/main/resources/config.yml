@@ -22,3 +22,7 @@ im:
     virtualHost: /
     userName: admin
     password: admin
+
+  zkConfig:
+    zkAddr: 127.0.0.1:2181
+    zkConnectTimeOut: 5000
