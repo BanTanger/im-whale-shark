@@ -47,7 +47,7 @@ public class Starter {
             // MQ 工厂初始化
             MqFactory.init(config.getIm().getRabbitmq());
             // MQ 监听器初始化
-            MqMessageListener.init(config.getIm().getBrokerId() + "");
+            MqMessageListener.init();
             // 每个服务器都注册 Zk
             registerZk(config);
         } catch (FileNotFoundException | UnknownHostException e) {
