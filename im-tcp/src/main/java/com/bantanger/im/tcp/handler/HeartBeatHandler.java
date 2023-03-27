@@ -1,7 +1,7 @@
 package com.bantanger.im.tcp.handler;
 
 import com.bantanger.im.common.comstant.Constants;
-import com.bantanger.im.service.utils.UserChannelRepository;
+import com.bantanger.im.service.utils.SessionSocketHolder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -40,7 +40,7 @@ public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
 
                 if (lastReadTime != null && nowReadTime - lastReadTime > heartBeatTime) {
                     // 用户退后台
-                    UserChannelRepository.forceOffLine(ctx.channel());
+                    SessionSocketHolder.offlineUserSession((NioSocketChannel) ctx.channel());
                 }
             }
         }

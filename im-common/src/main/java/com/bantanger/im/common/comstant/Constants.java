@@ -24,10 +24,20 @@ public class Constants {
          */
         public static final String ReadTime = "readTime";
 
-        public static final String UserChannelKey = AppId + ":" + UserId + ":" + ClientType;
+        /**
+         * imei 号，标识用户登录设备号
+         */
+        public static final String imei = "imei";
+
+        public static final String UserChannelKey = AppId + ":" + UserId + ":" + ClientType + ":" + imei;
+
     }
 
     public static class RedisConstants {
+        /**
+         * 用户登录端消息通道信息
+         */
+        public static final String UserLoginChannel = "signal/channel/LOGIN_USER_INNER_QUEUE";
         /**
          * 用户session：格式为 appId + userSessionConstants + 用户 ID
          * 例如：10001:userSessionConstants:userId

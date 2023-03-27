@@ -3,7 +3,7 @@ package com.bantanger.im.codec;
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.codec.proto.MessageHeader;
-import com.bantanger.im.common.enums.message.ImSystemMessageType;
+import com.bantanger.im.common.enums.MessageType;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -11,6 +11,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
 
 /**
+ * 消息解码类
  * @author BanTanger 半糖
  * @Date 2023/3/24 18:48
  */
@@ -66,7 +67,7 @@ public class MessageDecoderHandler extends ByteToMessageDecoder {
         Message message = new Message();
         message.setMessageHeader(messageHeader);
 
-        if (messageType == ImSystemMessageType.DATA_TYPE_JSON.getCode()) {
+        if (messageType == MessageType.DATA_TYPE_JSON.getCode()) {
             String body = new String(bodyData);
             JSONObject parse = (JSONObject) JSONObject.parse(body);
             message.setMessagePack(parse);

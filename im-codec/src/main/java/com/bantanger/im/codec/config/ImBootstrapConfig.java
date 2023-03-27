@@ -46,6 +46,15 @@ public class ImBootstrapConfig {
          */
         private Long heartBeatTime;
         /**
+         * 分布式 Id 区分服务
+         */
+        private Integer brokerId;
+        /**
+         * 端同步策略类型
+         */
+        private Integer loginModel;
+
+        /**
          * redis配置
          */
         private RedisConfig redis;

@@ -1,6 +1,6 @@
 package com.bantanger.im.codec.proto;
 
-import com.bantanger.im.common.enums.message.ImSystemMessageType;
+import com.bantanger.im.common.enums.MessageType;
 import lombok.Data;
 
 /**
@@ -30,10 +30,10 @@ public class MessageHeader {
      * 数据解析类型(4字节) 和具体业务无关
      * 后续根据解析类型解析data数据 0x0:Json,0x1:ProtoBuf,0x2:Xml,默认:0x0
      */
-    private Integer messageType = ImSystemMessageType.DATA_TYPE_JSON.getCode();
+    private Integer messageType = MessageType.DATA_TYPE_JSON.getCode();
 
     /**
-     * 4字节 imel长度
+     * 4字节 imei长度
      */
     private Integer imeiLength;
 
