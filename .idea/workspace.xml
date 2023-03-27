@@ -4,10 +4,45 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b7e0d6ee-1aec-4bc7-8da2-cb381ddaba4a" name="Changes" comment="feat: Zookeeper 实现 TCP 网关服务注册中心的对接">
+    <list default="true" id="b7e0d6ee-1aec-4bc7-8da2-cb381ddaba4a" name="Changes" comment="feat: 心跳检测实现用户切后台逻辑">
+      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/MessageEncoderHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/proto/MessagePack.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/ClientType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/DeviceMultiLoginEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/rabbitmq/listener/UserLoginMessageListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/login/LoginContext.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/login/LoginStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/login/factory/LoginStatusFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/login/factory/LoginStatusFactoryConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/login/impl/AllClientLoginStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/login/impl/OneClientLoginStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/login/impl/ThreeClientLoginStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/login/impl/TwoClientLoginStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-tcp/src/main/resources/config2.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/MessageDecoderHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/MessageDecoderHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/config/ImBootstrapConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/config/ImBootstrapConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/proto/MessageHeader.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/proto/MessageHeader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/comstant/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/comstant/Constants.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/zookeeper/ZkManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/zookeeper/ZkManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/zookeeper/ZkRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/zookeeper/ZkRegistry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/command/ImSystemCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/Command.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/connect/ImSystemConnectState.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/ConnectState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/message/ImSystemMessageType.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/MessageType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/UserClientDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/UserClientDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/UserSession.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/UserSession.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/rabbitmq/listener/MqMessageListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/rabbitmq/listener/MqMessageListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/redis/RedisManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/redis/RedisManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/CommandStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/CommandStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LoginCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LoginCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LogoutCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LogoutCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/PingCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/PingCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/UserChannelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/UserChannelRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/resources/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/resources/config.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,6 +52,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Enum" />
         <option value="Interface" />
         <option value="Class" />
       </list>
@@ -29,7 +65,9 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="RESET_MODE" value="HARD" />
+  </component>
+  <component name="GitRewordedCommitMessages">
+    <option name="onto" value="5820c217a0dd6080b0d3a2535fc54d0b665afe8a" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -67,11 +105,11 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../im-system-gateway2" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../lottery-4577-bantanger" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.1359375" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="reference.settings.project.maven.repository.indices" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
@@ -81,12 +119,18 @@
       <recent name="com.bantanger.im.codec.config" />
       <recent name="com.bantanger.im.tcp.handler" />
     </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\JavaProjectManager\whale-shark\im-tcp\src\main\resources" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="E:\JavaProjectManager\im-system-gateway" />
       <recent name="E:\JavaProjectManager\im-system-gateway\im-service\src\main\java\com\bantanger\im\service" />
     </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.bantanger.im.service.strategy.login.impl" />
+    </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.Starter">
     <configuration name="Starter" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.bantanger.im.tcp.Starter" />
       <module name="im-tcp" />
@@ -101,6 +145,18 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Starter2" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="com.bantanger.im.tcp.Starter" />
+      <module name="im-tcp" />
+      <option name="PROGRAM_PARAMETERS" value="E:\JavaProjectManager\whale-shark\im-tcp\src\main\resources\config2.yml" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.Starter2" />
+      <item itemvalue="Application.Starter" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Starter" />
@@ -144,21 +200,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679740719750</updated>
     </task>
-    <task id="LOCAL-00004" summary="fix: 修复用户登出逻辑错误。重构user和channel的双向绑定关系，提升程序健壮性">
-      <created>1679794764409</created>
+    <task id="LOCAL-00004" summary="feat: Zookeeper 实现 TCP 网关服务注册中心的对接">
+      <created>1679810863019</created>
       <option name="number" value="00004" />
       <option name="presentableId" value="LOCAL-00004" />
       <option name="project" value="LOCAL" />
-      <updated>1679794764409</updated>
+      <updated>1679810863019</updated>
     </task>
-    <task id="LOCAL-00005" summary="feat: Zookeeper 实现 TCP 网关服务注册中心的对接">
-      <created>1679802276711</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1679802276711</updated>
-    </task>
-    <option name="localTasksCounter" value="6" />
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -169,7 +218,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="feat/tcp_gateway_distributed" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -181,8 +242,19 @@
     <MESSAGE value="feat: 采用策略模式重构命令执行逻辑" />
     <MESSAGE value="feat: 用户登出逻辑，调整包结构" />
     <MESSAGE value="feat: 心跳检测实现用户切后台逻辑" />
-    <MESSAGE value="fix: 修复用户登出逻辑错误。重构user和channel的双向绑定关系，提升程序健壮性" />
     <MESSAGE value="feat: Zookeeper 实现 TCP 网关服务注册中心的对接" />
+    <MESSAGE value="Revert &quot;fix: 修复用户登出逻辑错误。重构user和channel的双向绑定关系，提升程序健壮性, #2&quot;&#10;&#10;This reverts commit 5820c217a0dd6080b0d3a2535fc54d0b665afe8a." />
     <option name="LAST_COMMIT_MESSAGE" value="feat: Zookeeper 实现 TCP 网关服务注册中心的对接" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/rabbitmq/listener/UserLoginMessageListener.java</url>
+          <line>39</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

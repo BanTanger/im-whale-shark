@@ -16,7 +16,13 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
+
     <dependencies>
+        <dependency>
+            <groupId>com.bantanger.middleware</groupId>
+            <artifactId>c-db-router-spring-boot-starter</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>com.bantanger</groupId>
             <artifactId>im-codec</artifactId>

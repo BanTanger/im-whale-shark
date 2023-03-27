@@ -15,12 +15,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
+    private Integer brokerId;
+
+    public NettyServerHandler(Integer brokerId) {
+        this.brokerId = brokerId;
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
         Integer command = parseCommand(msg);
         CommandFactory commandFactory = new CommandFactory();
         CommandStrategy commandStrategy = commandFactory.getCommandStrategy(command);
-        commandStrategy.doStrategy(ctx, msg);
+        commandStrategy.doStrategy(ctx, msg, brokerId);
     }
 
     protected Integer parseCommand(Message msg) {

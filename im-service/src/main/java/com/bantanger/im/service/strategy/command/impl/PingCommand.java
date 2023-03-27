@@ -14,7 +14,7 @@ import io.netty.util.AttributeKey;
 public class PingCommand extends BaseCommandStrategy {
 
     @Override
-    public void doStrategy(ChannelHandlerContext ctx, Message msg) {
+    public void doStrategy(ChannelHandlerContext ctx, Message msg, Integer brokeId) {
         /**
          * channel 绑定当前时间
          */

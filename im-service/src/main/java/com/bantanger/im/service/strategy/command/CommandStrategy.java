@@ -9,6 +9,6 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public interface CommandStrategy {
 
-    void doStrategy(ChannelHandlerContext ctx, Message msg);
+    void doStrategy(ChannelHandlerContext ctx, Message msg, Integer brokeId);
 
 }

@@ -1,6 +1,7 @@
 package com.bantanger.im.service.strategy.command.factory;
 
 import com.bantanger.im.service.strategy.command.CommandStrategy;
+import com.bantanger.im.service.strategy.login.LoginContext;
 
 /**
  * @author BanTanger 半糖

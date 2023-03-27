@@ -13,7 +13,7 @@ import io.netty.channel.ChannelHandlerContext;
 public class LogoutCommand extends BaseCommandStrategy {
 
     @Override
-    public void doStrategy(ChannelHandlerContext ctx, Message msg) {
+    public void doStrategy(ChannelHandlerContext ctx, Message msg, Integer brokeId) {
         UserChannelRepository.remove(ctx.channel());
     }
 

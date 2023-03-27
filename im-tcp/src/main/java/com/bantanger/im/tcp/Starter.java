@@ -4,6 +4,7 @@ import com.bantanger.im.codec.config.ImBootstrapConfig;
 import com.bantanger.im.service.rabbitmq.listener.MqMessageListener;
 import com.bantanger.im.service.redis.RedisManager;
 import com.bantanger.im.service.strategy.command.factory.CommandFactoryConfig;
+import com.bantanger.im.service.strategy.login.factory.LoginStatusFactoryConfig;
 import com.bantanger.im.service.utils.MqFactory;
 import com.bantanger.im.service.zookeeper.ZkManager;
 import com.bantanger.im.service.zookeeper.ZkRegistry;
@@ -42,10 +43,11 @@ public class Starter {
             RedisManager.init(config);
             // 策略工厂初始化
             CommandFactoryConfig.init();
+            LoginStatusFactoryConfig.init();
             // MQ 工厂初始化
             MqFactory.init(config.getIm().getRabbitmq());
             // MQ 监听器初始化
-            MqMessageListener.init();
+            MqMessageListener.init(config.getIm().getBrokerId() + "");
             // 每个服务器都注册 Zk
             registerZk(config);
         } catch (FileNotFoundException | UnknownHostException e) {
