@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b7e0d6ee-1aec-4bc7-8da2-cb381ddaba4a" name="Changes" comment="feat: 用户关系模块导入 #15&#10;具体为：用户信息模块、好友模块、群组模块">
-      <change afterPath="$PROJECT_DIR$/test/heartBeat.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/login.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/loginLongTime.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/privateSend.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/ISSUE_TEMPLATE/bug_report.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/ISSUE_TEMPLATE/feature.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,6 +67,7 @@
     <option name="sortByType" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
@@ -219,6 +217,7 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="feat: 采用策略模式重构命令执行逻辑" />
     <MESSAGE value="feat: 用户登出逻辑，调整包结构" />
     <MESSAGE value="feat: 心跳检测实现用户切后台逻辑" />
