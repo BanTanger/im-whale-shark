@@ -3,6 +3,8 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/im-codec/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/im-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/im-domain/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/im-domain/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/im-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/im-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/im-tcp/src/main/java" charset="UTF-8" />

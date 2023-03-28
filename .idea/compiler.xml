@@ -6,6 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="im-domain" />
         <module name="im-tcp" />
         <module name="im-common" />
         <module name="im-codec" />
@@ -17,6 +18,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="im-codec" options="-parameters" />
       <module name="im-common" options="-parameters" />
+      <module name="im-domain" options="-parameters" />
       <module name="im-service" options="-parameters" />
       <module name="im-tcp" options="-parameters" />
     </option>
