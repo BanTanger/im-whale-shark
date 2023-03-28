@@ -3,7 +3,12 @@ WhaleShark（鲸鲨）是一个用 Java 实现的高性能分布式 IM 系统，
 <br>
 
 ## 技术栈
-使用到 Netty、Redisson、RabbitMQ、Zookeeper、Redis 等主流技术栈
+使用到 Netty、Redis、Redisson、RabbitMQ、Zookeeper 等主流技术栈
+<br>
++ Netty 实现高性能消息收发，应用层握手(用户登录登出)，心跳检测(挂后台)
++ Redis 和 Redisson 客户端实现用户 Session 信息的存储、发布订阅模式实现路由层信息缓存
++ RabbitMQ 解耦对接 TCP 网关服务和逻辑层交互
++ Zookeeper 注册中心及时感知服务节点上线下线情况
 <br>
 
 ## 模块职责介绍
@@ -15,4 +20,5 @@ WhaleShark（鲸鲨）是一个用 Java 实现的高性能分布式 IM 系统，
 ## 亮点
 1. 使用策略模式重构用户操作指令逻辑
 2. 使用状态模式重构用户自定义端同步方式
-3. 使用 Redisson 发布订阅模式监听用户登录行为，发送用户下线通知
+3. 使用 Redis 缓存用户信息的方式模拟路由层，实现跨服务之间的多 Channel 通讯
+4. 使用 Redisson 发布订阅模式，监听用户登录行为，发送用户下线通知
