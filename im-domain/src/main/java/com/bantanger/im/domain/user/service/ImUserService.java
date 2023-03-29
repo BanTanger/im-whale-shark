@@ -1,10 +1,7 @@
 package com.bantanger.im.domain.user.service;
 
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
-import com.bantanger.im.domain.user.model.req.DeleteUserReq;
-import com.bantanger.im.domain.user.model.req.GetUserInfoReq;
-import com.bantanger.im.domain.user.model.req.ImportUserReq;
-import com.bantanger.im.domain.user.model.req.ModifyUserInfoReq;
+import com.bantanger.im.domain.user.model.req.*;
 import com.bantanger.im.domain.user.model.resp.GetUserInfoResp;
 import com.bantanger.im.common.ResponseVO;
 
@@ -35,5 +32,5 @@ public interface ImUserService {
 
     ResponseVO modifyUserInfo(ModifyUserInfoReq req);
 
-
+    ResponseVO login(LoginReq req);
 }

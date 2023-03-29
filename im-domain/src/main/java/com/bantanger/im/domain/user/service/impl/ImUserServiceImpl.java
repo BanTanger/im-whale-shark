@@ -3,10 +3,7 @@ package com.bantanger.im.domain.user.service.impl;
 import com.bantanger.im.domain.group.service.ImGroupService;
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.domain.user.dao.mapper.ImUserDataMapper;
-import com.bantanger.im.domain.user.model.req.DeleteUserReq;
-import com.bantanger.im.domain.user.model.req.GetUserInfoReq;
-import com.bantanger.im.domain.user.model.req.ImportUserReq;
-import com.bantanger.im.domain.user.model.req.ModifyUserInfoReq;
+import com.bantanger.im.domain.user.model.req.*;
 import com.bantanger.im.domain.user.model.resp.GetUserInfoResp;
 import com.bantanger.im.domain.user.model.resp.ImportUserResp;
 import com.bantanger.im.domain.user.service.ImUserService;
@@ -166,6 +163,12 @@ public class ImUserServiceImpl implements ImUserService {
             return ResponseVO.successResponse();
         }
         throw new ApplicationException(UserErrorCode.MODIFY_USER_ERROR);
+    }
+
+    @Override
+    public ResponseVO login(LoginReq req) {
+        // TODO 后期补充鉴权
+        return ResponseVO.successResponse();
     }
 
 }
