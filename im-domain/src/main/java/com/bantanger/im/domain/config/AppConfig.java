@@ -30,4 +30,8 @@ public class AppConfig {
      */
     private Integer imRouteModel;
 
+    /**
+     * 一致性哈希所使用的底层数据结构
+     */
+    private Integer consistentHashModel;
 }

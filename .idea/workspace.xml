@@ -4,36 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b7e0d6ee-1aec-4bc7-8da2-cb381ddaba4a" name="Changes" comment="feat: 添加 issue 描述模板">
-      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/UrlRouteModelEnum.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/config/AppConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/model/req/LoginReq.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-domain/src/py_test/test_route.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/route/RouteHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/route/RouteInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/route/algroithm/hash/AbstractConsistentHash.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/route/algroithm/hash/ConsistentHashHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/route/algroithm/hash/TreeMapConsistentHash.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/route/algroithm/loop/LoopHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/route/algroithm/random/RandomHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/RouteInfoParseUtil.java" afterDir="false" />
+    <list default="true" id="b7e0d6ee-1aec-4bc7-8da2-cb381ddaba4a" name="Changes" comment="feat: 新增轮询、随机、一致性哈希三种方式实现长连接负载均衡策略 #11&#10;py 测试一致性哈希存在明显分配不均的问题">
+      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/RouteHashMethodEnum.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/UrlRouteModelEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/UrlRouteModelEnum.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/config/AppConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/config/AppConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/config/BeanConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/config/BeanConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/controller/ImUserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/controller/ImUserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/service/ImUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/service/ImUserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/service/impl/ImUserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/service/impl/ImUserServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/HostHolder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/SessionSocketHolder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/zookeeper/ZkManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/zookeeper/ZkManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/HeartBeatHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/HeartBeatHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/heartBeat.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/test/java/com/bantanger/im/tcp/handler/heartBeat.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/login.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/test/java/com/bantanger/im/tcp/handler/login.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/loginLongTime.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/test/java/com/bantanger/im/tcp/handler/loginLongTime.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/privateSend.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/test/java/com/bantanger/im/tcp/handler/privateSend.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -165,7 +142,7 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Python.test_route (1)">
+  <component name="RunManager" selected="Spring Boot.Application">
     <configuration name="Starter" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.bantanger.im.tcp.Starter" />
       <module name="im-tcp" />
@@ -302,7 +279,14 @@
       <option name="project" value="LOCAL" />
       <updated>1680021257941</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="feat: 新增轮询、随机、一致性哈希三种方式实现长连接负载均衡策略 #11">
+      <created>1680104781510</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1680104781510</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -342,7 +326,8 @@
     <MESSAGE value="Revert &quot;fix: 修复用户登出逻辑错误。重构user和channel的双向绑定关系，提升程序健壮性, #2&quot;&#10;&#10;This reverts commit 5820c217a0dd6080b0d3a2535fc54d0b665afe8a." />
     <MESSAGE value="feat: 用户关系模块导入 #15&#10;具体为：用户信息模块、好友模块、群组模块" />
     <MESSAGE value="feat: 添加 issue 描述模板" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: 添加 issue 描述模板" />
+    <MESSAGE value="feat: 新增轮询、随机、一致性哈希三种方式实现长连接负载均衡策略 #11&#10;py 测试一致性哈希存在明显分配不均的问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: 新增轮询、随机、一致性哈希三种方式实现长连接负载均衡策略 #11&#10;py 测试一致性哈希存在明显分配不均的问题" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -356,6 +341,11 @@
           <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/route/algroithm/hash/AbstractConsistentHash.java</url>
           <line>32</line>
           <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/config/BeanConfig.java</url>
+          <line>42</line>
+          <option name="timeStamp" value="26" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

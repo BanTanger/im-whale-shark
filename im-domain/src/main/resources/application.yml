@@ -14,6 +14,7 @@ appConfig:
   zkAddr: 127.0.0.1:2181 # zk 连接地址
   zkConnectTimeOut: 5000 # zk 超时时间
   imRouteModel: 3 # 路由策略 1.轮询 2.随机 3.一致性hash
+  consistentHashModel: 1 # 一致性哈希底层调用数据结构 1.TreeMap 2.自定义 Map 3.待扩展
 
 # logger 配置
 #logging:
