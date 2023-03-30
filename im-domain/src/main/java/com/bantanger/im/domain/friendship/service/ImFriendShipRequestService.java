@@ -1,9 +1,9 @@
 package com.bantanger.im.domain.friendship.service;
 
-import com.bantanger.im.domain.friendship.model.req.ApproverFriendRequestReq;
-import com.bantanger.im.domain.friendship.model.req.ReadFriendShipRequestReq;
+import com.bantanger.im.domain.friendship.model.req.ApprovalFriendRequestReq;
+import com.bantanger.im.domain.friendship.model.req.friend.ReadFriendShipRequestReq;
 import com.bantanger.im.common.ResponseVO;
-import com.bantanger.im.domain.friendship.model.req.FriendDto;
+import com.bantanger.im.domain.friendship.model.req.friend.FriendDto;
 
 
 /**
@@ -25,7 +25,7 @@ public interface ImFriendShipRequestService {
      * @param req
      * @return
      */
-    ResponseVO approverFriendRequest(ApproverFriendRequestReq req);
+    ResponseVO approvalFriendRequest(ApprovalFriendRequestReq req);
 
     /**
      * 好友申请读取情况【已读、未读】

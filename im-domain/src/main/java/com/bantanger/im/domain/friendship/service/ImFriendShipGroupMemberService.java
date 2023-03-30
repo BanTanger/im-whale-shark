@@ -1,8 +1,8 @@
 package com.bantanger.im.domain.friendship.service;
 
 import com.bantanger.im.common.ResponseVO;
-import com.bantanger.im.domain.friendship.model.req.AddFriendShipGroupMemberReq;
-import com.bantanger.im.domain.friendship.model.req.DeleteFriendShipGroupMemberReq;
+import com.bantanger.im.domain.friendship.model.req.group.member.AddFriendShipGroupMemberReq;
+import com.bantanger.im.domain.friendship.model.req.group.member.DeleteFriendShipGroupMemberReq;
 
 /**
  * @author bantanger 半糖

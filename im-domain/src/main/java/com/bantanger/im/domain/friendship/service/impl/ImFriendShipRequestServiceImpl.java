@@ -8,9 +8,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.friend.ApproverFriendRequestStatusEnum;
 import com.bantanger.im.common.exception.ApplicationException;
-import com.bantanger.im.domain.friendship.model.req.ApproverFriendRequestReq;
-import com.bantanger.im.domain.friendship.model.req.FriendDto;
-import com.bantanger.im.domain.friendship.model.req.ReadFriendShipRequestReq;
+import com.bantanger.im.domain.friendship.model.req.ApprovalFriendRequestReq;
+import com.bantanger.im.domain.friendship.model.req.friend.FriendDto;
+import com.bantanger.im.domain.friendship.model.req.friend.ReadFriendShipRequestReq;
 import com.bantanger.im.domain.friendship.service.ImFriendShipRequestService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -83,7 +83,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
 
     @Override
     @Transactional
-    public ResponseVO approverFriendRequest(ApproverFriendRequestReq req) {
+    public ResponseVO approvalFriendRequest(ApprovalFriendRequestReq req) {
 
         ImFriendShipRequestEntity imFriendShipRequestEntity = imFriendShipRequestMapper.selectById(req.getId());
         if (imFriendShipRequestEntity == null) {

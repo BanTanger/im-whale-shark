@@ -2,16 +2,17 @@ package com.bantanger.im.domain.friendship.controller;
 
 import com.bantanger.im.domain.friendship.service.ImFriendShipGroupMemberService;
 import com.bantanger.im.common.ResponseVO;
-import com.bantanger.im.domain.friendship.model.req.AddFriendShipGroupMemberReq;
-import com.bantanger.im.domain.friendship.model.req.AddFriendShipGroupReq;
-import com.bantanger.im.domain.friendship.model.req.DeleteFriendShipGroupMemberReq;
-import com.bantanger.im.domain.friendship.model.req.DeleteFriendShipGroupReq;
+import com.bantanger.im.domain.friendship.model.req.group.member.AddFriendShipGroupMemberReq;
+import com.bantanger.im.domain.friendship.model.req.group.AddFriendShipGroupReq;
+import com.bantanger.im.domain.friendship.model.req.group.member.DeleteFriendShipGroupMemberReq;
+import com.bantanger.im.domain.friendship.model.req.group.DeleteFriendShipGroupReq;
 import com.bantanger.im.domain.friendship.service.ImFriendShipGroupService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * @author BanTanger 半糖
@@ -21,10 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("v1/friendship/group")
 public class ImFriendShipGroupController {
 
-    @Autowired
+    @Resource
     ImFriendShipGroupService imFriendShipGroupService;
 
-    @Autowired
+    @Resource
     ImFriendShipGroupMemberService imFriendShipGroupMemberService;
 
 

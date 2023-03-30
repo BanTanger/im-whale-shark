@@ -1,10 +1,11 @@
-package com.bantanger.im.domain.friendship.model.req;
+package com.bantanger.im.domain.friendship.model.req.friend;
 
 import com.bantanger.im.common.model.RequestBase;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -12,16 +13,14 @@ import java.util.List;
  * @Date 2023/3/25 15:16
  */
 @Data
-public class DeleteFriendShipGroupMemberReq extends RequestBase {
+public class CheckFriendShipReq extends RequestBase {
 
     @NotBlank(message = "fromId不能为空")
     private String fromId;
 
-    @NotBlank(message = "分组名称不能为空")
-    private String groupName;
-
-    @NotEmpty(message = "请选择用户")
+    @NotEmpty(message = "toIds不能为空")
     private List<String> toIds;
 
-
+    @NotNull(message = "checkType不能为空")
+    private Integer checkType;
 }

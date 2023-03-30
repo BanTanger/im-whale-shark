@@ -1,4 +1,5 @@
-package com.bantanger.im.domain.friendship.model.req;
+package com.bantanger.im.domain.friendship.model.req.friend;
+
 
 import com.bantanger.im.common.model.RequestBase;
 import lombok.Data;
@@ -11,7 +12,7 @@ import javax.validation.constraints.NotNull;
  * @Date 2023/3/16 20:07
  */
 @Data
-public abstract class FriendReq extends RequestBase {
+public class AddFriendReq extends RequestBase {
 
     @NotBlank(message = "fromId不能为空")
     private String fromId;

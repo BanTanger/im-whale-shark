@@ -12,6 +12,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +20,8 @@ import org.slf4j.LoggerFactory;
  * @author BanTanger 半糖
  * @Date 2023/3/24 15:25
  */
+@Slf4j
 public class ImServer {
-
-    private final static Logger logger = LoggerFactory.getLogger(ImServer.class);
 
     private ImBootstrapConfig.TcpConfig config;
 
@@ -65,7 +65,7 @@ public class ImServer {
     public void start() {
         // 启动服务端
         this.bootstrap.bind(config.getTcpPort());
-        logger.info("tcp start success");
+        log.info("tcp start success");
     }
 
 }

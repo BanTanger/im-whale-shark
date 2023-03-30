@@ -8,12 +8,11 @@ import com.bantanger.im.domain.friendship.service.ImFriendShipGroupMemberService
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.friend.DelFlagEnum;
-import com.bantanger.im.domain.friendship.model.req.AddFriendShipGroupMemberReq;
-import com.bantanger.im.domain.friendship.model.req.AddFriendShipGroupReq;
-import com.bantanger.im.domain.friendship.model.req.DeleteFriendShipGroupReq;
+import com.bantanger.im.domain.friendship.model.req.group.member.AddFriendShipGroupMemberReq;
+import com.bantanger.im.domain.friendship.model.req.group.AddFriendShipGroupReq;
+import com.bantanger.im.domain.friendship.model.req.group.DeleteFriendShipGroupReq;
 import com.bantanger.im.domain.friendship.service.ImFriendShipGroupService;
 import com.bantanger.im.domain.user.service.ImUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +25,10 @@ public class ImFriendShipGroupServiceImpl implements ImFriendShipGroupService {
     @Resource
     ImFriendShipGroupMapper imFriendShipGroupMapper;
 
-    @Autowired
+    @Resource
     ImFriendShipGroupMemberService imFriendShipGroupMemberService;
 
-    @Autowired
+    @Resource
     ImUserService imUserService;
 
     @Override

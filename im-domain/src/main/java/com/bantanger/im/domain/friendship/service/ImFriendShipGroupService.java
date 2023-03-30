@@ -1,8 +1,8 @@
 package com.bantanger.im.domain.friendship.service;
 
 import com.bantanger.im.domain.friendship.dao.ImFriendShipGroupEntity;
-import com.bantanger.im.domain.friendship.model.req.AddFriendShipGroupReq;
-import com.bantanger.im.domain.friendship.model.req.DeleteFriendShipGroupReq;
+import com.bantanger.im.domain.friendship.model.req.group.AddFriendShipGroupReq;
+import com.bantanger.im.domain.friendship.model.req.group.DeleteFriendShipGroupReq;
 import com.bantanger.im.common.ResponseVO;
 
 /**

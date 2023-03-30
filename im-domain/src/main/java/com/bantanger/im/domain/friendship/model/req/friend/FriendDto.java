@@ -1,4 +1,4 @@
-package com.bantanger.im.domain.friendship.model.req;
+package com.bantanger.im.domain.friendship.model.req.friend;
 
 import lombok.Data;
 

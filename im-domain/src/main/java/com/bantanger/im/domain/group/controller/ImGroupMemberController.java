@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
+
 /**
  * @author BanTanger 半糖
  * @Date 2023/3/25 15:16
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("v1/group/member")
 public class ImGroupMemberController {
 
-    @Autowired
+    @Resource
     ImGroupMemberService groupMemberService;
 
     @RequestMapping("/importGroupMember")

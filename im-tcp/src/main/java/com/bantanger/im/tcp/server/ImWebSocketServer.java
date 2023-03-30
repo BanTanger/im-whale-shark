@@ -12,6 +12,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +23,8 @@ import org.slf4j.LoggerFactory;
  * @author BanTanger 半糖
  * @Date 2023/3/24 15:25
  */
+@Slf4j
 public class ImWebSocketServer {
-
-    private final static Logger logger = LoggerFactory.getLogger(ImWebSocketServer.class);
 
     private ImBootstrapConfig.TcpConfig config;
 

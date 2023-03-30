@@ -5,10 +5,13 @@ import lombok.Data;
 
 
 @Data
-public class ApproverFriendRequestReq extends RequestBase {
+public class ApprovalFriendRequestReq extends RequestBase {
 
     private Long id;
 
-    //1同意 2拒绝
+    /**
+     * 1同意 2拒绝
+     */
     private Integer status;
+
 }

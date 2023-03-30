@@ -1,8 +1,13 @@
 package com.bantanger.im.domain.group.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.bantanger.im.common.comstant.Constants;
 import com.bantanger.im.domain.group.model.req.*;
+import com.bantanger.im.domain.group.model.req.callback.DestroyGroupCallbackDto;
 import com.bantanger.im.domain.group.model.resp.GetGroupResp;
 import com.bantanger.im.domain.group.service.ImGroupService;
+import com.bantanger.im.service.callback.CallbackService;
+import com.bantanger.im.service.config.AppConfig;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -38,6 +43,11 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Resource
     ImGroupMemberService groupMemberService;
 
+    @Resource
+    CallbackService callbackService;
+
+    @Resource
+    AppConfig appConfig;
 
     @Override
     public ResponseVO importGroup(ImportGroupReq req) {
@@ -124,6 +134,13 @@ public class ImGroupServiceImpl implements ImGroupService {
             groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), dto);
         }
 
+        // 之后回调
+        if(appConfig.isCreateGroupAfterCallback()){
+            callbackService.afterCallback(req.getAppId(),
+                    Constants.CallbackCommand.CreateGroupAfter,
+                    JSONObject.toJSONString(imGroupEntity));
+        }
+
         return ResponseVO.successResponse();
     }
 
@@ -165,6 +182,14 @@ public class ImGroupServiceImpl implements ImGroupService {
                 throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
             }
 
+        }
+
+        // 之后回调
+        if(appConfig.isModifyGroupAfterCallback()){
+            callbackService.afterCallback(req.getAppId(),
+                    Constants.CallbackCommand.UpdateGroupAfter,
+                    // 将修改之后的群聊信息查询给服务器 TCP 服务层
+                    JSONObject.toJSONString(imGroupDataMapper.selectOne(query)));
         }
 
         ImGroupEntity update = new ImGroupEntity();
@@ -250,6 +275,15 @@ public class ImGroupServiceImpl implements ImGroupService {
         if (update1 != 1) {
             throw new ApplicationException(GroupErrorCode.UPDATE_GROUP_BASE_INFO_ERROR);
         }
+
+        if(appConfig.isModifyGroupAfterCallback()){
+            DestroyGroupCallbackDto dto = new DestroyGroupCallbackDto();
+            dto.setGroupId(req.getGroupId());
+            callbackService.afterCallback(req.getAppId()
+                    ,Constants.CallbackCommand.DestoryGroupAfter,
+                    JSONObject.toJSONString(dto));
+        }
+
         return ResponseVO.successResponse();
     }
 
