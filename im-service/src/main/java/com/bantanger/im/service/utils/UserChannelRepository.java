@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 用户信息与 Channel 双向存储
  * @author BanTanger 半糖
  * @Date 2023/3/26 8:06
  */
@@ -53,6 +54,7 @@ public class UserChannelRepository extends Constants {
             channel.attr(AttributeKey.valueOf(ChannelConstants.AppId)).set(userClientDto.getAppId());
             channel.attr(AttributeKey.valueOf(ChannelConstants.ClientType)).set(userClientDto.getClientType());
             channel.attr(AttributeKey.valueOf(ChannelConstants.imei)).set(userClientDto.getImei());
+            channel.attr(AttributeKey.valueOf(ChannelConstants.ClientImei)).set(userClientDto.getClientType() + ":" + userClientDto.getImei());
 
             // userChannelKey -> channel
             USER_CHANNEL.put(userClientDto, channel);
@@ -167,33 +169,6 @@ public class UserChannelRepository extends Constants {
             e.printStackTrace();
         }
     }
-//
-//    /**
-//     * 消息推送
-//     * @param receiverId
-//     * @param msgModel
-//     */
-//    public static void pushMsg(String receiverId, MsgModel msgModel) {
-//        Channel receiverChannel = isBind(receiverId);
-//        if (!ObjectUtils.isEmpty(receiverChannel)) {
-//            TextWebSocketFrame frame = new TextWebSocketFrame(toJson(msgModel));
-//            receiverChannel.writeAndFlush(frame);
-//        } else {
-//            // 离线状态
-//            log.info("{} 用户离线", receiverId);
-//        }
-//    }
-//
-//    private static String toJson(MsgModel msgModel) {
-//        // 在线，就推送；离线，不做处理
-//        ObjectMapper mapper = SpringUtils.getBean(ObjectMapper.class);
-//        try {
-//            return mapper.writeValueAsString(msgModel);
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
 
     /**
      * 遍历某用户绑定的所有 Channel

@@ -6,6 +6,24 @@ spring:
     password: 123456
     url: jdbc:mysql://127.0.0.1:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
     username: root
+  # redis
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    jedis:
+      pool:
+        max-active: 100
+        max-idle: 100
+        max-wait: 1000
+        min-idle: 10
+    password:
+  # rabbitmq
+  rabbitmq:
+    host: localhost
+    port: 5672
+    addresses: localhost
+    username: admin
+    password: admin
 
   application:
     name: im-core

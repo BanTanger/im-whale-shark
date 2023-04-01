@@ -1,10 +1,10 @@
-package com.bantanger.im.common.enums;
+package com.bantanger.im.common.enums.command;
 
 /**
  * @author BanTanger 半糖
  * @Date 2023/3/24 19:54
  */
-public enum Command implements CodeAdapter {
+public enum SystemCommand implements Command {
     /**
      * 心跳 9999 --> 0x270f
      */
@@ -24,15 +24,14 @@ public enum Command implements CodeAdapter {
 
     ;
 
-
     private Integer command;
 
-    Command(Integer command) {
+    SystemCommand(Integer command) {
         this.command = command;
     }
 
     @Override
-    public Integer getCode() {
+    public Integer getCommand() {
         return command;
     }
 

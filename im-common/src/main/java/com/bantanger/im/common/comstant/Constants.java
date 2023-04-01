@@ -25,12 +25,14 @@ public class Constants {
         public static final String ReadTime = "readTime";
 
         /**
-         * imei 号，标识用户登录设备号
+         * channel 绑定的 imei 号，标识用户登录设备号
          */
         public static final String imei = "imei";
 
-        public static final String UserChannelKey = AppId + ":" + UserId + ":" + ClientType + ":" + imei;
-
+        /**
+         * channel 绑定的 clientType 和 imei Key
+         */
+        public static final String ClientImei = "clientImei";
     }
 
     public static class RedisConstants {
