@@ -1,4 +1,4 @@
-package com.bantanger.im.service.strategy.command.impl;
+package com.bantanger.im.service.strategy.command.system;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -9,9 +9,8 @@ import com.bantanger.im.common.comstant.Constants;
 import com.bantanger.im.common.enums.ConnectState;
 import com.bantanger.im.common.model.UserClientDto;
 import com.bantanger.im.common.model.UserSession;
-import com.bantanger.im.service.redis.RedisManager;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
-import com.bantanger.im.service.strategy.login.LoginStatus;
+import com.bantanger.im.service.redis.RedisManager;
 import com.bantanger.im.service.utils.UserChannelRepository;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +30,7 @@ import java.net.UnknownHostException;
 public class LoginCommand extends BaseCommandStrategy {
 
     @Override
-    public void doStrategy(ChannelHandlerContext ctx, Message msg, Integer brokeId) {
+    public void systemStrategy(ChannelHandlerContext ctx, Message msg, Integer brokeId) {
         // 解析 msg
         LoginPack loginPack = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()),
                 new TypeReference<LoginPack>() {

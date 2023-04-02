@@ -1,4 +1,4 @@
-package com.bantanger.im.domain.group.utils;
+package com.bantanger.im.domain.group;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.pack.group.AddGroupMemberPack;

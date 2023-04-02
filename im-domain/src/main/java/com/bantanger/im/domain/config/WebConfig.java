@@ -1,8 +1,14 @@
-package com.bantanger.im.service.config;
+package com.bantanger.im.domain.config;
 
+import com.bantanger.im.domain.interceptor.GateWayInterceptor;
+import org.hibernate.validator.constraints.Range;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import javax.annotation.Resource;
 
 /**
  * @author BanTanger 半糖
@@ -10,6 +16,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    @Resource
+    GateWayInterceptor gateWayInterceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(gateWayInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/v1/user/login")
+                .excludePathPatterns("/v1/message/checkSend");
+    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

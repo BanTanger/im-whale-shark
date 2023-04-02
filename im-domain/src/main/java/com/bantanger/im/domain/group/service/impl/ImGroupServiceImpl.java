@@ -11,7 +11,7 @@ import com.bantanger.im.domain.group.model.req.*;
 import com.bantanger.im.domain.group.model.req.callback.DestroyGroupCallbackDto;
 import com.bantanger.im.domain.group.model.resp.GetGroupResp;
 import com.bantanger.im.domain.group.service.ImGroupService;
-import com.bantanger.im.domain.group.utils.GroupMessageProducer;
+import com.bantanger.im.domain.group.GroupMessageProducer;
 import com.bantanger.im.service.callback.CallbackService;
 import com.bantanger.im.service.config.AppConfig;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;

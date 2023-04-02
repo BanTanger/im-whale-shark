@@ -4,19 +4,37 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b7e0d6ee-1aec-4bc7-8da2-cb381ddaba4a" name="Changes" comment="feat: 增添 TCP 通知, 用于解决多端消息不一致的问题 #13">
-      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/WebSocketMessageDecoderHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/WebSocketMessageEncoderHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/utils/ByteBufToMessageUtils.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/rabbitmq/process/BaseProcess.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/rabbitmq/process/ProcessFactory.java" afterDir="false" />
+    <list default="true" id="b7e0d6ee-1aec-4bc7-8da2-cb381ddaba4a" name="Changes" comment="feat: TCP 服务层处理逻辑层投递的 MQ 消息 #13">
+      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/utils/Base64URL.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/utils/SigAPI.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/error/GateWayErrorCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/interceptor/GateWayInterceptor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/interceptor/IdentityCheck.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/test/java/SigApiTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/proto/MessagePack.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/proto/MessagePack.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/comstant/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/comstant/Constants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/controller/ImGroupMemberController.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/controller/ImGroupMemberController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupMemberServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupMemberServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/utils/GroupMessageProducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/GroupMessageProducer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/service/impl/ImUserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/service/impl/ImUserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/rabbitmq/listener/MqMessageListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/rabbitmq/listener/MqMessageListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/session/UserSessionServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/session/UserSessionServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LoginCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LoginCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/UserChannelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/UserChannelRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImWebSocketServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImWebSocketServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/py_test/test_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/test/python/RouteTest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/config/AppConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/config/AppConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/config/WebConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/config/WebConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/CommandStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/CommandStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LoginCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/system/LoginCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LogoutCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/system/LogoutCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/PingCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/system/PingCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/login/factory/LoginStatusFactoryConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/login/factory/LoginStatusFactoryConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/test/java/com/bantanger/im/tcp/handler/heartBeat.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/test/python/heartBeat.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/test/java/com/bantanger/im/tcp/handler/login.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/test/python/login.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/test/java/com/bantanger/im/tcp/handler/loginLongTime.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/test/python/loginLongTime.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/test/java/com/bantanger/im/tcp/handler/privateSend.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/test/python/privateSend.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,11 +144,11 @@
       <recent name="E:\JavaProjectManager\whale-shark\im-tcp\src\main\resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\JavaProjectManager\whale-shark\im-domain\src\test\python" />
+      <recent name="E:\JavaProjectManager\whale-shark\im-domain\src\test" />
       <recent name="E:\JavaProjectManager\whale-shark\im-domain\src" />
       <recent name="E:\JavaProjectManager\whale-shark\im-domain" />
       <recent name="E:\JavaProjectManager\whale-shark" />
-      <recent name="E:\JavaProjectManager\whale-shark\im-tcp\src\test\java\com\bantanger\im\tcp\handler" />
-      <recent name="E:\JavaProjectManager\im-system-gateway" />
     </key>
     <key name="CreateTestDialog.Recents.Supers">
       <recent name="" />
@@ -140,11 +158,11 @@
       <recent name="com.bantanger.im.domain.user.controller" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.bantanger.im.common.enums.error" />
+      <recent name="com.bantanger.im.service.strategy.command.group" />
       <recent name="com.bantanger.im.codec.utils" />
       <recent name="com.bantanger.im.common.enums.command" />
       <recent name="com.bantanger.im.codec.pack.user" />
-      <recent name="com.bantanger.im.service.redis" />
-      <recent name="com.bantanger.im.domain.group.model.req" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -154,7 +172,7 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Starter">
+  <component name="RunManager" selected="JUnit.SigApiTest.test_sigApi">
     <configuration name="Starter" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.bantanger.im.tcp.Starter" />
       <module name="im-tcp" />
@@ -173,6 +191,16 @@
       <option name="MAIN_CLASS_NAME" value="com.bantanger.im.tcp.Starter" />
       <module name="im-tcp" />
       <option name="PROGRAM_PARAMETERS" value="E:\JavaProjectManager\whale-shark\im-tcp\src\main\resources\config2.yml" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SigApiTest.test_sigApi" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="im-domain" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="SigApiTest" />
+      <option name="METHOD_NAME" value="test_sigApi" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -235,13 +263,14 @@
       <item itemvalue="Python.test_route" />
       <item itemvalue="Python.test_route (1)" />
       <item itemvalue="Spring Boot.Application" />
+      <item itemvalue="JUnit.SigApiTest.test_sigApi" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.SigApiTest.test_sigApi" />
         <item itemvalue="Application.Starter" />
         <item itemvalue="Python.test_route (1)" />
         <item itemvalue="Python.test_route" />
-        <item itemvalue="Application.Starter" />
         <item itemvalue="Application.Starter" />
       </list>
     </recent_temporary>
@@ -259,7 +288,7 @@
       <workItem from="1679717581118" duration="2930000" />
       <workItem from="1679725532442" duration="16630000" />
       <workItem from="1680179499700" duration="14548000" />
-      <workItem from="1680334824202" duration="29212000" />
+      <workItem from="1680334824202" duration="36418000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 采用策略模式重构命令执行逻辑">
       <created>1679715761283</created>
@@ -338,7 +367,14 @@
       <option name="project" value="LOCAL" />
       <updated>1680402906352</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="feat: TCP 服务层处理逻辑层投递的 MQ 消息 #13">
+      <created>1680413461237</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1680413461238</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -383,7 +419,8 @@
     <MESSAGE value="feat: 扩展回调机制，分别处理事件执行之前和之后，并细粒度化回调机制的场景，用户可在配置文件中进行开启或关闭 #12" />
     <MESSAGE value="feat: 增添用户消息发送功能，为后面 TCP 通知完成多端数据同步做准备 #13" />
     <MESSAGE value="feat: 增添 TCP 通知, 用于解决多端消息不一致的问题 #13" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: 增添 TCP 通知, 用于解决多端消息不一致的问题 #13" />
+    <MESSAGE value="feat: TCP 服务层处理逻辑层投递的 MQ 消息 #13" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: TCP 服务层处理逻辑层投递的 MQ 消息 #13" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

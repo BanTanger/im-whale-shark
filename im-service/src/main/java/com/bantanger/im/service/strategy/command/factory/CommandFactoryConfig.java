@@ -1,10 +1,10 @@
 package com.bantanger.im.service.strategy.command.factory;
 
 import com.bantanger.im.common.enums.command.SystemCommand;
+import com.bantanger.im.service.strategy.command.system.PingCommand;
 import com.bantanger.im.service.strategy.command.CommandStrategy;
-import com.bantanger.im.service.strategy.command.impl.LoginCommand;
-import com.bantanger.im.service.strategy.command.impl.LogoutCommand;
-import com.bantanger.im.service.strategy.command.impl.PingCommand;
+import com.bantanger.im.service.strategy.command.system.LoginCommand;
+import com.bantanger.im.service.strategy.command.system.LogoutCommand;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

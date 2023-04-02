@@ -1,4 +1,4 @@
-package com.bantanger.im.service.strategy.command.impl;
+package com.bantanger.im.service.strategy.command.system;
 
 import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
@@ -13,7 +13,7 @@ import io.netty.channel.ChannelHandlerContext;
 public class LogoutCommand extends BaseCommandStrategy {
 
     @Override
-    public void doStrategy(ChannelHandlerContext ctx, Message msg, Integer brokeId) {
+    public void systemStrategy(ChannelHandlerContext ctx, Message msg, Integer brokeId) {
         UserChannelRepository.remove(ctx.channel());
     }
 

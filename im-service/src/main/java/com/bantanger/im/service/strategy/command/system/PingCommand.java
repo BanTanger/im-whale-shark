@@ -1,4 +1,4 @@
-package com.bantanger.im.service.strategy.command.impl;
+package com.bantanger.im.service.strategy.command.system;
 
 import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.common.comstant.Constants;
@@ -14,7 +14,7 @@ import io.netty.util.AttributeKey;
 public class PingCommand extends BaseCommandStrategy {
 
     @Override
-    public void doStrategy(ChannelHandlerContext ctx, Message msg, Integer brokeId) {
+    public void systemStrategy(ChannelHandlerContext ctx, Message msg, Integer brokeId) {
         /**
          * channel 绑定当前时间
          */

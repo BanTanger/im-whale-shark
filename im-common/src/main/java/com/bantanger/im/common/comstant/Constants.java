@@ -37,6 +37,10 @@ public class Constants {
 
     public static class RedisConstants {
         /**
+         * UserSign，格式：appId:UserSign:
+         */
+        public static final String UserSign = ":UserSign:";
+        /**
          * 用户登录端消息通道信息
          */
         public static final String UserLoginChannel = "signal/channel/LOGIN_USER_INNER_QUEUE";

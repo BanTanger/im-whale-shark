@@ -13,7 +13,7 @@ import com.bantanger.im.domain.group.model.req.callback.AddMemberAfterCallback;
 import com.bantanger.im.domain.group.model.resp.AddMemberResp;
 import com.bantanger.im.domain.group.service.ImGroupMemberService;
 import com.bantanger.im.domain.group.service.ImGroupService;
-import com.bantanger.im.domain.group.utils.GroupMessageProducer;
+import com.bantanger.im.domain.group.GroupMessageProducer;
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.service.callback.CallbackService;
 import com.bantanger.im.service.config.AppConfig;
@@ -35,7 +35,6 @@ import com.bantanger.im.domain.user.service.ImUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
