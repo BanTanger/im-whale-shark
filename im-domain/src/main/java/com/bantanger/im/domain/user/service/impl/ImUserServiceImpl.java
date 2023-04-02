@@ -1,7 +1,9 @@
 package com.bantanger.im.domain.user.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bantanger.im.codec.pack.user.UserModifyPack;
 import com.bantanger.im.common.comstant.Constants;
+import com.bantanger.im.common.enums.command.UserEventCommand;
 import com.bantanger.im.domain.group.service.ImGroupService;
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.domain.user.dao.mapper.ImUserDataMapper;
@@ -11,6 +13,7 @@ import com.bantanger.im.domain.user.model.resp.ImportUserResp;
 import com.bantanger.im.domain.user.service.ImUserService;
 import com.bantanger.im.service.callback.CallbackService;
 import com.bantanger.im.service.config.AppConfig;
+import com.bantanger.im.service.sendmsg.MessageProducer;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.friend.DelFlagEnum;
@@ -45,6 +48,9 @@ public class ImUserServiceImpl implements ImUserService {
 
     @Resource
     CallbackService callbackService;
+
+    @Resource
+    MessageProducer messageProducer;
 
     @Override
     public ResponseVO importUser(ImportUserReq req) {
@@ -172,6 +178,11 @@ public class ImUserServiceImpl implements ImUserService {
         update.setUserId(null);
         int update1 = imUserDataMapper.update(update, query);
         if (update1 == 1) {
+            // 在回调开始前，先发送 TCP 通知，保证数据同步
+            UserModifyPack pack = new UserModifyPack();
+            messageProducer.sendMsgToUser(req.getUserId(), UserEventCommand.USER_MODIFY,
+                    pack, req.getAppId(), req.getClientType(), req.getImei());
+
             // 若修改成功且开启修改用户信息的业务回调，则发起回调
             if (appConfig.isModifyUserAfterCallback()) {
                 callbackService.afterCallback(req.getAppId(),

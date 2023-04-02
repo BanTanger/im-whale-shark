@@ -6,7 +6,7 @@ import com.bantanger.im.common.model.UserSession;
 import com.bantanger.im.service.session.UserSessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * @Date 2023/3/31 23:20
  */
 @Slf4j
-@Service
+@Component
 public class MessageProducer extends AbstractMessageSend {
 
     @Resource
@@ -45,7 +45,7 @@ public class MessageProducer extends AbstractMessageSend {
     }
 
     @Override
-    protected List<ClientInfo> sendToUserAllClient(String toId, Command command, Object data, Integer appId) {
+    public List<ClientInfo> sendToUserAllClient(String toId, Command command, Object data, Integer appId) {
         List<UserSession> userSession = userSessionService.getUserSession(appId, toId);
         return userSession.stream()
                 // 筛出非空对象
@@ -59,13 +59,13 @@ public class MessageProducer extends AbstractMessageSend {
 
 
     @Override
-    protected void sendToUserOneClient(String toId, Command command, Object data, ClientInfo clientInfo) {
+    public void sendToUserOneClient(String toId, Command command, Object data, ClientInfo clientInfo) {
         UserSession userSession = userSessionService.getUserSession(clientInfo.getAppId(), toId, clientInfo.getClientType(), clientInfo.getImei());
         sendMessage(toId, command, data, userSession);
     }
 
     @Override
-    protected void sendToUserExceptClient(String toId, Command command, Object data, ClientInfo clientInfo) {
+    public void sendToUserExceptClient(String toId, Command command, Object data, ClientInfo clientInfo) {
         List<UserSession> userSession = userSessionService.getUserSession(clientInfo.getAppId(), toId);
         userSession.stream()
                 .filter(session -> !isMatch(session, clientInfo))

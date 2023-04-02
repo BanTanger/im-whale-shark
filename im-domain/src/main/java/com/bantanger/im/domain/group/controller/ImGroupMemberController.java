@@ -3,6 +3,7 @@ package com.bantanger.im.domain.group.controller;
 import com.bantanger.im.domain.group.model.req.*;
 import com.bantanger.im.domain.group.service.ImGroupMemberService;
 import com.bantanger.im.common.ResponseVO;
+import com.bantanger.im.domain.group.utils.GroupMessageProducer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;

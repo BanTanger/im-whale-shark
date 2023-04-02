@@ -2,13 +2,18 @@ package com.bantanger.im.domain.group.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.bantanger.im.codec.pack.group.AddGroupMemberPack;
+import com.bantanger.im.codec.pack.group.GroupMemberSpeakPack;
+import com.bantanger.im.codec.pack.group.UpdateGroupMemberPack;
 import com.bantanger.im.common.comstant.Constants;
+import com.bantanger.im.common.enums.command.GroupEventCommand;
 import com.bantanger.im.common.model.ClientInfo;
 import com.bantanger.im.domain.group.model.req.*;
 import com.bantanger.im.domain.group.model.req.callback.AddMemberAfterCallback;
 import com.bantanger.im.domain.group.model.resp.AddMemberResp;
 import com.bantanger.im.domain.group.service.ImGroupMemberService;
 import com.bantanger.im.domain.group.service.ImGroupService;
+import com.bantanger.im.domain.group.utils.GroupMessageProducer;
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.service.callback.CallbackService;
 import com.bantanger.im.service.config.AppConfig;
@@ -62,6 +67,9 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Resource
     AppConfig appConfig;
+
+    @Resource
+    GroupMessageProducer groupMessageProducer;
 
     @Override
     public ResponseVO importGroupMember(ImportGroupMemberReq req) {
@@ -289,6 +297,14 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             resp.add(addMemberResp);
         }
 
+        // TCP 通知
+        AddGroupMemberPack addGroupMemberPack = new AddGroupMemberPack();
+        addGroupMemberPack.setGroupId(req.getGroupId());
+        addGroupMemberPack.setMembers(successId);
+        groupMessageProducer.producer(req.getOperater(), GroupEventCommand.ADDED_MEMBER, addGroupMemberPack
+                , new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
+
+        // 事件处理回调
         if(appConfig.isAddGroupMemberAfterCallback()){
             AddMemberAfterCallback dto = new AddMemberAfterCallback();
             dto.setGroupId(req.getGroupId());
@@ -360,8 +376,16 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         }
         ResponseVO responseVO = groupMemberService.removeGroupMember(req.getGroupId(), req.getAppId(), req.getMemberId());
 
-        // 事件之后回调
+
         if(responseVO.isOk()){
+            // TCP 通知
+            RemoveGroupMemberPack removeGroupMemberPack = new RemoveGroupMemberPack();
+            removeGroupMemberPack.setGroupId(req.getGroupId());
+            removeGroupMemberPack.setMember(req.getMemberId());
+            groupMessageProducer.producer(req.getMemberId(), GroupEventCommand.DELETED_MEMBER, removeGroupMemberPack
+                    , new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
+
+            // 事件之后回调
             if(appConfig.isDeleteGroupMemberAfterCallback()){
                 callbackService.afterCallback(req.getAppId(),
                         Constants.CallbackCommand.GroupMemberDeleteAfter,
@@ -468,6 +492,10 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         objectUpdateWrapper.eq("group_id", req.getGroupId());
         imGroupMemberMapper.update(update, objectUpdateWrapper);
 
+        UpdateGroupMemberPack pack = new UpdateGroupMemberPack();
+        BeanUtils.copyProperties(req, pack);
+        groupMessageProducer.producer(req.getOperater(), GroupEventCommand.UPDATED_MEMBER, pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
+
         return ResponseVO.successResponse();
     }
 
@@ -563,6 +591,13 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         }
 
         int i = imGroupMemberMapper.updateById(imGroupMemberEntity);
+        if (i == 1) {
+            GroupMemberSpeakPack pack = new GroupMemberSpeakPack();
+            BeanUtils.copyProperties(req,pack);
+            groupMessageProducer.producer(req.getOperater(),GroupEventCommand.SPEAK_GROUP_MEMBER,pack,
+                    new ClientInfo(req.getAppId(),req.getClientType(),req.getImei()));
+        }
+
         return ResponseVO.successResponse();
     }
 

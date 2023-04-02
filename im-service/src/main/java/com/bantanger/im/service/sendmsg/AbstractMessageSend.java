@@ -69,7 +69,7 @@ public abstract class AbstractMessageSend implements MessageSend {
      * @param appId
      * @return
      */
-    protected abstract List<ClientInfo> sendToUserAllClient(String toId, Command command, Object data, Integer appId);
+    public abstract List<ClientInfo> sendToUserAllClient(String toId, Command command, Object data, Integer appId);
 
     /**
      * 将消息发送给指定端
@@ -78,7 +78,7 @@ public abstract class AbstractMessageSend implements MessageSend {
      * @param data
      * @param clientInfo
      */
-    protected abstract void sendToUserOneClient(String toId, Command command, Object data, ClientInfo clientInfo);
+    public abstract void sendToUserOneClient(String toId, Command command, Object data, ClientInfo clientInfo);
 
     /**
      * 将消息发送给除了指定端的其他端
@@ -87,5 +87,5 @@ public abstract class AbstractMessageSend implements MessageSend {
      * @param data
      * @param clientInfo
      */
-    protected abstract void sendToUserExceptClient(String toId, Command command, Object data, ClientInfo clientInfo);
+    public abstract void sendToUserExceptClient(String toId, Command command, Object data, ClientInfo clientInfo);
 }
