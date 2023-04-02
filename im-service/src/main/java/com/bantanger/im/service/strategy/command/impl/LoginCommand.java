@@ -11,8 +11,10 @@ import com.bantanger.im.common.model.UserClientDto;
 import com.bantanger.im.common.model.UserSession;
 import com.bantanger.im.service.redis.RedisManager;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
+import com.bantanger.im.service.strategy.login.LoginStatus;
 import com.bantanger.im.service.utils.UserChannelRepository;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RMap;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
@@ -25,6 +27,7 @@ import java.net.UnknownHostException;
  * @author BanTanger 半糖
  * @Date 2023/3/25 9:52
  */
+@Slf4j
 public class LoginCommand extends BaseCommandStrategy {
 
     @Override
@@ -48,7 +51,8 @@ public class LoginCommand extends BaseCommandStrategy {
         userSession.setUserId(loginPack.getUserId());
         userSession.setAppId(msg.getMessageHeader().getAppId());
         userSession.setClientType(msg.getMessageHeader().getClientType());
-        userSession.setConnectState(ConnectState.CONNECT_STATE_OFFLINE.getCode());
+        userSession.setConnectState(ConnectState.CONNECT_STATE_ONLINE.getCode());
+        userSession.setImei(userClientDto.getImei());
         userSession.setBrokerId(brokeId);
 
         try {

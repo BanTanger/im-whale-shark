@@ -1,6 +1,9 @@
 package com.bantanger.im.tcp.server;
 
+import com.bantanger.im.codec.WebSocketMessageDecoderHandler;
+import com.bantanger.im.codec.WebSocketMessageEncoderHandler;
 import com.bantanger.im.codec.config.ImBootstrapConfig;
+import com.bantanger.im.tcp.handler.NettyServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -65,6 +68,9 @@ public class ImWebSocketServer {
                          * 对于websocket来讲，都是以frames进行传输的，不同的数据类型对应的frames也不同
                          */
                         pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
+                        pipeline.addLast(new WebSocketMessageDecoderHandler());
+                        pipeline.addLast(new WebSocketMessageEncoderHandler());
+                        pipeline.addLast(new NettyServerHandler(config.getBrokerId()));
                     }
                 });
     }

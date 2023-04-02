@@ -188,6 +188,19 @@ public class UserChannelRepository extends Constants {
         return channels;
     }
 
+    public static Channel getUserChannel(Integer appId, String userId, Integer clientType, String imei) {
+        UserClientDto dto = new UserClientDto();
+        dto.setUserId(userId);
+        dto.setAppId(appId);
+        dto.setClientType(clientType);
+        dto.setImei(imei);
+        if (!USER_CHANNEL.containsKey(dto)) {
+            log.error("channel 通道 没有 [{}] 信息", JSONObject.toJSONString(dto));
+            return null;
+        }
+        return USER_CHANNEL.get(dto);
+    }
+
     public synchronized static void print() {
         log.info("所有通道的长id：");
         for (Channel channel : CHANNEL_GROUP) {

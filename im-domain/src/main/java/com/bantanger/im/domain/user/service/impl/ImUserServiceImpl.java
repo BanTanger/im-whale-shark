@@ -180,6 +180,7 @@ public class ImUserServiceImpl implements ImUserService {
         if (update1 == 1) {
             // 在回调开始前，先发送 TCP 通知，保证数据同步
             UserModifyPack pack = new UserModifyPack();
+            BeanUtils.copyProperties(req, pack);
             messageProducer.sendMsgToUser(req.getUserId(), UserEventCommand.USER_MODIFY,
                     pack, req.getAppId(), req.getClientType(), req.getImei());
 
