@@ -1,16 +1,20 @@
 package com.bantanger.im.domain.friendship.service.impl;
 
+import com.bantanger.im.codec.pack.friendship.ApproverFriendRequestPack;
+import com.bantanger.im.codec.pack.friendship.ReadAllFriendRequestPack;
+import com.bantanger.im.common.enums.command.FriendshipEventCommand;
 import com.bantanger.im.common.enums.friend.FriendShipErrorCode;
 import com.bantanger.im.domain.friendship.dao.ImFriendShipRequestEntity;
 import com.bantanger.im.domain.friendship.dao.mapper.ImFriendShipRequestMapper;
 import com.bantanger.im.domain.friendship.service.ImFriendService;
+import com.bantanger.im.service.sendmsg.MessageProducer;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.friend.ApproverFriendRequestStatusEnum;
 import com.bantanger.im.common.exception.ApplicationException;
-import com.bantanger.im.domain.friendship.model.req.ApproverFriendRequestReq;
-import com.bantanger.im.domain.friendship.model.req.FriendDto;
-import com.bantanger.im.domain.friendship.model.req.ReadFriendShipRequestReq;
+import com.bantanger.im.domain.friendship.model.req.ApprovalFriendRequestReq;
+import com.bantanger.im.domain.friendship.model.req.friend.FriendDto;
+import com.bantanger.im.domain.friendship.model.req.friend.ReadFriendShipRequestReq;
 import com.bantanger.im.domain.friendship.service.ImFriendShipRequestService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -28,6 +32,9 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
 
     @Resource
     ImFriendService imFriendShipService;
+
+    @Resource
+    MessageProducer messageProducer;
 
     @Override
     public ResponseVO getFriendRequest(String fromId, Integer appId) {
@@ -78,12 +85,15 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
             imFriendShipRequestMapper.updateById(request);
         }
 
+        //发送好友申请的 tcp 给接收方
+        messageProducer.sendToUserAllClient(dto.getToId(), FriendshipEventCommand.FRIEND_REQUEST, request, appId);
+
         return ResponseVO.successResponse();
     }
 
     @Override
     @Transactional
-    public ResponseVO approverFriendRequest(ApproverFriendRequestReq req) {
+    public ResponseVO approvalFriendRequest(ApprovalFriendRequestReq req) {
 
         ImFriendShipRequestEntity imFriendShipRequestEntity = imFriendShipRequestMapper.selectById(req.getId());
         if (imFriendShipRequestEntity == null) {
@@ -118,6 +128,12 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
             }
         }
 
+        //发送好友申请的 tcp 给接收方
+        ApproverFriendRequestPack approverFriendRequestPack = new ApproverFriendRequestPack();
+        approverFriendRequestPack.setId(req.getId());
+        approverFriendRequestPack.setStatus(req.getStatus());
+        messageProducer.sendMsgToUser(imFriendShipRequestEntity.getToId(), FriendshipEventCommand.FRIEND_REQUEST_APPROVER,
+                approverFriendRequestPack, req.getAppId(), req.getClientType(), req.getImei());
         return ResponseVO.successResponse();
     }
 
@@ -130,6 +146,12 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         ImFriendShipRequestEntity update = new ImFriendShipRequestEntity();
         update.setReadStatus(1);
         imFriendShipRequestMapper.update(update, query);
+
+        // TCP 通知
+        ReadAllFriendRequestPack readAllFriendRequestPack = new ReadAllFriendRequestPack();
+        readAllFriendRequestPack.setFromId(req.getFromId());
+        messageProducer.sendMsgToUser(req.getFromId(), FriendshipEventCommand.FRIEND_REQUEST_READ,
+                readAllFriendRequestPack, req.getAppId(), req.getClientType(), req.getImei());
 
         return ResponseVO.successResponse();
     }

@@ -4,9 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @author: Chackylee
- * @description:
- **/
+ * @author BanTanger 半糖
+ */
 @Data
 @NoArgsConstructor
 public class ClientInfo {

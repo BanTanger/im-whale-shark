@@ -3,6 +3,7 @@ package com.bantanger.im.domain.friendship.service;
 import com.bantanger.im.domain.friendship.model.req.*;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.model.RequestBase;
+import com.bantanger.im.domain.friendship.model.req.friend.*;
 
 /**
  * @author BanTanger 半糖

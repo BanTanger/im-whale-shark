@@ -1,6 +1,7 @@
 package com.bantanger.im.domain.friendship.controller;
 
 import com.bantanger.im.domain.friendship.model.req.*;
+import com.bantanger.im.domain.friendship.model.req.friend.*;
 import com.bantanger.im.domain.friendship.service.ImFriendService;
 import com.bantanger.im.common.ResponseVO;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +17,7 @@ public class ImFriendShipController {
     ImFriendService imFriendShipService;
 
     /**
+     * importFriendShip
      * http://localhost:8000/v1/friendship/importFriendShip?appId=10001
      * @param req
      * {

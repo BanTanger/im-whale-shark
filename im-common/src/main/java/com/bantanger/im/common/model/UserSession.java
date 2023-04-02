@@ -32,4 +32,6 @@ public class UserSession {
 
     private String brokerHost;
 
+    private String imei;
+
 }

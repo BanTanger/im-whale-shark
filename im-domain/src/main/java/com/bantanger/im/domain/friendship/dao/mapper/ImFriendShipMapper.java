@@ -1,11 +1,10 @@
 package com.bantanger.im.domain.friendship.dao.mapper;
 
 import com.bantanger.im.domain.friendship.dao.ImFriendShipEntity;
-import com.bantanger.im.domain.friendship.model.req.CheckFriendShipReq;
+import com.bantanger.im.domain.friendship.model.req.friend.CheckFriendShipReq;
 import com.bantanger.im.domain.friendship.model.resp.CheckFriendShipResp;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 

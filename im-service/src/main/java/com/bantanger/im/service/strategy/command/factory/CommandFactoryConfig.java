@@ -1,10 +1,10 @@
 package com.bantanger.im.service.strategy.command.factory;
 
-import com.bantanger.im.common.enums.Command;
+import com.bantanger.im.common.enums.command.SystemCommand;
+import com.bantanger.im.service.strategy.command.system.PingCommand;
 import com.bantanger.im.service.strategy.command.CommandStrategy;
-import com.bantanger.im.service.strategy.command.impl.LoginCommand;
-import com.bantanger.im.service.strategy.command.impl.LogoutCommand;
-import com.bantanger.im.service.strategy.command.impl.PingCommand;
+import com.bantanger.im.service.strategy.command.system.LoginCommand;
+import com.bantanger.im.service.strategy.command.system.LogoutCommand;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,9 +21,9 @@ public class CommandFactoryConfig {
     protected static Map<Integer, CommandStrategy> commandStrategyMap = new ConcurrentHashMap<>();
 
     public static void init() {
-        commandStrategyMap.put(Command.LOGIN.getCode(), new LoginCommand());
-        commandStrategyMap.put(Command.LOGOUT.getCode(), new LogoutCommand());
-        commandStrategyMap.put(Command.PING.getCode(), new PingCommand());
+        commandStrategyMap.put(SystemCommand.LOGIN.getCommand(), new LoginCommand());
+        commandStrategyMap.put(SystemCommand.LOGOUT.getCommand(), new LogoutCommand());
+        commandStrategyMap.put(SystemCommand.PING.getCommand(), new PingCommand());
     }
 
 }

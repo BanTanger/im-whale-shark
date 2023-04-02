@@ -4,22 +4,66 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b7e0d6ee-1aec-4bc7-8da2-cb381ddaba4a" name="Changes" comment="feat: 用户关系模块导入 #15&#10;具体为：用户信息模块、好友模块、群组模块">
-      <change afterPath="$PROJECT_DIR$/.github/ISSUE_TEMPLATE/bug_report.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.github/ISSUE_TEMPLATE/feature.md" afterDir="false" />
+    <list default="true" id="b7e0d6ee-1aec-4bc7-8da2-cb381ddaba4a" name="Changes" comment="feat: TCP 服务层处理逻辑层投递的 MQ 消息 #13">
+      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/utils/Base64URL.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/utils/SigAPI.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/error/GateWayErrorCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/interceptor/GateWayInterceptor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/interceptor/IdentityCheck.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/test/java/SigApiTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/proto/MessagePack.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/proto/MessagePack.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/comstant/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/comstant/Constants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/controller/ImGroupMemberController.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/controller/ImGroupMemberController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupMemberServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupMemberServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/utils/GroupMessageProducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/GroupMessageProducer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/service/impl/ImUserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/service/impl/ImUserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/py_test/test_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/test/python/RouteTest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/config/AppConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/config/AppConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/config/WebConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/config/WebConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/CommandStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/CommandStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LoginCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/system/LoginCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/LogoutCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/system/LogoutCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/impl/PingCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/system/PingCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/login/factory/LoginStatusFactoryConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/login/factory/LoginStatusFactoryConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/test/java/com/bantanger/im/tcp/handler/heartBeat.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/test/python/heartBeat.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/test/java/com/bantanger/im/tcp/handler/login.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/test/python/login.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/test/java/com/bantanger/im/tcp/handler/loginLongTime.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/test/python/loginLongTime.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/test/java/com/bantanger/im/tcp/handler/privateSend.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/test/python/privateSend.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
+        <option value="JUnit5 Test Class" />
+        <option value="Python Script" />
         <option value="Interface" />
         <option value="Class" />
       </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
     </option>
   </component>
   <component name="Git.Settings">
@@ -33,7 +77,7 @@
     <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitRewordedCommitMessages">
-    <option name="onto" value="5820c217a0dd6080b0d3a2535fc54d0b665afe8a" />
+    <option name="onto" value="afe72ed2767ed1c70a1f3083a4097b3dc5ab3a22" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -68,14 +112,21 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="DatabaseDriversLRU" value="mysql" />
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/test" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.1359375" />
-    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="project.structure.side.proportion" value="0.22986425" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="ReactorSettings">
@@ -87,19 +138,41 @@
       <recent name="com.bantanger.im.tcp.handler" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\JavaProjectManager\whale-shark\im-codec\src\main\java\com\bantanger\im\codec" />
+      <recent name="E:\JavaProjectManager\whale-shark\im-codec\src\main\java\com\bantanger\im\codec\pack" />
       <recent name="E:\JavaProjectManager\whale-shark\test" />
       <recent name="E:\JavaProjectManager\whale-shark\im-tcp\src\main\resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\JavaProjectManager\whale-shark\im-domain\src\test\python" />
+      <recent name="E:\JavaProjectManager\whale-shark\im-domain\src\test" />
+      <recent name="E:\JavaProjectManager\whale-shark\im-domain\src" />
+      <recent name="E:\JavaProjectManager\whale-shark\im-domain" />
       <recent name="E:\JavaProjectManager\whale-shark" />
-      <recent name="E:\JavaProjectManager\im-system-gateway" />
-      <recent name="E:\JavaProjectManager\im-system-gateway\im-service\src\main\java\com\bantanger\im\service" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="com.bantanger.im.tcp.handler" />
+      <recent name="com.bantanger.im.domain.user.controller" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="com.bantanger.im.service.strategy.login.impl" />
+      <recent name="com.bantanger.im.common.enums.error" />
+      <recent name="com.bantanger.im.service.strategy.command.group" />
+      <recent name="com.bantanger.im.codec.utils" />
+      <recent name="com.bantanger.im.common.enums.command" />
+      <recent name="com.bantanger.im.codec.pack.user" />
     </key>
   </component>
-  <component name="RunManager" selected="Spring Boot.Application">
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="JUnit.SigApiTest.test_sigApi">
     <configuration name="Starter" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.bantanger.im.tcp.Starter" />
       <module name="im-tcp" />
@@ -122,9 +195,64 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="SigApiTest.test_sigApi" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="im-domain" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="SigApiTest" />
+      <option name="METHOD_NAME" value="test_sigApi" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_route (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="im-domain" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/im-domain/src/py_test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/im-domain/src/py_test/test_route.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="test_route" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="im-domain" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/im-domain/src/test/java/com/bantanger/im/domain/user/controller" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/im-domain/src/test/java/com/bantanger/im/domain/user/controller/test_route.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="im-domain" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.bantanger.im.domain.Application" />
+      <option name="ALTERNATIVE_JRE_PATH" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -132,14 +260,17 @@
     <list>
       <item itemvalue="Application.Starter2" />
       <item itemvalue="Application.Starter" />
+      <item itemvalue="Python.test_route" />
+      <item itemvalue="Python.test_route (1)" />
       <item itemvalue="Spring Boot.Application" />
+      <item itemvalue="JUnit.SigApiTest.test_sigApi" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.SigApiTest.test_sigApi" />
         <item itemvalue="Application.Starter" />
-        <item itemvalue="Application.Starter" />
-        <item itemvalue="Application.Starter" />
-        <item itemvalue="Application.Starter" />
+        <item itemvalue="Python.test_route (1)" />
+        <item itemvalue="Python.test_route" />
         <item itemvalue="Application.Starter" />
       </list>
     </recent_temporary>
@@ -156,6 +287,8 @@
       <workItem from="1679675273836" duration="12670000" />
       <workItem from="1679717581118" duration="2930000" />
       <workItem from="1679725532442" duration="16630000" />
+      <workItem from="1680179499700" duration="14548000" />
+      <workItem from="1680334824202" duration="36418000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 采用策略模式重构命令执行逻辑">
       <created>1679715761283</created>
@@ -185,7 +318,63 @@
       <option name="project" value="LOCAL" />
       <updated>1679810863019</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="feat: 添加 issue 描述模板">
+      <created>1680021257941</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1680021257941</updated>
+    </task>
+    <task id="LOCAL-00006" summary="feat: 新增轮询、随机、一致性哈希三种方式实现长连接负载均衡策略 #11">
+      <created>1680104781510</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1680104781510</updated>
+    </task>
+    <task id="LOCAL-00007" summary="feat: 将配置文件的使用策略集成到配置文件中，解耦服务端职责 #11">
+      <created>1680159686240</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1680159686240</updated>
+    </task>
+    <task id="LOCAL-00008" summary="feat: 扩展回调机制，分别处理事件执行之前和之后，并细粒度化回调机制的场景，用户可在配置文件中进行开启或关闭 #12">
+      <created>1680185510478</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1680185510478</updated>
+    </task>
+    <task id="LOCAL-00009" summary="feat: 增添用户消息发送功能，为后面 TCP 通知完成多端数据同步做准备 #13">
+      <created>1680339237991</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1680339237991</updated>
+    </task>
+    <task id="LOCAL-00010" summary="feat: 增添用户消息发送功能，为后面 TCP 通知完成多端数据同步做准备 #13">
+      <created>1680341122830</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1680341122830</updated>
+    </task>
+    <task id="LOCAL-00011" summary="feat: 增添 TCP 通知, 用于解决多端消息不一致的问题 #13">
+      <created>1680402906352</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1680402906352</updated>
+    </task>
+    <task id="LOCAL-00012" summary="feat: TCP 服务层处理逻辑层投递的 MQ 消息 #13">
+      <created>1680413461237</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1680413461238</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -224,15 +413,27 @@
     <MESSAGE value="feat: Zookeeper 实现 TCP 网关服务注册中心的对接" />
     <MESSAGE value="Revert &quot;fix: 修复用户登出逻辑错误。重构user和channel的双向绑定关系，提升程序健壮性, #2&quot;&#10;&#10;This reverts commit 5820c217a0dd6080b0d3a2535fc54d0b665afe8a." />
     <MESSAGE value="feat: 用户关系模块导入 #15&#10;具体为：用户信息模块、好友模块、群组模块" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: 用户关系模块导入 #15&#10;具体为：用户信息模块、好友模块、群组模块" />
+    <MESSAGE value="feat: 添加 issue 描述模板" />
+    <MESSAGE value="feat: 新增轮询、随机、一致性哈希三种方式实现长连接负载均衡策略 #11&#10;py 测试一致性哈希存在明显分配不均的问题" />
+    <MESSAGE value="feat: 将配置文件的使用策略集成到配置文件中，解耦服务端职责 #11" />
+    <MESSAGE value="feat: 扩展回调机制，分别处理事件执行之前和之后，并细粒度化回调机制的场景，用户可在配置文件中进行开启或关闭 #12" />
+    <MESSAGE value="feat: 增添用户消息发送功能，为后面 TCP 通知完成多端数据同步做准备 #13" />
+    <MESSAGE value="feat: 增添 TCP 通知, 用于解决多端消息不一致的问题 #13" />
+    <MESSAGE value="feat: TCP 服务层处理逻辑层投递的 MQ 消息 #13" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: TCP 服务层处理逻辑层投递的 MQ 消息 #13" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/rabbitmq/listener/UserLoginMessageListener.java</url>
-          <line>39</line>
-          <option name="timeStamp" value="23" />
+          <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/route/algroithm/hash/AbstractConsistentHash.java</url>
+          <line>32</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/UserChannelRepository.java</url>
+          <line>197</line>
+          <option name="timeStamp" value="31" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -240,5 +441,8 @@
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
     <select />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/whale_shark$test_route__1_.coverage" NAME="test_route (1) Coverage Results" MODIFIED="1680101927939" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/im-domain/src/py_test" />
   </component>
 </project>

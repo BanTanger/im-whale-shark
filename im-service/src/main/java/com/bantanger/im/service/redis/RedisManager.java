@@ -5,6 +5,7 @@ import com.bantanger.im.service.rabbitmq.listener.UserLoginMessageListener;
 import org.redisson.api.RedissonClient;
 
 /**
+ * Redisson 客户端管理类
  * @author BanTanger 半糖
  * @Date 2023/3/24 22:07
  */

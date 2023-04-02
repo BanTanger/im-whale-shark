@@ -4,7 +4,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.bantanger.im.service", "com.bantanger.im.domain"})
 @MapperScan("com.bantanger.im.domain.*.dao.mapper")
 public class Application {
 

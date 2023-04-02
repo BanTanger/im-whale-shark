@@ -3,8 +3,8 @@ package com.bantanger.im.common.enums.group;
 import com.bantanger.im.common.exception.ApplicationExceptionEnum;
 
 /**
- * @author: Chackylee
- * @description:
+ * @author BanTanger 半糖
+ * @Date 2023/4/1 17:54
  **/
 public enum GroupErrorCode implements ApplicationExceptionEnum {
 

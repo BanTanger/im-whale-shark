@@ -2,10 +2,10 @@ package com.bantanger.im.service.strategy.login.factory;
 
 import com.bantanger.im.common.enums.DeviceMultiLoginEnum;
 import com.bantanger.im.service.strategy.login.LoginStatus;
-import com.bantanger.im.service.strategy.login.impl.AllClientLoginStatus;
 import com.bantanger.im.service.strategy.login.impl.OneClientLoginStatus;
 import com.bantanger.im.service.strategy.login.impl.ThreeClientLoginStatus;
 import com.bantanger.im.service.strategy.login.impl.TwoClientLoginStatus;
+import com.bantanger.im.service.strategy.login.impl.AllClientLoginStatus;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

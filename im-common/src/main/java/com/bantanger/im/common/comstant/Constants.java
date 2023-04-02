@@ -25,15 +25,21 @@ public class Constants {
         public static final String ReadTime = "readTime";
 
         /**
-         * imei 号，标识用户登录设备号
+         * channel 绑定的 imei 号，标识用户登录设备号
          */
         public static final String imei = "imei";
 
-        public static final String UserChannelKey = AppId + ":" + UserId + ":" + ClientType + ":" + imei;
-
+        /**
+         * channel 绑定的 clientType 和 imei Key
+         */
+        public static final String ClientImei = "clientImei";
     }
 
     public static class RedisConstants {
+        /**
+         * UserSign，格式：appId:UserSign:
+         */
+        public static final String UserSign = ":UserSign:";
         /**
          * 用户登录端消息通道信息
          */
@@ -74,6 +80,44 @@ public class Constants {
         public static final String ImCoreZkRootTcp = "/tcp";
 
         public static final String ImCoreZkRootWeb = "/web";
+    }
+
+    public static class CallbackCommand{
+
+        public static final String ModifyUserAfter = "user.modify.after";
+
+        public static final String CreateGroupAfter = "group.create.after";
+
+        public static final String UpdateGroupAfter = "group.update.after";
+
+        public static final String DestoryGroupAfter = "group.destory.after";
+
+        public static final String TransferGroupAfter = "group.transfer.after";
+
+        public static final String GroupMemberAddBefore = "group.member.add.before";
+
+        public static final String GroupMemberAddAfter = "group.member.add.after";
+
+        public static final String GroupMemberDeleteAfter = "group.member.delete.after";
+
+        public static final String AddFriendBefore = "friend.add.before";
+
+        public static final String AddFriendAfter = "friend.add.after";
+
+        public static final String UpdateFriendBefore = "friend.update.before";
+
+        public static final String UpdateFriendAfter = "friend.update.after";
+
+        public static final String DeleteFriendAfter = "friend.delete.after";
+
+        public static final String AddBlackAfter = "black.add.after";
+
+        public static final String DeleteBlack = "black.delete";
+
+        public static final String SendMessageAfter = "message.send.after";
+
+        public static final String SendMessageBefore = "message.send.before";
+
     }
 
 }

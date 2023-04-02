@@ -26,7 +26,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
         Integer command = parseCommand(msg);
         CommandFactory commandFactory = new CommandFactory();
         CommandStrategy commandStrategy = commandFactory.getCommandStrategy(command);
-        commandStrategy.doStrategy(ctx, msg, brokerId);
+        commandStrategy.systemStrategy(ctx, msg, brokerId);
     }
 
     protected Integer parseCommand(Message msg) {

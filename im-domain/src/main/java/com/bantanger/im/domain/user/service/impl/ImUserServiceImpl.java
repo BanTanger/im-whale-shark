@@ -1,25 +1,29 @@
 package com.bantanger.im.domain.user.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.bantanger.im.codec.pack.user.UserModifyPack;
+import com.bantanger.im.common.comstant.Constants;
+import com.bantanger.im.common.enums.command.UserEventCommand;
 import com.bantanger.im.domain.group.service.ImGroupService;
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.domain.user.dao.mapper.ImUserDataMapper;
-import com.bantanger.im.domain.user.model.req.DeleteUserReq;
-import com.bantanger.im.domain.user.model.req.GetUserInfoReq;
-import com.bantanger.im.domain.user.model.req.ImportUserReq;
-import com.bantanger.im.domain.user.model.req.ModifyUserInfoReq;
+import com.bantanger.im.domain.user.model.req.*;
 import com.bantanger.im.domain.user.model.resp.GetUserInfoResp;
 import com.bantanger.im.domain.user.model.resp.ImportUserResp;
 import com.bantanger.im.domain.user.service.ImUserService;
+import com.bantanger.im.service.callback.CallbackService;
+import com.bantanger.im.service.config.AppConfig;
+import com.bantanger.im.service.sendmsg.MessageProducer;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.friend.DelFlagEnum;
 import com.bantanger.im.common.enums.user.UserErrorCode;
 import com.bantanger.im.common.exception.ApplicationException;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,11 +36,20 @@ import java.util.Map;
 @Service
 public class ImUserServiceImpl implements ImUserService {
 
-    @Autowired
+    @Resource
     ImUserDataMapper imUserDataMapper;
 
-    @Autowired
+    @Resource
     ImGroupService imGroupService;
+
+    @Resource
+    AppConfig appConfig;
+
+    @Resource
+    CallbackService callbackService;
+
+    @Resource
+    MessageProducer messageProducer;
 
     @Override
     public ResponseVO importUser(ImportUserReq req) {
@@ -159,13 +172,32 @@ public class ImUserServiceImpl implements ImUserService {
         ImUserDataEntity update = new ImUserDataEntity();
         BeanUtils.copyProperties(req, update);
 
+        // TODO ?
         update.setAppId(null);
         update.setUserId(null);
         int update1 = imUserDataMapper.update(update, query);
         if (update1 == 1) {
+            // 在回调开始前，先发送 TCP 通知，保证数据同步
+            UserModifyPack pack = new UserModifyPack();
+            BeanUtils.copyProperties(req, pack);
+            messageProducer.sendMsgToUser(req.getUserId(), UserEventCommand.USER_MODIFY,
+                    pack, req.getAppId(), req.getClientType(), req.getImei());
+
+            // 若修改成功且开启修改用户信息的业务回调，则发起回调
+            if (appConfig.isModifyUserAfterCallback()) {
+                callbackService.afterCallback(req.getAppId(),
+                        Constants.CallbackCommand.ModifyUserAfter,
+                        JSONObject.toJSONString(req));
+            }
             return ResponseVO.successResponse();
         }
         throw new ApplicationException(UserErrorCode.MODIFY_USER_ERROR);
+    }
+
+    @Override
+    public ResponseVO login(LoginReq req) {
+        // TODO 后期补充鉴权
+        return ResponseVO.successResponse();
     }
 
 }

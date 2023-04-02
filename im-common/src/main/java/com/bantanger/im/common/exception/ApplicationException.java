@@ -1,8 +1,8 @@
 package com.bantanger.im.common.exception;
 
 /**
- * @author: Chackylee
- * @description:
+ * @author BanTanger 半糖
+ * @Date 2023/4/1 17:54
  **/
 public class ApplicationException extends RuntimeException {
 
