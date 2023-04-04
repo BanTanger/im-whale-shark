@@ -1,6 +1,6 @@
 package com.bantanger.im.service.utils;
 
-import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.common.comstant.Constants;
 import com.bantanger.im.common.enums.ConnectState;
 import com.bantanger.im.common.model.UserClientDto;

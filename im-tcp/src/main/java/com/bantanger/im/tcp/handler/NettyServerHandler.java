@@ -1,6 +1,7 @@
 package com.bantanger.im.tcp.handler;
 
 import com.bantanger.im.codec.proto.Message;
+import com.bantanger.im.service.rabbitmq.publish.MqMessageProducer;
 import com.bantanger.im.service.strategy.command.CommandStrategy;
 import com.bantanger.im.service.strategy.command.factory.CommandFactory;
 import com.bantanger.im.service.utils.UserChannelRepository;
@@ -26,7 +27,11 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
         Integer command = parseCommand(msg);
         CommandFactory commandFactory = new CommandFactory();
         CommandStrategy commandStrategy = commandFactory.getCommandStrategy(command);
-        commandStrategy.systemStrategy(ctx, msg, brokerId);
+        if (commandStrategy != null) {
+            commandStrategy.systemStrategy(ctx, msg, brokerId);
+        } else {
+            MqMessageProducer.sendMessage(msg, command);
+        }
     }
 
     protected Integer parseCommand(Message msg) {

@@ -15,6 +15,8 @@ public enum FriendShipErrorCode implements ApplicationExceptionEnum {
 
     FRIEND_IS_DELETED(30004,"好友已被删除"),
 
+    FRIEND_IS_DELETED_YOU(30005,"你已被对方删除"),
+
     FRIEND_IS_BLACK(30006,"好友已被拉黑"),
 
     TARGET_IS_BLACK_YOU(30007,"对方把你拉黑"),
@@ -50,6 +52,7 @@ public enum FriendShipErrorCode implements ApplicationExceptionEnum {
         return this.code;
     }
 
+    @Override
     public String getError() {
         return this.error;
     }

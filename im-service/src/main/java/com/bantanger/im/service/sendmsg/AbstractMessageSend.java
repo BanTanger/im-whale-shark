@@ -53,6 +53,7 @@ public abstract class AbstractMessageSend implements MessageSend {
         // 行为埋点
         try {
             log.info("send message {} ", msg);
+            // MQ 发送消息
             rabbitTemplate.convertAndSend(queueName, session.getBrokerId() + "", msg);
             return true;
         } catch (AmqpException e) {

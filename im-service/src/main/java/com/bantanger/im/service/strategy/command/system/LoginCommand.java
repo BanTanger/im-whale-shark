@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RMap;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
+import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -26,7 +27,6 @@ import java.net.UnknownHostException;
  * @author BanTanger 半糖
  * @Date 2023/3/25 9:52
  */
-@Slf4j
 public class LoginCommand extends BaseCommandStrategy {
 
     @Override

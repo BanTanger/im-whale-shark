@@ -4,6 +4,7 @@ import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
 import com.bantanger.im.service.utils.UserChannelRepository;
 import io.netty.channel.ChannelHandlerContext;
+import org.springframework.stereotype.Component;
 
 /**
  * 用户登出逻辑
