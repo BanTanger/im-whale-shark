@@ -10,7 +10,7 @@ public enum GroupMemberRoleEnum {
     /**
      * 管理员
      */
-    MAMAGER(1),
+    MANAGER(1),
 
     /**
      * 群主
@@ -24,7 +24,7 @@ public enum GroupMemberRoleEnum {
     ;
 
 
-    private int code;
+    private Integer code;
 
     /**
      * 不能用 默认的 enumType b= enumType.values()[i]; 因为本枚举是类形式封装
@@ -44,7 +44,7 @@ public enum GroupMemberRoleEnum {
         this.code=code;
     }
 
-    public int getCode() {
+    public Integer getCode() {
         return code;
     }
 }
