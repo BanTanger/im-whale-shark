@@ -15,7 +15,7 @@ s.connect(("127.0.0.1",9001))
 
 
 ## 基础数据
-command = 0x2328
+command = 9005
 print(command)
 version = 1
 clientType = 4

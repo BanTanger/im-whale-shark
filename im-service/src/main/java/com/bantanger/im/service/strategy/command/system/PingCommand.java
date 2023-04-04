@@ -5,6 +5,7 @@ import com.bantanger.im.common.comstant.Constants;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
+import org.springframework.stereotype.Component;
 
 /**
  * 心跳检测

@@ -22,6 +22,11 @@ public enum SystemCommand implements Command {
      */
     MUTALOGIN(0x232a),
 
+    /**
+     * 消息发送 9005 --> 0x232d
+     */
+    SENDMSG(0x232d)
+
     ;
 
     private Integer command;

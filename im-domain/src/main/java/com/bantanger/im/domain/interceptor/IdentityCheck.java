@@ -35,7 +35,7 @@ public class IdentityCheck {
     StringRedisTemplate stringRedisTemplate;
 
     public ApplicationExceptionEnum checkUserSig(String identifier, String appId, String userSig) {
-        // 10001:userSign:
+        // 10001:userSign:bantangereJyrVgrxCdZLrSjILEpVsjI0gAIdsHBiQYFnCkTUUAdJYUhmLkixmYWBiYm5sSVULjMlNa8kMy0ztUjJSikpMa8kMS8dyIZIFmemA0XziiJzQs0tvVLK-IPLjE1K9XOTMs3KyiL9w0qTwkMCsg1CLI2Kg-wiqyIibZVqAQHCL7I_
         String cacheUserSig = stringRedisTemplate.opsForValue().get(
                 appId + Constants.RedisConstants.UserSign + identifier + userSig);
         if (!StringUtils.isBlank(cacheUserSig) &&
@@ -95,9 +95,7 @@ public class IdentityCheck {
             String key = appId + Constants.RedisConstants.UserSign + identifier + userSig;
 
             Long etime = expireTime - System.currentTimeMillis() / 1000;
-            stringRedisTemplate.opsForValue().set(
-                    key, expireTime.toString(), etime, TimeUnit.SECONDS
-            );
+            stringRedisTemplate.opsForValue().set(key, expireTime.toString(), etime, TimeUnit.SECONDS);
             return BaseErrorCode.SUCCESS;
         }
 

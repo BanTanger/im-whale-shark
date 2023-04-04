@@ -24,6 +24,7 @@ public enum BaseErrorCode implements ApplicationExceptionEnum {
         return this.code;
     }
 
+    @Override
     public String getError() {
         return this.error;
     }
