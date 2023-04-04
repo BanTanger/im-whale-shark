@@ -342,7 +342,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 Integer roleInfo = data.getRole();
 
                 boolean isOwner = roleInfo == GroupMemberRoleEnum.OWNER.getCode();
-                boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode();
+                boolean isManager = roleInfo == GroupMemberRoleEnum.MANAGER.getCode();
 
                 // 既不是群主也不是管理员
                 if (!isOwner && !isManager) {
@@ -439,7 +439,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             if (req.getRole() != null) {
                 // 私有群不能设置管理员
                 if (groupData.getGroupType() == GroupTypeEnum.PRIVATE.getCode() &&
-                        req.getRole() != null && (req.getRole() == GroupMemberRoleEnum.MAMAGER.getCode() ||
+                        req.getRole() != null && (req.getRole() == GroupMemberRoleEnum.MANAGER.getCode() ||
                         req.getRole() == GroupMemberRoleEnum.OWNER.getCode())) {
                     return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_APPMANAGER_ROLE);
                 }
@@ -459,7 +459,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 GetRoleInGroupResp data = operateRoleInGroupOne.getData();
                 Integer roleInfo = data.getRole();
                 boolean isOwner = roleInfo == GroupMemberRoleEnum.OWNER.getCode();
-                boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode();
+                boolean isManager = roleInfo == GroupMemberRoleEnum.MANAGER.getCode();
 
                 // 不是管理员不能修改权限
                 if (req.getRole() != null && !isOwner && !isManager) {
@@ -467,7 +467,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 }
 
                 // 管理员只有群主能够设置
-                if (req.getRole() != null && req.getRole() == GroupMemberRoleEnum.MAMAGER.getCode() && !isOwner) {
+                if (req.getRole() != null && req.getRole() == GroupMemberRoleEnum.MANAGER.getCode() && !isOwner) {
                     return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
                 }
 
@@ -548,7 +548,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             Integer roleInfo = data.getRole();
 
             isOwner = roleInfo == GroupMemberRoleEnum.OWNER.getCode();
-            isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode();
+            isManager = roleInfo == GroupMemberRoleEnum.MANAGER.getCode();
 
             if (!isOwner && !isManager) {
                 throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);

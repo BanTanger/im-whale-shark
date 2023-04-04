@@ -11,8 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 /**
+ * WebSocket 解码器
+ *
  * @author BanTanger 半糖
- * @version: 1.0
+ * @Date 2023/4/1 13:30
  */
 @Slf4j
 public class WebSocketMessageDecoderHandler extends MessageToMessageDecoder<BinaryWebSocketFrame> {
@@ -24,7 +26,7 @@ public class WebSocketMessageDecoderHandler extends MessageToMessageDecoder<Bina
             return;
         }
         Message message = ByteBufToMessageUtils.transition(content);
-        if(message == null){
+        if (message == null) {
             return;
         }
         out.add(message);

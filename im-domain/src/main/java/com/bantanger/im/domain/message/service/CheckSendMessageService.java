@@ -4,11 +4,18 @@ import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.error.MessageErrorCode;
 import com.bantanger.im.common.enums.friend.FriendShipErrorCode;
 import com.bantanger.im.common.enums.friend.FriendShipStatusEnum;
+import com.bantanger.im.common.enums.group.GroupErrorCode;
+import com.bantanger.im.common.enums.group.GroupMemberRoleEnum;
+import com.bantanger.im.common.enums.group.GroupMuteTypeEnum;
 import com.bantanger.im.common.enums.user.UserForbiddenFlagEnum;
 import com.bantanger.im.common.enums.user.UserSilentFlagEnum;
 import com.bantanger.im.domain.friendship.dao.ImFriendShipEntity;
 import com.bantanger.im.domain.friendship.model.req.GetRelationReq;
 import com.bantanger.im.domain.friendship.service.ImFriendService;
+import com.bantanger.im.domain.group.dao.ImGroupEntity;
+import com.bantanger.im.domain.group.model.resp.GetRoleInGroupResp;
+import com.bantanger.im.domain.group.service.ImGroupMemberService;
+import com.bantanger.im.domain.group.service.ImGroupService;
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.domain.user.service.ImUserService;
 import com.bantanger.im.service.config.AppConfig;
@@ -21,7 +28,7 @@ import javax.annotation.Resource;
  * @Date 2023/4/4 9:31
  */
 @Service
-public class CheckSendMessageService {
+public class CheckSendMessageService implements CheckSendMessage {
 
     @Resource
     ImUserService userService;
@@ -30,15 +37,15 @@ public class CheckSendMessageService {
     ImFriendService friendService;
 
     @Resource
+    ImGroupService groupService;
+
+    @Resource
+    ImGroupMemberService groupMemberService;
+
+    @Resource
     AppConfig appConfig;
 
-    /**
-     * 检查发送人是否被禁言或者是禁用
-     *
-     * @param fromId
-     * @param appId
-     * @return
-     */
+    @Override
     public ResponseVO checkSenderForbidAndMute(String fromId, Integer appId) {
         // 查询用户是否存在
         ResponseVO<ImUserDataEntity> singleUserInfo = userService.getSingleUserInfo(fromId, appId);
@@ -57,13 +64,7 @@ public class CheckSendMessageService {
         return ResponseVO.successResponse();
     }
 
-    /**
-     * 检查好友关系链
-     * @param fromId 己方
-     * @param toId 对方
-     * @param appId 平台 SDK
-     * @return
-     */
+    @Override
     public ResponseVO checkFriendShip(String fromId, String toId, Integer appId) {
 
         if (appConfig.isSendMessageCheckFriend()) {
@@ -105,6 +106,48 @@ public class CheckSendMessageService {
                 }
             }
         }
+        return ResponseVO.successResponse();
+    }
+
+    @Override
+    public ResponseVO checkGroupMessage(String fromId, String groupId, Integer appId) {
+
+        // 校验发送方是否被禁言或封禁
+        ResponseVO responseVO = checkSenderForbidAndMute(fromId, appId);
+        if (!responseVO.isOk()) {
+            return responseVO;
+        }
+
+        // 数据库查询是否有该群
+        ResponseVO<ImGroupEntity> group = groupService.getGroup(groupId, appId);
+        if (!group.isOk()) {
+            return group;
+        }
+
+        // 查询该成员是否在群，在群里为什么角色
+        ResponseVO<GetRoleInGroupResp> roleInGroupOne = groupMemberService.getRoleInGroupOne(groupId, fromId, appId);
+        if (!roleInGroupOne.isOk()) {
+            return roleInGroupOne;
+        }
+        GetRoleInGroupResp data = roleInGroupOne.getData();
+
+        // 查询群内是否禁言
+        // 如果禁言，只有群主和管理员才有权说话
+        ImGroupEntity groupData = group.getData();
+        boolean isGroupMute = GroupMuteTypeEnum.MUTE.getCode().equals(groupData.getMute());
+        boolean isManager = GroupMemberRoleEnum.MANAGER.getCode().equals(data.getRole());
+        boolean isOwner = GroupMemberRoleEnum.OWNER.getCode().equals(data.getRole());
+        if (isGroupMute) {
+            if (!(isManager || isOwner)) {
+                return ResponseVO.errorResponse(GroupErrorCode.THIS_GROUP_IS_MUTE);
+            }
+        }
+
+        // 禁言过期时间大于当前时间
+        if (data.getSpeakDate() != null && data.getSpeakDate() > System.currentTimeMillis()) {
+            return ResponseVO.errorResponse(GroupErrorCode.GROUP_MEMBER_IS_SPEAK);
+        }
+
         return ResponseVO.successResponse();
     }
 
