@@ -11,6 +11,8 @@
 
     <artifactId>im-codec</artifactId>
     <dependencies>
+        <!-- 业务层 -->
+        <!-- im-common -->
         <dependency>
             <groupId>com.bantanger</groupId>
             <artifactId>im-common</artifactId>

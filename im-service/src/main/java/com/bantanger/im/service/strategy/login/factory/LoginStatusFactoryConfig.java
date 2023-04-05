@@ -1,6 +1,6 @@
 package com.bantanger.im.service.strategy.login.factory;
 
-import com.bantanger.im.common.enums.DeviceMultiLoginEnum;
+import com.bantanger.im.common.enums.device.DeviceMultiLoginEnum;
 import com.bantanger.im.service.strategy.login.LoginStatus;
 import com.bantanger.im.service.strategy.login.impl.OneClientLoginStatus;
 import com.bantanger.im.service.strategy.login.impl.ThreeClientLoginStatus;

@@ -5,15 +5,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.bantanger.im.codec.pack.LoginPack;
 import com.bantanger.im.codec.proto.Message;
-import com.bantanger.im.common.comstant.Constants;
-import com.bantanger.im.common.enums.ConnectState;
+import com.bantanger.im.common.constant.Constants;
+import com.bantanger.im.common.enums.device.ConnectState;
 import com.bantanger.im.common.model.UserClientDto;
 import com.bantanger.im.common.model.UserSession;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
 import com.bantanger.im.service.redis.RedisManager;
+import com.bantanger.im.service.strategy.command.model.CommandExecutionRequest;
 import com.bantanger.im.service.utils.UserChannelRepository;
 import io.netty.channel.ChannelHandlerContext;
-import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RMap;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
@@ -26,11 +26,14 @@ import java.net.UnknownHostException;
  * @author BanTanger 半糖
  * @Date 2023/3/25 9:52
  */
-@Slf4j
 public class LoginCommand extends BaseCommandStrategy {
 
     @Override
-    public void systemStrategy(ChannelHandlerContext ctx, Message msg, Integer brokeId) {
+    public void systemStrategy(CommandExecutionRequest commandExecutionRequest) {
+        ChannelHandlerContext ctx = commandExecutionRequest.getCtx();
+        Message msg = commandExecutionRequest.getMsg();
+        Integer brokeId = commandExecutionRequest.getBrokeId();
+
         // 解析 msg
         LoginPack loginPack = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()),
                 new TypeReference<LoginPack>() {

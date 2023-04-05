@@ -29,7 +29,7 @@ public class ImUserDataEntity {
     private String photo;
 
     // 性别
-    private Integer userSex;
+    private String userSex;
 
     // 个性签名
     private String selfSignature;

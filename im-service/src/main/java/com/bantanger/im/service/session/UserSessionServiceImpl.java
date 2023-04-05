@@ -1,8 +1,8 @@
 package com.bantanger.im.service.session;
 
 import com.alibaba.fastjson.JSONObject;
-import com.bantanger.im.common.comstant.Constants;
-import com.bantanger.im.common.enums.ConnectStatusEnum;
+import com.bantanger.im.common.constant.Constants;
+import com.bantanger.im.common.enums.device.ConnectStatusEnum;
 import com.bantanger.im.common.model.UserSession;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -38,7 +38,7 @@ public class UserSessionServiceImpl implements UserSessionService {
     @Override
     public UserSession getUserSession(Integer appId, String userId, Integer clientType, String imei) {
         String userSessionKey = appId + Constants.RedisConstants.UserSessionConstants + userId;
-        String hashKey = clientType + imei;
+        String hashKey = clientType + ":" + imei;
         // 通过 userSessionKey 获取用户的 Session map 集合，再通过 hashKey 键值寻找到指定的端 Session value 值
         Object value = stringRedisTemplate.opsForHash().get(userSessionKey, hashKey);
         assert value != null;

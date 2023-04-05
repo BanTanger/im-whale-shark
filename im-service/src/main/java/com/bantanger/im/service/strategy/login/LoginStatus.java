@@ -1,8 +1,8 @@
 package com.bantanger.im.service.strategy.login;
 
 import com.bantanger.im.codec.proto.MessagePack;
-import com.bantanger.im.common.comstant.Constants;
-import com.bantanger.im.common.enums.ClientType;
+import com.bantanger.im.common.constant.Constants;
+import com.bantanger.im.common.enums.device.ClientType;
 import com.bantanger.im.common.enums.command.SystemCommand;
 import com.bantanger.im.common.model.UserClientDto;
 import io.netty.channel.Channel;

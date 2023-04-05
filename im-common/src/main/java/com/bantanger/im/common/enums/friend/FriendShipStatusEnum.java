@@ -12,20 +12,20 @@ public enum FriendShipStatusEnum {
     FRIEND_STATUS_DELETE(2),
 
     /**
-     * 0未添加 1正常 2删除
+     * 0未添加 1正常 2拉黑
      */
     BLACK_STATUS_NORMAL(1),
 
     BLACK_STATUS_BLACKED(2),
     ;
 
-    private int code;
+    private Integer code;
 
     FriendShipStatusEnum(int code){
         this.code=code;
     }
 
-    public int getCode() {
+    public Integer getCode() {
         return code;
     }
 }

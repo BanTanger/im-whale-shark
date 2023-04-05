@@ -4,11 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.pack.group.AddGroupMemberPack;
 import com.bantanger.im.codec.pack.group.RemoveGroupMemberPack;
 import com.bantanger.im.codec.pack.group.UpdateGroupMemberPack;
-import com.bantanger.im.common.enums.ClientType;
+import com.bantanger.im.common.enums.device.ClientType;
 import com.bantanger.im.common.enums.command.Command;
 import com.bantanger.im.common.enums.command.GroupEventCommand;
 import com.bantanger.im.common.model.ClientInfo;
 import com.bantanger.im.domain.group.model.req.GroupMemberDto;
+import com.bantanger.im.domain.group.model.req.GroupMsgReq;
 import com.bantanger.im.domain.group.service.ImGroupMemberService;
 import com.bantanger.im.service.sendmsg.MessageProducer;
 import org.springframework.stereotype.Component;
@@ -39,87 +40,118 @@ public class GroupMessageProducer {
         // 获取所有群成员
         List<String> groupMemberId = groupMemberService.getGroupMemberId(groupId, clientInfo.getAppId());
 
+        GroupMsgReq groupMsgReq = GroupMsgReq.builder()
+                .userId(userId)
+                .command(command)
+                .data(data)
+                .clientInfo(clientInfo)
+                .groupMemberId(groupMemberId)
+                .o(o)
+                .groupId(groupId)
+                .build();
+
         if (GroupEventCommand.ADDED_MEMBER.equals(command)) {
-            addMemberMsg(userId, command, data, clientInfo, groupMemberId, o, groupId);
+            addMemberMsg(groupMsgReq);
         } else if (GroupEventCommand.DELETED_MEMBER.equals(command)) {
-            deleteMemberMsg(userId, command, data, clientInfo, groupMemberId, o, groupId);
+            deleteMemberMsg(groupMsgReq);
         } else if (GroupEventCommand.UPDATED_MEMBER.equals(command)) {
-            updateMemberMsg(userId, command, data, clientInfo, groupMemberId, o, groupId);
+            updateMemberMsg(groupMsgReq);
         } else {
-            DefaultMsg(userId, command, data, clientInfo, groupMemberId, o, groupId);
+            defaultMsg(groupMsgReq);
         }
     }
 
-    private void addMemberMsg(String userId, Command command, Object data, ClientInfo clientInfo,
-                              List<String> groupMemberId, JSONObject o, String groupId) {
+    private void addMemberMsg(GroupMsgReq groupMsgReq) {
         // TCP 通知发送给管理员和被加入人本身
-        AddGroupMemberPack addGroupMemberPack = o.toJavaObject(AddGroupMemberPack.class);
+        AddGroupMemberPack addGroupMemberPack = groupMsgReq.getO().toJavaObject(AddGroupMemberPack.class);
 
-        groupMemberService.getGroupManager(groupId, clientInfo.getAppId()).stream()
+        groupMemberService.getGroupManager(groupMsgReq.getGroupId(), groupMsgReq.getClientInfo().getAppId()).stream()
                 .filter(Objects::nonNull)
                 .forEach(groupMemberDto -> {
-                    if (ClientType.WEBAPI.getCode().equals(clientInfo.getClientType()) && groupMemberDto.getMemberId().equals(userId)) {
-                        messageProducer.sendToUserExceptClient(groupMemberDto.getMemberId(), command, data, clientInfo);
+                    if (ClientType.WEBAPI.getCode().equals(groupMsgReq.getClientInfo().getClientType())
+                            && groupMemberDto.getMemberId().equals(groupMsgReq.getUserId())) {
+                        messageProducer.sendToUserExceptClient(
+                                groupMemberDto.getMemberId(), groupMsgReq.getCommand(),
+                                groupMsgReq.getData(), groupMsgReq.getClientInfo());
                     } else {
-                        messageProducer.sendToUserAllClient(groupMemberDto.getMemberId(), command, data, clientInfo.getAppId());
+                        messageProducer.sendToUserAllClient(
+                                groupMemberDto.getMemberId(), groupMsgReq.getCommand(),
+                                groupMsgReq.getData(), groupMsgReq.getClientInfo().getAppId());
                     }
                 });
         addGroupMemberPack.getMembers().stream()
                 .filter(Objects::nonNull)
                 .forEach(member -> {
-                    if (ClientType.WEBAPI.getCode().equals(clientInfo.getClientType()) && userId.equals(member)) {
-                        messageProducer.sendToUserExceptClient(member, command, data, clientInfo);
+                    if (ClientType.WEBAPI.getCode().equals(groupMsgReq.getClientInfo().getClientType()) && groupMsgReq.getUserId().equals(member)) {
+                        messageProducer.sendToUserExceptClient(
+                                member, groupMsgReq.getCommand(),
+                                groupMsgReq.getData(), groupMsgReq.getClientInfo());
                     } else {
-                        messageProducer.sendToUserAllClient(member, command, data, clientInfo.getAppId());
+                        messageProducer.sendToUserAllClient(
+                                member, groupMsgReq.getCommand(),
+                                groupMsgReq.getData(), groupMsgReq.getClientInfo().getAppId());
                     }
                 });
     }
 
-    private void deleteMemberMsg(String userId, Command command, Object data, ClientInfo clientInfo,
-                                 List<String> groupMemberId, JSONObject o, String groupId) {
-        RemoveGroupMemberPack pack = o.toJavaObject(RemoveGroupMemberPack.class);
+    private void deleteMemberMsg(GroupMsgReq groupMsgReq) {
+        RemoveGroupMemberPack pack = groupMsgReq.getO().toJavaObject(RemoveGroupMemberPack.class);
         String memberId = pack.getMember();
         // 退出群聊用户需要加入群信息进行遍历
-        List<String> memberIds = groupMemberService.getGroupMemberId(groupId, clientInfo.getAppId());
+        List<String> memberIds = groupMemberService.getGroupMemberId(
+                groupMsgReq.getGroupId(), groupMsgReq.getClientInfo().getAppId());
         memberIds.add(memberId);
         memberIds.stream()
                 .filter(Objects::nonNull)
                 .forEach(member -> {
-                    if (ClientType.WEBAPI.getCode().equals(clientInfo.getClientType()) && member.equals(userId)) {
-                        messageProducer.sendToUserExceptClient(member, command, data, clientInfo);
+                    if (ClientType.WEBAPI.getCode().equals(groupMsgReq.getClientInfo().getClientType())
+                            && member.equals(groupMsgReq.getUserId())) {
+                        messageProducer.sendToUserExceptClient(
+                                memberId, groupMsgReq.getCommand(),
+                                groupMsgReq.getData(), groupMsgReq.getClientInfo());
                     } else {
-                        messageProducer.sendToUserAllClient(member, command, data, clientInfo.getAppId());
+                        messageProducer.sendToUserAllClient(
+                                memberId, groupMsgReq.getCommand(),
+                                groupMsgReq.getData(), groupMsgReq.getClientInfo().getAppId());
                     }
                 });
     }
 
-    private void updateMemberMsg(String userId, Command command, Object data, ClientInfo clientInfo,
-                                 List<String> groupMemberId, JSONObject o, String groupId) {
-        UpdateGroupMemberPack pack = o.toJavaObject(UpdateGroupMemberPack.class);
+    private void updateMemberMsg(GroupMsgReq groupMsgReq) {
+        UpdateGroupMemberPack pack = groupMsgReq.getO().toJavaObject(UpdateGroupMemberPack.class);
         String memberId = pack.getMemberId();
 
-        List<GroupMemberDto> groupManager = groupMemberService.getGroupManager(groupId, clientInfo.getAppId());
+        List<GroupMemberDto> groupManager = groupMemberService.getGroupManager(
+                groupMsgReq.getGroupId(), groupMsgReq.getClientInfo().getAppId());
         GroupMemberDto groupMemberDto = new GroupMemberDto();
         groupMemberDto.setMemberId(memberId);
         groupManager.add(groupMemberDto);
         groupManager.stream().forEach(member -> {
-            if (ClientType.WEBAPI.getCode().equals(clientInfo.getClientType()) && member.equals(userId)) {
-                messageProducer.sendToUserExceptClient(member.getMemberId(), command, data, clientInfo);
+            if (ClientType.WEBAPI.getCode().equals(groupMsgReq.getClientInfo().getClientType())
+                    && member.equals(groupMsgReq.getUserId())) {
+                messageProducer.sendToUserExceptClient(
+                        memberId, groupMsgReq.getCommand(),
+                        groupMsgReq.getData(), groupMsgReq.getClientInfo());
             } else {
-                messageProducer.sendToUserAllClient(member.getMemberId(), command, data, clientInfo.getAppId());
+                messageProducer.sendToUserAllClient(
+                        memberId, groupMsgReq.getCommand(),
+                        groupMsgReq.getData(), groupMsgReq.getClientInfo().getAppId());
             }
         });
 
     }
 
-    private void DefaultMsg(String userId, Command command, Object data, ClientInfo clientInfo,
-                            List<String> groupMemberId, JSONObject o, String groupId) {
-        groupMemberId.stream().forEach(memberId -> {
-            if (ClientType.WEBAPI.getCode().equals(clientInfo.getClientType()) && memberId.equals(userId)) {
-                messageProducer.sendToUserExceptClient(memberId, command,
-                        data, clientInfo);
+    private void defaultMsg(GroupMsgReq groupMsgReq) {
+        groupMsgReq.getGroupMemberId().stream().forEach(memberId -> {
+            if (ClientType.WEBAPI.getCode().equals(groupMsgReq.getClientInfo().getClientType())
+                    && memberId.equals(groupMsgReq.getUserId())) {
+                messageProducer.sendToUserExceptClient(
+                        memberId, groupMsgReq.getCommand(),
+                        groupMsgReq.getData(), groupMsgReq.getClientInfo());
             } else {
-                messageProducer.sendToUserAllClient(memberId, command, data, clientInfo.getAppId());
+                messageProducer.sendToUserAllClient(
+                        memberId, groupMsgReq.getCommand(),
+                        groupMsgReq.getData(), groupMsgReq.getClientInfo().getAppId());
             }
         });
     }
