@@ -1,4 +1,4 @@
-package com.bantanger.im.domain.group.dao;
+package com.bantanger.im.domain.message.dao;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;

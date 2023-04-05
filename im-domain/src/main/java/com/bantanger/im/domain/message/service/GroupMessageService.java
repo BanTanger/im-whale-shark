@@ -5,10 +5,12 @@ import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.command.GroupEventCommand;
 import com.bantanger.im.common.model.message.GroupChatMessageContent;
 import com.bantanger.im.common.model.message.MessageContent;
+import com.bantanger.im.domain.group.model.req.SendGroupMessageReq;
 import com.bantanger.im.domain.group.service.ImGroupMemberService;
+import com.bantanger.im.domain.message.model.resp.SendMessageResp;
 import com.bantanger.im.service.sendmsg.MessageProducer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,6 +35,9 @@ public class GroupMessageService {
     @Resource
     ImGroupMemberService groupMemberService;
 
+    @Resource
+    MessageStoreService messageStoreService;
+
     public void processor(GroupChatMessageContent messageContent) {
         // 日志打印
         log.info("消息 ID [{}] 开始处理", messageContent.getMessageId());
@@ -52,6 +57,12 @@ public class GroupMessageService {
         messageContent.setMemberId(groupMemberId);
         messageContent.setGroupId(groupId);
 
+        // 消息持久化落库
+        ResponseVO msgResp = messageStoreService.storeGroupMessage(messageContent);
+        if (!msgResp.isOk()) {
+            log.error("消息持久化失败 {}", msgResp.getMsg());
+        }
+
         // 2. 返回应答报文 ACK 给自己
         ack(messageContent, ResponseVO.successResponse());
         // 3. 发送消息，同步发送方多端设备
@@ -59,6 +70,31 @@ public class GroupMessageService {
         // 4. 发送消息给对方所有在线端(TODO 离线端也要做消息同步)
         dispatchMessage(messageContent);
         log.info("消息 ID [{}] 处理完成", messageContent.getMessageId());
+    }
+
+    public SendMessageResp send(SendGroupMessageReq req) {
+        SendMessageResp sendMessageResp = new SendMessageResp();
+        GroupChatMessageContent message = new GroupChatMessageContent();
+        message.setAppId(req.getAppId());
+        message.setClientType(req.getClientType());
+        message.setImei(req.getImei());
+        message.setMessageId(req.getMessageId());
+        message.setFromId(req.getFromId());
+        message.setMessageBody(req.getMessageBody());
+        message.setMessageTime(req.getMessageTime());
+        message.setGroupId(req.getGroupId());
+
+        messageStoreService.storeGroupMessage(message);
+
+        sendMessageResp.setMessageKey(message.getMessageKey());
+        sendMessageResp.setMessageTime(System.currentTimeMillis());
+        //2.发消息给同步在线端
+        syncToSender(message);
+        //3.发消息给对方在线端
+        dispatchMessage(message);
+
+        return sendMessageResp;
+
     }
 
     /**
@@ -96,6 +132,7 @@ public class GroupMessageService {
      * @param messageContent
      */
     protected void syncToSender(MessageContent messageContent) {
+        log.info("[GROUP] 发送方消息同步");
         messageProducer.sendToUserExceptClient(messageContent.getFromId(),
                 GroupEventCommand.MSG_GROUP, messageContent, messageContent);
     }

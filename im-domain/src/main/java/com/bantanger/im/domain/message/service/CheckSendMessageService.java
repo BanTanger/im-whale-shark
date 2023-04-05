@@ -95,13 +95,13 @@ public class CheckSendMessageService implements CheckSendMessage {
             if(appConfig.isSendMessageCheckBlack()){
                 // 检查自己是否拉黑对方
                 if(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode()
-                        != fromRelation.getData().getBlack()){
+                        .equals(fromRelation.getData().getBlack())){
                     return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_IS_BLACK);
                 }
 
                 // 检查对方是否拉黑自己
                 if(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode()
-                        != toRelation.getData().getBlack()){
+                        .equals(toRelation.getData().getBlack())){
                     return ResponseVO.errorResponse(FriendShipErrorCode.TARGET_IS_BLACK_YOU);
                 }
             }

@@ -2,7 +2,7 @@ package com.bantanger.im.service.sendmsg;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.proto.MessagePack;
-import com.bantanger.im.common.comstant.Constants;
+import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.Command;
 import com.bantanger.im.common.model.ClientInfo;
 import com.bantanger.im.common.model.UserSession;

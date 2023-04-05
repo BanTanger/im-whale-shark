@@ -1,7 +1,7 @@
 package com.bantanger.im.domain.message.mq;
 
 import com.alibaba.fastjson.JSONObject;
-import com.bantanger.im.common.comstant.Constants;
+import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.MessageCommand;
 import com.bantanger.im.common.model.message.MessageContent;
 import com.bantanger.im.domain.message.service.P2PMessageService;

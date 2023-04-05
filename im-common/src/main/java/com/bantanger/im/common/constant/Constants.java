@@ -1,4 +1,4 @@
-package com.bantanger.im.common.comstant;
+package com.bantanger.im.common.constant;
 
 /**
  * @author BanTanger 半糖

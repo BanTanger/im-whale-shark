@@ -2,7 +2,7 @@ package com.bantanger.im.service.rabbitmq.listener;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.proto.MessagePack;
-import com.bantanger.im.common.comstant.Constants;
+import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.service.rabbitmq.process.BaseProcess;
 import com.bantanger.im.service.rabbitmq.process.ProcessFactory;
 import com.bantanger.im.service.utils.MqFactory;
