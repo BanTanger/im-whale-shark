@@ -3,7 +3,7 @@ package com.bantanger.im.domain.interceptor;
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.utils.SigAPI;
 import com.bantanger.im.common.BaseErrorCode;
-import com.bantanger.im.common.comstant.Constants;
+import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.error.GateWayErrorCode;
 import com.bantanger.im.common.exception.ApplicationExceptionEnum;
 import com.bantanger.im.domain.user.service.ImUserService;

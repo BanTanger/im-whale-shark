@@ -19,13 +19,13 @@ public enum FriendShipStatusEnum {
     BLACK_STATUS_BLACKED(2),
     ;
 
-    private int code;
+    private Integer code;
 
     FriendShipStatusEnum(int code){
         this.code=code;
     }
 
-    public int getCode() {
+    public Integer getCode() {
         return code;
     }
 }

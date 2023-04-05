@@ -1,7 +1,7 @@
 package com.bantanger.im.service.zookeeper;
 
 import com.alibaba.fastjson.JSON;
-import com.bantanger.im.common.comstant.Constants;
+import com.bantanger.im.common.constant.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.I0Itec.zkclient.ZkClient;
 import org.springframework.stereotype.Component;

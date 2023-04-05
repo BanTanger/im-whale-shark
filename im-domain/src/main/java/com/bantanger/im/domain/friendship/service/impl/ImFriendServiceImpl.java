@@ -2,7 +2,7 @@ package com.bantanger.im.domain.friendship.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.pack.friendship.*;
-import com.bantanger.im.common.comstant.Constants;
+import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.FriendshipEventCommand;
 import com.bantanger.im.common.enums.friend.FriendShipErrorCode;
 import com.bantanger.im.common.enums.friend.FriendShipStatusEnum;
@@ -221,13 +221,8 @@ public class ImFriendServiceImpl implements ImFriendService {
         ImFriendShipEntity fromItem = imFriendShipMapper.selectOne(query);
         if (fromItem == null) {
             //走添加逻辑。
-            fromItem = new ImFriendShipEntity();
-            fromItem.setAppId(appId);
-            fromItem.setFromId(fromId);
-//            entity.setToId(to);
-            BeanUtils.copyProperties(dto, fromItem);
-            fromItem.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode());
-            fromItem.setCreateTime(System.currentTimeMillis());
+            fromItem = getFriendShipEntity(appId, fromId, dto.getToId(), dto);
+
             int insert = imFriendShipMapper.insert(fromItem);
             if (insert != 1) {
                 return ResponseVO.errorResponse(FriendShipErrorCode.ADD_FRIEND_ERROR);
@@ -267,14 +262,8 @@ public class ImFriendServiceImpl implements ImFriendService {
         toQuery.eq("to_id", fromId);
         ImFriendShipEntity toItem = imFriendShipMapper.selectOne(toQuery);
         if (toItem == null) {
-            toItem = new ImFriendShipEntity();
-            toItem.setAppId(appId);
-            toItem.setFromId(dto.getToId());
-            BeanUtils.copyProperties(dto, toItem);
-            toItem.setToId(fromId);
-            toItem.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode());
-            toItem.setCreateTime(System.currentTimeMillis());
-//            toItem.setBlack(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode());
+            toItem = getFriendShipEntity(appId, dto.getToId(), fromId, dto);
+
             int insert = imFriendShipMapper.insert(toItem);
         } else {
             if (FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode() !=
@@ -287,7 +276,11 @@ public class ImFriendServiceImpl implements ImFriendService {
 
         // TCP 通知发送给 from 端
         AddFriendPack addFriendPack = new AddFriendPack();
-        BeanUtils.copyProperties(fromItem, addFriendPack);
+        addFriendPack.setFromId(fromItem.getFromId());
+        addFriendPack.setRemark(fromItem.getRemark());
+        addFriendPack.setToId(fromItem.getToId());
+        addFriendPack.setAddSource(fromItem.getAddSource());
+
         if (requestBase != null) {
             // 存在 req 同步除本端的所有端
             messageProducer.sendMsgToUser(fromId, FriendshipEventCommand.FRIEND_ADD, addFriendPack,
@@ -300,7 +293,11 @@ public class ImFriendServiceImpl implements ImFriendService {
 
         // TCP 通知发给 to 端
         AddFriendPack addFriendToPack = new AddFriendPack();
-        BeanUtils.copyProperties(toItem, addFriendPack);
+        addFriendToPack.setFromId(toItem.getFromId());
+        addFriendToPack.setRemark(toItem.getRemark());
+        addFriendToPack.setToId(toItem.getToId());
+        addFriendToPack.setAddSource(toItem.getAddSource());
+
         // 同步所有端
         messageProducer.sendToUserAllClient(toItem.getFromId(),
                 FriendshipEventCommand.FRIEND_ADD, addFriendToPack, appId);
@@ -317,6 +314,18 @@ public class ImFriendServiceImpl implements ImFriendService {
         return ResponseVO.successResponse();
     }
 
+    private ImFriendShipEntity getFriendShipEntity(Integer appId, String fromId, String toId, FriendDto dto) {
+        ImFriendShipEntity userItem = new ImFriendShipEntity();
+        userItem.setAppId(appId);
+        userItem.setFromId(fromId);
+        userItem.setToId(toId);
+        userItem.setRemark(dto.getRemark());
+        userItem.setAddSource(dto.getAddSource());
+        userItem.setExtra(dto.getExtra());
+        userItem.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode());
+        userItem.setCreateTime(System.currentTimeMillis());
+        return userItem;
+    }
 
     @Override
     public ResponseVO deleteFriend(DeleteFriendReq req) {

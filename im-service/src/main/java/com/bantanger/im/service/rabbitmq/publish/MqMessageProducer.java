@@ -3,7 +3,7 @@ package com.bantanger.im.service.rabbitmq.publish;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.proto.Message;
-import com.bantanger.im.common.comstant.Constants;
+import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.service.utils.MqFactory;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;

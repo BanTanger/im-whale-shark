@@ -69,7 +69,7 @@ public class MessageProducer extends AbstractMessageSend {
         List<UserSession> userSession = userSessionService.getUserSession(clientInfo.getAppId(), toId);
         userSession.stream()
                 .filter(session -> !isMatch(session, clientInfo))
-                .filter(session -> sendMessage(toId, command, data, session));
+                .forEach(session -> sendMessage(toId, command, data, session));
     }
 
     private boolean isMatch(UserSession session, ClientInfo clientInfo) {

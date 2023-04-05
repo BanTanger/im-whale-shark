@@ -1,7 +1,7 @@
 package com.bantanger.im.service.rabbitmq.listener;
 
 import com.alibaba.fastjson.JSONObject;
-import com.bantanger.im.common.comstant.Constants;
+import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.model.UserClientDto;
 import com.bantanger.im.service.redis.RedisManager;
 import com.bantanger.im.service.strategy.login.factory.LoginStatusFactory;
