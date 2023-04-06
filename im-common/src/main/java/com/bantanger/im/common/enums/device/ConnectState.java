@@ -1,4 +1,4 @@
-package com.bantanger.im.common.enums;
+package com.bantanger.im.common.enums.device;
 
 import com.bantanger.im.common.enums.CodeAdapter;
 

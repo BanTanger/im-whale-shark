@@ -34,7 +34,7 @@ public class HttpRequestUtils {
     GlobalHttpClientConfig httpClientConfig;
 
     public String doGet(String url, Map<String, Object> params, String charset) throws Exception {
-        return doGet(url,params,null,charset);
+        return doGet(url, params, null, charset);
     }
 
     /**
@@ -65,7 +65,7 @@ public class HttpRequestUtils {
         if (header != null) {
             // 遍历map,拼接header参数
             for (Map.Entry<String, Object> entry : header.entrySet()) {
-                httpGet.addHeader(entry.getKey(),entry.getValue().toString());
+                httpGet.addHeader(entry.getKey(), entry.getValue().toString());
             }
         }
 
@@ -110,7 +110,7 @@ public class HttpRequestUtils {
     }
 
     public String doPost(String url, Map<String, Object> params, String jsonBody, String charset) throws Exception {
-        return doPost(url,params,null,jsonBody,charset);
+        return doPost(url, params, null, jsonBody, charset);
     }
 
     /**
@@ -152,7 +152,7 @@ public class HttpRequestUtils {
         if (header != null) {
             // 遍历map,拼接header参数
             for (Map.Entry<String, Object> entry : header.entrySet()) {
-                httpPost.addHeader(entry.getKey(),entry.getValue().toString());
+                httpPost.addHeader(entry.getKey(), entry.getValue().toString());
             }
         }
 
@@ -177,16 +177,18 @@ public class HttpRequestUtils {
 
     /**
      * 不带参数post请求
+     *
      * @param url
      * @return
      * @throws Exception
      */
     public String doPost(String url) throws Exception {
-        return doPost(url, null,null,null);
+        return doPost(url, null, null, null);
     }
 
     /**
      * get 方法调用的通用方式
+     *
      * @param url
      * @param tClass
      * @param map
@@ -205,6 +207,7 @@ public class HttpRequestUtils {
 
     /**
      * get 方法调用的通用方式
+     *
      * @param url
      * @param tClass
      * @param map
@@ -223,6 +226,7 @@ public class HttpRequestUtils {
 
     /**
      * post 方法调用的通用方式
+     *
      * @param url
      * @param tClass
      * @param map
@@ -233,7 +237,7 @@ public class HttpRequestUtils {
      */
     public <T> T doPost(String url, Class<T> tClass, Map<String, Object> map, String jsonBody, String charSet) throws Exception {
 
-        String result = doPost(url, map,jsonBody,charSet);
+        String result = doPost(url, map, jsonBody, charSet);
         if (StringUtils.isNotEmpty(result))
             return JSON.parseObject(result, tClass);
         return null;
@@ -242,7 +246,7 @@ public class HttpRequestUtils {
 
     public <T> T doPost(String url, Class<T> tClass, Map<String, Object> map, Map<String, Object> header, String jsonBody, String charSet) throws Exception {
 
-        String result = doPost(url, map, header,jsonBody,charSet);
+        String result = doPost(url, map, header, jsonBody, charSet);
         if (StringUtils.isNotEmpty(result))
             return JSON.parseObject(result, tClass);
         return null;
@@ -251,6 +255,7 @@ public class HttpRequestUtils {
 
     /**
      * post 方法调用的通用方式
+     *
      * @param url
      * @param map
      * @param jsonBody
@@ -258,12 +263,13 @@ public class HttpRequestUtils {
      * @return
      * @throws Exception
      */
-    public String  doPostString(String url, Map<String, Object> map, String jsonBody, String charSet) throws Exception {
-        return doPost(url, map,jsonBody,charSet);
+    public String doPostString(String url, Map<String, Object> map, String jsonBody, String charSet) throws Exception {
+        return doPost(url, map, jsonBody, charSet);
     }
 
     /**
      * post 方法调用的通用方式
+     *
      * @param url
      * @param map
      * @param jsonBody
@@ -271,8 +277,8 @@ public class HttpRequestUtils {
      * @return
      * @throws Exception
      */
-    public String  doPostString(String url, Map<String, Object> map, Map<String, Object> header, String jsonBody, String charSet) throws Exception {
-        return doPost(url, map, header, jsonBody,charSet);
+    public String doPostString(String url, Map<String, Object> map, Map<String, Object> header, String jsonBody, String charSet) throws Exception {
+        return doPost(url, map, header, jsonBody, charSet);
     }
 
 }

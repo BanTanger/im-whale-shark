@@ -11,20 +11,21 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
 
 /**
- * 消息解码类
+ * Socket 消息解码类
+ *
  * @author BanTanger 半糖
  * @Date 2023/3/24 18:48
  */
 public class MessageDecoderHandler extends ByteToMessageDecoder {
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, 
+    protected void decode(ChannelHandlerContext ctx,
                           ByteBuf in, List<Object> out) throws Exception {
         // 解析私有协议
         if (in.readableBytes() < 28) {
-            return ;
+            return;
         }
-    // 解析请求头
+        // 解析请求头
         // 指令
         int command = in.readInt();
         // 版本
@@ -43,10 +44,10 @@ public class MessageDecoderHandler extends ByteToMessageDecoder {
         // 处理粘包、半包
         if (in.readableBytes() < bodyLen + imeiLen) {
             in.resetReaderIndex();
-            return ;
+            return;
         }
 
-    // 解析请求体
+        // 解析请求体
         byte[] imeiData = new byte[imeiLen];
         in.readBytes(imeiData);
         String imei = new String(imeiData);

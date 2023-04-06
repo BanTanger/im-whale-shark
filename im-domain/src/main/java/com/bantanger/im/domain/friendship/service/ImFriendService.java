@@ -39,7 +39,7 @@ public interface ImFriendService {
     ResponseVO getAllFriendShip(GetAllFriendShipReq req);
 
     /**
-     * 查询指定好友关系
+     * 查询指定好友关系 [是否落库持久化]
      * @param req fromId、toId
      * @return
      */

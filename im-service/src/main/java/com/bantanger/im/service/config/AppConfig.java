@@ -31,6 +31,16 @@ public class AppConfig {
     private Integer imRouteModel;
 
     /**
+     * 发送消息是否校验关系链 TODO 需要持久化到数据库表
+     */
+    private boolean sendMessageCheckFriend;
+
+    /**
+     * 发送消息是否校验黑名单 TODO 需要持久化到数据库表
+     */
+    private boolean sendMessageCheckBlack;
+
+    /**
      * 一致性哈希所使用的底层数据结构
      */
     private Integer consistentHashModel;

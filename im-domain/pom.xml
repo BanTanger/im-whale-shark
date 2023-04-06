@@ -69,14 +69,15 @@
             <version>1.5.1-RELEASE</version>
         </dependency>
 
-        <!-- common -->
+        <!-- 业务层 -->
+        <!-- im-common -->
         <dependency>
             <groupId>com.bantanger</groupId>
             <artifactId>im-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
-        <!-- service -->
+        <!-- im-service -->
         <dependency>
             <groupId>com.bantanger</groupId>
             <artifactId>im-service</artifactId>

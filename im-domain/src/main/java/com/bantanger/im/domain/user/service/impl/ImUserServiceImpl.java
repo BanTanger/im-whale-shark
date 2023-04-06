@@ -2,7 +2,7 @@ package com.bantanger.im.domain.user.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.pack.user.UserModifyPack;
-import com.bantanger.im.common.comstant.Constants;
+import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.UserEventCommand;
 import com.bantanger.im.domain.group.service.ImGroupService;
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
@@ -170,7 +170,17 @@ public class ImUserServiceImpl implements ImUserService {
         }
 
         ImUserDataEntity update = new ImUserDataEntity();
-        BeanUtils.copyProperties(req, update);
+        update.setUserId(req.getUserId());
+        update.setNickName(req.getNickName());
+        update.setLocation(req.getLocation());
+        update.setBirthDay(req.getBirthDay());
+        update.setPassword(req.getPassword());
+        update.setPhoto(req.getPhoto());
+        update.setUserSex(req.getUserSex());
+        update.setSelfSignature(req.getSelfSignature());
+        update.setFriendAllowType(req.getFriendAllowType());
+        update.setAppId(req.getAppId());
+        update.setExtra(req.getExtra());
 
         // TODO ?
         update.setAppId(null);
@@ -179,7 +189,14 @@ public class ImUserServiceImpl implements ImUserService {
         if (update1 == 1) {
             // 在回调开始前，先发送 TCP 通知，保证数据同步
             UserModifyPack pack = new UserModifyPack();
-            BeanUtils.copyProperties(req, pack);
+            pack.setUserId(req.getUserId());
+            pack.setNickName(req.getNickName());
+            pack.setPassword(req.getPassword());
+            pack.setPhoto(req.getPhoto());
+            pack.setUserSex(req.getUserSex());
+            pack.setSelfSignature(req.getSelfSignature());
+            pack.setFriendAllowType(req.getFriendAllowType());
+
             messageProducer.sendMsgToUser(req.getUserId(), UserEventCommand.USER_MODIFY,
                     pack, req.getAppId(), req.getClientType(), req.getImei());
 

@@ -33,7 +33,7 @@ public class ByteBufToMessageUtils {
         /** 获取clientType*/
         int clientType = in.readInt();
 
-        /** 获取clientType*/
+        /** 获取messageType*/
         int messageType = in.readInt();
 
         /** 获取appId*/
@@ -66,6 +66,7 @@ public class ByteBufToMessageUtils {
         messageHeader.setVersion(version);
         messageHeader.setMessageType(messageType);
         messageHeader.setImei(imei);
+        messageHeader.setImeiLength(imeiLength);
 
         Message message = new Message();
         message.setMessageHeader(messageHeader);

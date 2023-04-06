@@ -1,4 +1,4 @@
-package com.bantanger.im.common.comstant;
+package com.bantanger.im.common.constant;
 
 /**
  * @author BanTanger 半糖
@@ -39,7 +39,7 @@ public class Constants {
         /**
          * UserSign，格式：appId:UserSign:
          */
-        public static final String UserSign = ":UserSign:";
+        public static final String UserSign = ":userSign:";
         /**
          * 用户登录端消息通道信息
          */

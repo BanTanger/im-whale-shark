@@ -3,6 +3,7 @@ package com.bantanger.im.domain.group.controller;
 import com.bantanger.im.domain.group.model.req.*;
 import com.bantanger.im.domain.group.service.ImGroupService;
 import com.bantanger.im.common.ResponseVO;
+import com.bantanger.im.domain.message.service.GroupMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,9 @@ public class ImGroupController {
 
     @Resource
     ImGroupService groupService;
+
+    @Resource
+    GroupMessageService groupMessageService;
 
     /**
      * 导入群组信息
@@ -149,6 +153,15 @@ public class ImGroupController {
         req.setAppId(appId);
         req.setOperater(identifier);
         return groupService.muteGroup(req);
+    }
+
+    @RequestMapping("/sendMessage")
+    public ResponseVO sendMessage(@RequestBody @Validated SendGroupMessageReq
+                                          req, Integer appId,
+                                  String identifier)  {
+        req.setAppId(appId);
+        req.setOperater(identifier);
+        return ResponseVO.successResponse(groupMessageService.send(req));
     }
 
 }

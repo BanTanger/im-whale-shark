@@ -1,9 +1,10 @@
 package com.bantanger.im.service.config;
 
-import com.bantanger.im.common.enums.RouteHashMethodEnum;
-import com.bantanger.im.common.enums.UrlRouteModelEnum;
+import com.bantanger.im.common.enums.route.RouteHashMethodEnum;
+import com.bantanger.im.common.enums.route.UrlRouteModelEnum;
 import com.bantanger.im.service.route.RouteHandler;
 import com.bantanger.im.service.route.algroithm.hash.AbstractConsistentHash;
+import com.bantanger.im.service.support.ids.SnowflakeIdWorker;
 import org.I0Itec.zkclient.ZkClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,6 +52,11 @@ public class BeanConfig {
             setHash.invoke(routeHandler, consistentHash);
         }
         return routeHandler;
+    }
+
+    @Bean
+    public SnowflakeIdWorker buildSnowflakeSeq() {
+        return new SnowflakeIdWorker(0);
     }
 
 }
