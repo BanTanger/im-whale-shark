@@ -2,7 +2,7 @@ package com.bantanger.im.service.session;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.common.constant.Constants;
-import com.bantanger.im.common.enums.ConnectStatusEnum;
+import com.bantanger.im.common.enums.device.ConnectStatusEnum;
 import com.bantanger.im.common.model.UserSession;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;

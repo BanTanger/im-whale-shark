@@ -1,7 +1,7 @@
 package com.bantanger.im.service.strategy.command;
 
-import com.bantanger.im.codec.proto.Message;
-import io.netty.channel.ChannelHandlerContext;
+
+import com.bantanger.im.service.strategy.command.model.CommandExecutionRequest;
 
 /**
  * @author BanTanger 半糖
@@ -11,10 +11,8 @@ public interface CommandStrategy {
 
     /**
      * 系统命令执行策略接口
-     *
-     * @param ctx
-     * @param msg
-     * @param brokeId
+     * @param commandExecutionRequest
      */
-    void systemStrategy(ChannelHandlerContext ctx, Message msg, Integer brokeId);
+    void systemStrategy(CommandExecutionRequest commandExecutionRequest);
+
 }

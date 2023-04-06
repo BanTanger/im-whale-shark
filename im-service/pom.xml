@@ -12,6 +12,7 @@
     <artifactId>im-service</artifactId>
     <dependencies>
         <!-- 业务层 -->
+        <!-- im-codec -->
         <dependency>
             <groupId>com.bantanger</groupId>
             <artifactId>im-codec</artifactId>

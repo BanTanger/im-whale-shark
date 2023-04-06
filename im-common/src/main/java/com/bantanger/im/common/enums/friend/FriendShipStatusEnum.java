@@ -12,7 +12,7 @@ public enum FriendShipStatusEnum {
     FRIEND_STATUS_DELETE(2),
 
     /**
-     * 0未添加 1正常 2删除
+     * 0未添加 1正常 2拉黑
      */
     BLACK_STATUS_NORMAL(1),
 

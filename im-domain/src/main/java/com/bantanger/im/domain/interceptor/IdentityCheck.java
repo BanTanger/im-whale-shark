@@ -3,9 +3,12 @@ package com.bantanger.im.domain.interceptor;
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.utils.SigAPI;
 import com.bantanger.im.common.BaseErrorCode;
+import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.error.GateWayErrorCode;
+import com.bantanger.im.common.enums.user.UserTypeEnum;
 import com.bantanger.im.common.exception.ApplicationExceptionEnum;
+import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.domain.user.service.ImUserService;
 import com.bantanger.im.service.config.AppConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +43,7 @@ public class IdentityCheck {
                 appId + Constants.RedisConstants.UserSign + identifier + userSig);
         if (!StringUtils.isBlank(cacheUserSig) &&
                 Long.parseLong(cacheUserSig) > System.currentTimeMillis() / 1000) {
+            this.setIsAdmin(identifier, Integer.valueOf(appId));
             return BaseErrorCode.SUCCESS;
         }
 
@@ -96,10 +100,27 @@ public class IdentityCheck {
 
             Long etime = expireTime - System.currentTimeMillis() / 1000;
             stringRedisTemplate.opsForValue().set(key, expireTime.toString(), etime, TimeUnit.SECONDS);
+            this.setIsAdmin(identifier, Integer.valueOf(appId));
             return BaseErrorCode.SUCCESS;
         }
 
         return GateWayErrorCode.USERSIGN_IS_ERROR;
+    }
+
+    /**
+     * 根据appid,identifier判断是否App管理员,并设置到RequestHolder
+     * @param identifier
+     * @param appId
+     * @return
+     */
+    public void setIsAdmin(String identifier, Integer appId) {
+        //去DB或Redis中查找, 后面写
+        ResponseVO<ImUserDataEntity> singleUserInfo = userService.getSingleUserInfo(identifier, appId);
+        if(singleUserInfo.isOk()){
+            RequestHolder.set(singleUserInfo.getData().getUserType() == UserTypeEnum.APP_ADMIN.getCode());
+        }else{
+            RequestHolder.set(false);
+        }
     }
 
 }

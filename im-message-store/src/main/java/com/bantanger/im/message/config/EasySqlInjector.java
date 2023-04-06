@@ -1,4 +1,4 @@
-package com.bantanger.im.domain.config;
+package com.bantanger.im.message.config;
 
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
@@ -12,7 +12,7 @@ import java.util.List;
  * @author BanTanger 半糖
  * @Date 2023/4/5 13:02
  */
-@Component
+
 public class EasySqlInjector extends DefaultSqlInjector {
 
     @Override

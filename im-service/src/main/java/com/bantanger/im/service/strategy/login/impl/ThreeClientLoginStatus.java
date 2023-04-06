@@ -1,6 +1,6 @@
 package com.bantanger.im.service.strategy.login.impl;
 
-import com.bantanger.im.common.enums.ClientType;
+import com.bantanger.im.common.enums.device.ClientType;
 import com.bantanger.im.common.model.UserClientDto;
 import com.bantanger.im.service.strategy.login.LoginStatus;
 import com.bantanger.im.service.utils.UserChannelRepository;

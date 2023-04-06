@@ -1,7 +1,7 @@
 package com.bantanger.im.service.config;
 
-import com.bantanger.im.common.enums.RouteHashMethodEnum;
-import com.bantanger.im.common.enums.UrlRouteModelEnum;
+import com.bantanger.im.common.enums.route.RouteHashMethodEnum;
+import com.bantanger.im.common.enums.route.UrlRouteModelEnum;
 import com.bantanger.im.service.route.RouteHandler;
 import com.bantanger.im.service.route.algroithm.hash.AbstractConsistentHash;
 import com.bantanger.im.service.support.ids.SnowflakeIdWorker;

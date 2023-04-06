@@ -1,6 +1,6 @@
 package com.bantanger.im.domain.user.controller;
 
-import com.bantanger.im.common.enums.ClientType;
+import com.bantanger.im.common.enums.device.ClientType;
 import com.bantanger.im.domain.user.model.req.DeleteUserReq;
 import com.bantanger.im.domain.user.model.req.ImportUserReq;
 import com.bantanger.im.domain.user.model.req.LoginReq;
@@ -10,7 +10,6 @@ import com.bantanger.im.service.route.RouteHandler;
 import com.bantanger.im.service.route.RouteInfo;
 import com.bantanger.im.service.utils.RouteInfoParseUtil;
 import com.bantanger.im.service.zookeeper.ZkManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

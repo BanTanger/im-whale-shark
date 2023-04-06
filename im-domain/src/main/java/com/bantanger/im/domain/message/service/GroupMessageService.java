@@ -15,6 +15,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 群聊逻辑
@@ -33,42 +37,38 @@ public class GroupMessageService {
     MessageProducer messageProducer;
 
     @Resource
-    ImGroupMemberService groupMemberService;
-
-    @Resource
     MessageStoreService messageStoreService;
+
+    /** 线程池优化单聊消息处理逻辑 */
+    private final ThreadPoolExecutor threadPoolExecutor;
+
+    {
+        final AtomicInteger num = new AtomicInteger(0);
+        threadPoolExecutor = new ThreadPoolExecutor(8, 8, 60, TimeUnit.SECONDS,
+                // 任务队列存储超过核心线程数的任务
+                new LinkedBlockingDeque<>(1000), r -> {
+            Thread thread = new Thread(r);
+            thread.setDaemon(true);
+            thread.setName("[GROUP] message-process-thread-" + num.getAndIncrement());
+            return thread;
+        });
+    }
 
     public void processor(GroupChatMessageContent messageContent) {
         // 日志打印
         log.info("消息 ID [{}] 开始处理", messageContent.getMessageId());
 
-        String fromId = messageContent.getFromId();
-        String groupId = messageContent.getGroupId();
-        Integer appId = messageContent.getAppId();
+        threadPoolExecutor.execute(() -> {
+            // 消息持久化落库
+            messageStoreService.storeGroupMessage(messageContent);
+            // 2. 返回应答报文 ACK 给自己
+            ack(messageContent, ResponseVO.successResponse());
+            // 3. 发送消息，同步发送方多端设备
+            syncToSender(messageContent);
+            // 4. 发送消息给对方所有在线端(TODO 离线端也要做消息同步)
+            dispatchMessage(messageContent);
+        });
 
-        // 1. 前置校验，判断发送方是否被禁言、封禁，好友关系链是否正确
-        ResponseVO responseVO = serverPermissionCheck(fromId, groupId, appId);
-        if (!responseVO.isOk()) {
-            // ack 应答，告知 SDK 消息发送失败，状态出现异常
-            ack(messageContent,responseVO);
-        }
-
-        List<String> groupMemberId = groupMemberService.getGroupMemberId(messageContent.getGroupId(), messageContent.getAppId());
-        messageContent.setMemberId(groupMemberId);
-        messageContent.setGroupId(groupId);
-
-        // 消息持久化落库
-        ResponseVO msgResp = messageStoreService.storeGroupMessage(messageContent);
-        if (!msgResp.isOk()) {
-            log.error("消息持久化失败 {}", msgResp.getMsg());
-        }
-
-        // 2. 返回应答报文 ACK 给自己
-        ack(messageContent, ResponseVO.successResponse());
-        // 3. 发送消息，同步发送方多端设备
-        syncToSender(messageContent);
-        // 4. 发送消息给对方所有在线端(TODO 离线端也要做消息同步)
-        dispatchMessage(messageContent);
         log.info("消息 ID [{}] 处理完成", messageContent.getMessageId());
     }
 

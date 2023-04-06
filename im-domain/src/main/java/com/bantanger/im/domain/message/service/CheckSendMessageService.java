@@ -80,27 +80,27 @@ public class CheckSendMessageService implements CheckSendMessage {
             }
 
             // 检查自己是否删除对方【status = 2（删除）】
-            if(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode()
-                    != fromRelation.getData().getStatus()){
+            if(FriendShipStatusEnum.BLACK_STATUS_BLACKED.getCode()
+                    .equals(fromRelation.getData().getStatus())){
                 return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_IS_DELETED);
             }
 
             // 检查对方是否删除己方【status = 2（删除）】
-            if(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode()
-                    != toRelation.getData().getStatus()){
+            if(FriendShipStatusEnum.BLACK_STATUS_BLACKED.getCode()
+                    .equals(toRelation.getData().getStatus())){
                 return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_IS_DELETED_YOU);
             }
 
             // 检查黑名单列表中
             if(appConfig.isSendMessageCheckBlack()){
                 // 检查自己是否拉黑对方
-                if(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode()
+                if(FriendShipStatusEnum.BLACK_STATUS_BLACKED.getCode()
                         .equals(fromRelation.getData().getBlack())){
                     return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_IS_BLACK);
                 }
 
                 // 检查对方是否拉黑自己
-                if(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode()
+                if(FriendShipStatusEnum.BLACK_STATUS_BLACKED.getCode()
                         .equals(toRelation.getData().getBlack())){
                     return ResponseVO.errorResponse(FriendShipErrorCode.TARGET_IS_BLACK_YOU);
                 }

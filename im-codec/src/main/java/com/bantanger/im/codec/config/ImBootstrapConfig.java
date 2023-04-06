@@ -50,7 +50,12 @@ public class ImBootstrapConfig {
          */
         private Integer brokerId;
         /**
-         * 端同步策略类型
+         * Feign RPC 连接 TCP层和业务层内部地址
+         */
+        private String logicUrl;
+
+        /**
+         * 端登录策略类型
          */
         private Integer loginModel;
 

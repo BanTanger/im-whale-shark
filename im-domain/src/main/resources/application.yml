@@ -58,7 +58,6 @@ appConfig:
 server:
   port: 8000
 
-
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
