@@ -79,6 +79,10 @@ public class UserChannelRepository extends Constants {
         CHANNEL_GROUP.add(channel);
     }
 
+    /**
+     * 双删，redisson 和 本地缓存
+     * @param channel
+     */
     public static void remove(Channel channel) {
         synchronized(removeLocker) { // 确保原子性
 
@@ -145,7 +149,7 @@ public class UserChannelRepository extends Constants {
 
     public static void forceOffLine(UserClientDto userClientDto) {
         Channel channel = isBind(userClientDto);
-        if (!ObjectUtils.isEmpty(channel)) {
+        if (ObjectUtils.isEmpty(channel)) {
             RedissonClient redissonClient = RedisManager.getRedissonClient();
             RMap<String, String> map = redissonClient.getMap(userClientDto.getAppId() + RedisConstants.UserSessionConstants + userClientDto.getUserId());
             String key = userClientDto.getClientType() + ":" + userClientDto.getImei();

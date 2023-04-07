@@ -2,14 +2,17 @@ package com.bantanger.im.domain.message.service;
 
 import com.bantanger.im.codec.proto.ChatMessageAck;
 import com.bantanger.im.common.ResponseVO;
+import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.MessageCommand;
 import com.bantanger.im.common.model.ClientInfo;
 import com.bantanger.im.common.model.message.MessageContent;
+import com.bantanger.im.common.model.message.MessageReceiveAckPack;
 import com.bantanger.im.domain.message.model.req.SendMessageReq;
 import com.bantanger.im.domain.message.model.resp.SendMessageResp;
+import com.bantanger.im.domain.message.seq.RedisSequence;
 import com.bantanger.im.service.sendmsg.MessageProducer;
+import com.bantanger.im.service.support.ids.ConversationIdGenerate;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -38,7 +41,12 @@ public class P2PMessageService {
     @Resource
     MessageStoreService messageStoreService;
 
-    /** 线程池优化单聊消息处理逻辑 */
+    @Resource
+    RedisSequence redisSequence;
+
+    /**
+     * 线程池优化单聊消息处理逻辑
+     */
     private final ThreadPoolExecutor threadPoolExecutor;
 
     {
@@ -57,18 +65,55 @@ public class P2PMessageService {
         // 日志打印
         log.info("消息 ID [{}] 开始处理", messageContent.getMessageId());
 
+        MessageContent messageCache = messageStoreService.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId(), MessageContent.class);
+        if (messageCache != null) {
+            threadPoolExecutor.execute(() -> {
+                // 线程池执行消息同步，发送，回应等任务流程
+                doThreadPoolTask(messageContent);
+            });
+            return ;
+        }
+
+        // TODO 外提 Seq 存储，因为 seq 生成策略可以是 redis，也可以是一个新的服务专门处理。
+        //  为了保证安全性需要对第三方接口进行异常捕获，因此不要将这段逻辑脏污线程池的逻辑，保证线程池的流式纯粹
+        // 定义单聊消息的 Sequence, 客户端根据 seq 进行排序
+        // key: appId + Seq + (from + toId) / groupId
+        long seq = redisSequence.doGetSeq(messageContent.getAppId()
+                + Constants.SeqConstants.MessageSeq
+                + ConversationIdGenerate.generateP2PId(
+                messageContent.getFromId(), messageContent.getToId()));
+
+        messageContent.setMessageSequence(seq);
+
         threadPoolExecutor.execute(() -> {
             // 1 消息持久化落库(MQ 异步)
             messageStoreService.storeP2PMessage(messageContent);
-            // 2. 返回应答报文 ACK 给自己
-            ack(messageContent, ResponseVO.successResponse());
-            // 3. 发送消息，同步发送方多端设备
-            syncToSender(messageContent);
-            // 4. 发送消息给对方所有在线端(TODO 离线端也要做消息同步)
-            dispatchMessage(messageContent);
+            // 线程池执行消息同步，发送，回应等任务流程
+            doThreadPoolTask(messageContent);
+            messageStoreService.setMessageCacheByMessageId(
+                    messageContent.getAppId(), messageContent.getMessageId(), messageContent);
         });
 
         log.info("消息 ID [{}] 处理完成", messageContent.getMessageId());
+    }
+
+    /**
+     * 线程池执行消息同步，发送，回应等任务流程
+     * @param messageContent
+     */
+    private void doThreadPoolTask(MessageContent messageContent) {
+        // 2. 返回应答报文 ACK 给自己
+        ack(messageContent, ResponseVO.successResponse());
+        // 3. 发送消息，同步发送方多端设备
+        syncToSender(messageContent);
+        // 4. 发送消息给对方所有在线端(TODO 离线端也要做消息同步)
+        List<ClientInfo> clientInfos = dispatchMessage(messageContent);
+        // 决策前移，因为离线用户无法走消息接收逻辑，也就无法识别命令
+        // 这里将服务端接收确认迁移于此，保证离线用户也能实现消息可靠性
+        if (clientInfos.isEmpty()) {
+            // 如果接收方为空，代表目标用户离线，服务端代发响应 ACK 数据包
+            receiveAckByServer(messageContent);
+        }
     }
 
     public SendMessageResp send(SendMessageReq req) {
@@ -125,11 +170,31 @@ public class P2PMessageService {
         log.info("[P2P] msg ack, msgId = {}, checkResult = {}", messageContent.getMessageId(), responseVO.getCode());
 
         // ack 包塞入消息 id，告知客户端端 该条消息已被成功接收
-        ChatMessageAck chatMessageAck = new ChatMessageAck(messageContent.getMessageId());
+        ChatMessageAck chatMessageAck = new ChatMessageAck(messageContent.getMessageId(), messageContent.getMessageSequence());
         responseVO.setData(chatMessageAck);
         // 发送消息，回传给发送方端
         messageProducer.sendToUserOneClient(messageContent.getFromId(),
                 MessageCommand.MSG_ACK, responseVO, messageContent);
+    }
+
+    /**
+     * 服务端代替离线目标用户发送接受确认 ACK
+     *
+     * @param messageContent
+     */
+    public void receiveAckByServer(MessageContent messageContent) {
+        MessageReceiveAckPack pack = new MessageReceiveAckPack();
+        pack.setAppId(messageContent.getAppId());
+        pack.setClientType(messageContent.getClientType());
+        pack.setImei(messageContent.getImei());
+        pack.setMessageKey(messageContent.getMessageKey());
+        pack.setFromId(messageContent.getFromId());
+        pack.setToId(messageContent.getToId());
+        // 服务端发送接收确认 ACK 数据包
+        pack.setServerSend(true);
+        // 确认接收 ACK 发送给发送方指定端
+        messageProducer.sendToUserOneClient(pack.getFromId(), MessageCommand.MSG_RECEIVE_ACK,
+                pack, new ClientInfo(pack.getAppId(), pack.getClientType(), pack.getImei()));
     }
 
     /**

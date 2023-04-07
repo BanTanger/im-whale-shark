@@ -75,7 +75,7 @@ public class StoreMessageService {
                     extractToGroupMessageHistory(doStoreGroupMessageDto.getGroupChatMessageContent(), doStoreGroupMessageDto.getImMessageBodyEntity());
             groupMessageHistoryMapper.insert(imGroupMessageHistoryEntity);
         } catch (Exception e) {
-            log.error("单聊消息持久化失败 {}", e.getMessage());
+            log.error("群聊消息持久化失败 {}", e.getMessage());
         }
     }
 
@@ -133,6 +133,7 @@ public class StoreMessageService {
         msgHistory.setOwnerId(userId);
         msgHistory.setMessageKey(msgBody.getMessageKey());
         msgHistory.setCreateTime(System.currentTimeMillis());
+        msgHistory.setSequence(msgContent.getMessageSequence());
         return msgHistory;
     }
 
