@@ -14,10 +14,14 @@ import com.bantanger.im.domain.message.dao.ImMessageBodyEntity;
 import com.bantanger.im.domain.message.dao.mapper.ImGroupMessageHistoryMapper;
 import com.bantanger.im.domain.message.dao.mapper.ImMessageBodyMapper;
 import com.bantanger.im.service.support.ids.SnowflakeIdWorker;
+import org.apache.commons.lang3.StringUtils;
+import org.omg.CORBA.TIMEOUT;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 消息(MQ 异步)落库持久化
@@ -29,13 +33,10 @@ import javax.annotation.Resource;
 public class MessageStoreService {
 
     @Resource
-    ImMessageBodyMapper messageBodyMapper;
-
-    @Resource
-    ImGroupMessageHistoryMapper groupMessageHistoryMapper;
-
-    @Resource
     RabbitTemplate rabbitTemplate;
+
+    @Resource
+    StringRedisTemplate stringRedisTemplate;
 
     /**
      * 单聊消息持久化(MQ 异步持久化)
@@ -55,9 +56,8 @@ public class MessageStoreService {
     }
 
     /**
-     * 群聊消息持久化
+     * 群聊消息持久化(MQ 异步持久化)
      * @param messageContent
-     * @return
      */
     public void storeGroupMessage(GroupChatMessageContent messageContent) {
         MessageBody messageBody = extractMessageBody(messageContent);
@@ -71,29 +71,40 @@ public class MessageStoreService {
     }
 
     /**
-     * 【读扩散】群聊历史记录存储实体类
-     *
+     * 通过 MessageId 设置消息缓存
+     * @param appId
+     * @param messageId
      * @param messageContent
-     * @param imMessageBodyEntity
-     * @return
      */
-    private ImGroupMessageHistoryEntity extractToGroupMessageHistory(
-            GroupChatMessageContent messageContent, ImMessageBodyEntity imMessageBodyEntity
-    ) {
-        ImGroupMessageHistoryEntity imGroupMessageHistoryEntity = new ImGroupMessageHistoryEntity();
-        imGroupMessageHistoryEntity.setAppId(messageContent.getAppId());
-        imGroupMessageHistoryEntity.setFromId(messageContent.getFromId());
-        imGroupMessageHistoryEntity.setGroupId(messageContent.getGroupId());
-        imGroupMessageHistoryEntity.setMessageTime(messageContent.getMessageTime());
-
-        imGroupMessageHistoryEntity.setMessageKey(imMessageBodyEntity.getMessageKey());
-        imGroupMessageHistoryEntity.setMessageTime(imMessageBodyEntity.getMessageTime());
-        imGroupMessageHistoryEntity.setCreateTime(System.currentTimeMillis());
-
-        return imGroupMessageHistoryEntity;
+    public void setMessageCacheByMessageId(Integer appId, String messageId, Object messageContent) {
+        String key = appId + Constants.RedisConstants.CacheMessage + messageId;
+        // 过期时间设置成 5 分钟
+        stringRedisTemplate.opsForValue().set(key, JSONObject.toJSONString(messageContent), 300, TimeUnit.SECONDS);
     }
 
-    public MessageBody extractMessageBody(MessageContent messageContent) {
+    /**
+     * 通过 MessageId 获取消息缓存
+     * @param appId
+     * @param messageId
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    public <T> T getMessageCacheByMessageId(Integer appId, String messageId, Class<T> clazz) {
+        String key = appId + Constants.RedisConstants.CacheMessage + messageId;
+        String msgCache = stringRedisTemplate.opsForValue().get(key);
+        if (StringUtils.isBlank(msgCache)) {
+            return null;
+        }
+        return JSONObject.parseObject(msgCache, clazz);
+    }
+
+    /**
+     * messageContent 转换成 MessageBody
+     * @param messageContent
+     * @return
+     */
+    private MessageBody extractMessageBody(MessageContent messageContent) {
         MessageBody messageBody = new MessageBody();
         messageBody.setAppId(messageContent.getAppId());
         // TODO 消息唯一 ID 通过雪花算法生成
@@ -108,16 +119,4 @@ public class MessageStoreService {
         return messageBody;
     }
 
-    private ImMessageBodyEntity getMsgBody(MessageBody messageBody) {
-        ImMessageBodyEntity imMessageBodyEntity = new ImMessageBodyEntity();
-        imMessageBodyEntity.setAppId(messageBody.getAppId());
-        imMessageBodyEntity.setMessageKey(messageBody.getMessageKey());
-        imMessageBodyEntity.setMessageBody(messageBody.getMessageBody());
-        imMessageBodyEntity.setSecurityKey(messageBody.getSecurityKey());
-        imMessageBodyEntity.setMessageTime(messageBody.getMessageTime());
-        imMessageBodyEntity.setCreateTime(messageBody.getCreateTime());
-        imMessageBodyEntity.setExtra(messageBody.getExtra());
-        imMessageBodyEntity.setDelFlag(messageBody.getDelFlag());
-        return imMessageBodyEntity;
-    }
 }

@@ -46,6 +46,31 @@ s.connect(("127.0.0.1",9001))
 t1 = threading.Thread(target=ping,args=(s,))
 t1.start()
 
+import random
+import string
 
+special_char = ["#", "@", "$", "&"]  # 特殊符号列表
+lst = []
 
+# 生成随机字符串
+for _ in range(110):
+    char_type = random.choice(["digit", "lower", "upper", "special"])
+    if char_type == "digit":
+        lst.append(str(random.randint(0, 9)))
+    elif char_type == "lower":
+        lst.append(random.choice(string.ascii_lowercase))
+    elif char_type == "upper":
+        lst.append(random.choice(string.ascii_uppercase))
+    elif char_type == "special":
+        lst.append(random.choice(special_char))
 
+s = "".join(lst)  # 转换为字符串
+print(s)
+
+char_list = list(s)  # 将字符串转换为字符列表
+print(char_list)
+
+from collections import Counter
+
+char_count_dict = Counter(char_list)  # 计算每个字符的出现次数
+print(char_count_dict)

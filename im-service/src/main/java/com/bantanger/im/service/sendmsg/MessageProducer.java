@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
+ * 消息发送目标/数量选择 实体类
  * @author BanTanger 半糖
  * @Date 2023/3/31 23:20
  */
@@ -46,8 +47,8 @@ public class MessageProducer extends AbstractMessageSend {
 
     @Override
     public List<ClientInfo> sendToUserAllClient(String toId, Command command, Object data, Integer appId) {
-        List<UserSession> userSession = userSessionService.getUserSession(appId, toId);
-        return userSession.stream()
+        List<UserSession> userSessions = userSessionService.getUserSession(appId, toId);
+        return userSessions.stream()
                 // 筛出非空对象
                 .filter(Objects::nonNull)
                 // 消息发送

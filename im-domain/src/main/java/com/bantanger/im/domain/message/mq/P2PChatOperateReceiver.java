@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.MessageCommand;
 import com.bantanger.im.common.model.message.MessageContent;
+import com.bantanger.im.common.model.message.MessageReceiveAckPack;
+import com.bantanger.im.domain.message.service.MessageSyncService;
 import com.bantanger.im.domain.message.service.P2PMessageService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,9 @@ public class P2PChatOperateReceiver extends AbstractChatOperateReceiver {
     @Resource
     P2PMessageService p2pMessageService;
 
+    @Resource
+    MessageSyncService messageSyncService;
+
     @RabbitListener(
             bindings = @QueueBinding(
                     // 绑定 MQ 队列
@@ -53,6 +58,10 @@ public class P2PChatOperateReceiver extends AbstractChatOperateReceiver {
             // 处理消息
             MessageContent messageContent = jsonObject.toJavaObject(MessageContent.class);
             p2pMessageService.processor(messageContent);
+        } else if (command.equals(MessageCommand.MSG_RECEIVE_ACK.getCommand())) {
+            // 消息接收确认
+            MessageReceiveAckPack messageReceiveAckPack = jsonObject.toJavaObject(MessageReceiveAckPack.class);
+            messageSyncService.receiveMark(messageReceiveAckPack);
         }
     }
 

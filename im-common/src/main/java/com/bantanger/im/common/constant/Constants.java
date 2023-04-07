@@ -49,6 +49,11 @@ public class Constants {
          * 例如：10001:userSessionConstants:userId
          */
         public static final String UserSessionConstants = ":userSession:";
+        /**
+         * 缓存客户端消息防重，格式： appId + :cacheMessage: + messageId
+         */
+        public static final String CacheMessage = ":cacheMessage:";
+
     }
 
     public static class RabbitmqConstants {
@@ -118,6 +123,13 @@ public class Constants {
 
         public static final String SendMessageBefore = "message.send.before";
 
+    }
+
+    public static class SeqConstants {
+        /** 单聊消息有序 */
+        public static final String MessageSeq = ":messageSeq:";
+        /** 群聊消息有序 */
+        public static final String GroupMessageSeq = ":groupMessageSeq:";
     }
 
 }

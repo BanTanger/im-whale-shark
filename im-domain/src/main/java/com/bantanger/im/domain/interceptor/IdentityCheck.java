@@ -40,7 +40,7 @@ public class IdentityCheck {
     public ApplicationExceptionEnum checkUserSig(String identifier, String appId, String userSig) {
         // 10001:userSign:bantangereJyrVgrxCdZLrSjILEpVsjI0gAIdsHBiQYFnCkTUUAdJYUhmLkixmYWBiYm5sSVULjMlNa8kMy0ztUjJSikpMa8kMS8dyIZIFmemA0XziiJzQs0tvVLK-IPLjE1K9XOTMs3KyiL9w0qTwkMCsg1CLI2Kg-wiqyIibZVqAQHCL7I_
         String cacheUserSig = stringRedisTemplate.opsForValue().get(
-                appId + Constants.RedisConstants.UserSign + identifier + userSig);
+                appId + Constants.RedisConstants.UserSign + identifier + "#" + userSig);
         if (!StringUtils.isBlank(cacheUserSig) &&
                 Long.parseLong(cacheUserSig) > System.currentTimeMillis() / 1000) {
             this.setIsAdmin(identifier, Integer.valueOf(appId));
@@ -96,7 +96,7 @@ public class IdentityCheck {
         //appid + "xxx" + userId + sign
         String genSig = sigAPI.genUserSig(identifier, expireSec, time, null);
         if (genSig.toLowerCase().equals(userSig.toLowerCase())) {
-            String key = appId + Constants.RedisConstants.UserSign + identifier + userSig;
+            String key = appId + Constants.RedisConstants.UserSign + identifier + "#" + userSig;
 
             Long etime = expireTime - System.currentTimeMillis() / 1000;
             stringRedisTemplate.opsForValue().set(key, expireTime.toString(), etime, TimeUnit.SECONDS);

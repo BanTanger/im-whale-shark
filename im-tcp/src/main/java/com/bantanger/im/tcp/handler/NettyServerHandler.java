@@ -1,6 +1,7 @@
 package com.bantanger.im.tcp.handler;
 
 import com.bantanger.im.codec.proto.Message;
+import com.bantanger.im.service.rabbitmq.publish.MqMessageProducer;
 import com.bantanger.im.service.strategy.command.CommandStrategy;
 import com.bantanger.im.service.strategy.command.factory.CommandFactory;
 import com.bantanger.im.service.strategy.command.model.CommandExecutionRequest;
@@ -50,8 +51,12 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
         commandExecutionRequest.setMsg(msg);
         commandExecutionRequest.setFeignMessageService(feignMessageService);
 
-        // 执行策略
-        commandStrategy.systemStrategy(commandExecutionRequest);
+        if (commandStrategy != null) {
+            // 执行策略
+            commandStrategy.systemStrategy(commandExecutionRequest);
+        } else {
+            MqMessageProducer.sendMessage(msg, command);
+        }
     }
 
     protected Integer parseCommand(Message msg) {
@@ -65,7 +70,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        UserChannelRepository.remove(ctx.channel());
+        UserChannelRepository.forceOffLine(ctx.channel());
+        ctx.close();
 //        logger.info("剩余通道个数：{}", UserChannelRepository.CHANNEL_GROUP.size());
     }
 

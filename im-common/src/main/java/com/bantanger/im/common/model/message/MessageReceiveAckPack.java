@@ -4,26 +4,23 @@ import com.bantanger.im.common.model.ClientInfo;
 import lombok.Data;
 
 /**
+ * 消息确认收到 ACK
  * @author BanTanger 半糖
- * @Date 2023/4/4 11:22
+ * @Date 2023/4/6 23:03
  */
 @Data
-public class MessageContent extends ClientInfo {
+public class MessageReceiveAckPack extends ClientInfo {
 
-    private String messageId;
+    /** 消息唯一标识 */
+    private Long messageKey;
 
     private String fromId;
 
     private String toId;
 
-    private String messageBody;
-
-    private String extra;
-
-    private Long messageTime;
-
-    private Long messageKey;
-
     private Long messageSequence;
+
+    /** 是否为服务端发送的消息 */
+    private boolean serverSend = false;
 
 }
