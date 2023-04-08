@@ -1,7 +1,7 @@
 package com.bantanger.im.common.model.message.store;
 
-import com.bantanger.im.common.model.message.MessageBody;
-import com.bantanger.im.common.model.message.MessageContent;
+import com.bantanger.im.common.model.message.content.MessageBody;
+import com.bantanger.im.common.model.message.content.MessageContent;
 import lombok.Data;
 
 /**

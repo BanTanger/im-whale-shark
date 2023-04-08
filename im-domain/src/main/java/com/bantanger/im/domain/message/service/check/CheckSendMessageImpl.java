@@ -1,4 +1,4 @@
-package com.bantanger.im.domain.message.service;
+package com.bantanger.im.domain.message.service.check;
 
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.error.MessageErrorCode;
@@ -28,7 +28,7 @@ import javax.annotation.Resource;
  * @Date 2023/4/4 9:31
  */
 @Service
-public class CheckSendMessageService implements CheckSendMessage {
+public class CheckSendMessageImpl implements CheckSendMessage {
 
     @Resource
     ImUserService userService;

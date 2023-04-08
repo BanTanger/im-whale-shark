@@ -37,7 +37,7 @@ public class P2PMsgCommand extends BaseCommandStrategy {
         req.setToId(toId);
 
         // 1.调用业务层校验消息发送方的内部接口
-        ResponseVO responseVO = feignMessageService.checkSendMessage(req);
+        ResponseVO responseVO = feignMessageService.checkP2PSendMessage(req);
         if (responseVO.isOk()) {
             // 2. 如果成功就投递到 MQ
             MqMessageProducer.sendMessage(msg, req.getCommand());

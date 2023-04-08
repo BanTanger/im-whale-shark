@@ -45,8 +45,8 @@ import java.util.*;
  * @author BanTanger 半糖
  * @Date 2023/3/25 15:16
  */
-@Service
 @Slf4j
+@Service
 public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Resource

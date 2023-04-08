@@ -1,7 +1,7 @@
 package com.bantanger.im.message.service;
 
-import com.bantanger.im.common.model.message.GroupChatMessageContent;
-import com.bantanger.im.common.model.message.MessageContent;
+import com.bantanger.im.common.model.message.content.GroupChatMessageContent;
+import com.bantanger.im.common.model.message.content.MessageContent;
 import com.bantanger.im.message.dao.ImGroupMessageHistoryEntity;
 import com.bantanger.im.message.dao.ImMessageBodyEntity;
 import com.bantanger.im.message.dao.ImMessageHistoryEntity;

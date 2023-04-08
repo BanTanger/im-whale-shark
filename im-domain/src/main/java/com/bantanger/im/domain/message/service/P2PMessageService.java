@@ -1,15 +1,18 @@
 package com.bantanger.im.domain.message.service;
 
+import com.bantanger.im.codec.pack.message.MessageReceiveServerAckPack;
 import com.bantanger.im.codec.proto.ChatMessageAck;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.MessageCommand;
 import com.bantanger.im.common.model.ClientInfo;
-import com.bantanger.im.common.model.message.MessageContent;
-import com.bantanger.im.common.model.message.MessageReceiveAckPack;
+import com.bantanger.im.common.model.message.content.MessageContent;
+import com.bantanger.im.common.model.message.content.OfflineMessageContent;
 import com.bantanger.im.domain.message.model.req.SendMessageReq;
 import com.bantanger.im.domain.message.model.resp.SendMessageResp;
 import com.bantanger.im.domain.message.seq.RedisSequence;
+import com.bantanger.im.domain.message.service.check.CheckSendMessageImpl;
+import com.bantanger.im.domain.message.service.store.MessageStoreServiceImpl;
 import com.bantanger.im.service.sendmsg.MessageProducer;
 import com.bantanger.im.service.support.ids.ConversationIdGenerate;
 import lombok.extern.slf4j.Slf4j;
@@ -33,13 +36,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class P2PMessageService {
 
     @Resource
-    CheckSendMessageService checkSendMessageService;
+    CheckSendMessageImpl checkSendMessageServiceImpl;
 
     @Resource
     MessageProducer messageProducer;
 
     @Resource
-    MessageStoreService messageStoreService;
+    MessageStoreServiceImpl messageStoreImpl;
 
     @Resource
     RedisSequence redisSequence;
@@ -65,13 +68,13 @@ public class P2PMessageService {
         // 日志打印
         log.info("消息 ID [{}] 开始处理", messageContent.getMessageId());
 
-        MessageContent messageCache = messageStoreService.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId(), MessageContent.class);
+        MessageContent messageCache = messageStoreImpl.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId(), MessageContent.class);
         if (messageCache != null) {
             threadPoolExecutor.execute(() -> {
                 // 线程池执行消息同步，发送，回应等任务流程
                 doThreadPoolTask(messageContent);
             });
-            return ;
+            return;
         }
 
         // TODO 外提 Seq 存储，因为 seq 生成策略可以是 redis，也可以是一个新的服务专门处理。
@@ -82,23 +85,39 @@ public class P2PMessageService {
                 + Constants.SeqConstants.MessageSeq
                 + ConversationIdGenerate.generateP2PId(
                 messageContent.getFromId(), messageContent.getToId()));
-
         messageContent.setMessageSequence(seq);
 
         threadPoolExecutor.execute(() -> {
-            // 1 消息持久化落库(MQ 异步)
-            messageStoreService.storeP2PMessage(messageContent);
+            // 1. 消息持久化落库(MQ 异步)
+            messageStoreImpl.storeP2PMessage(messageContent);
+            // 2. 在异步持久化之后执行离线消息存储
+            OfflineMessageContent offlineMessage = getOfflineMessage(messageContent);
+            messageStoreImpl.storeOfflineMessage(offlineMessage);
             // 线程池执行消息同步，发送，回应等任务流程
             doThreadPoolTask(messageContent);
-            messageStoreService.setMessageCacheByMessageId(
+            messageStoreImpl.setMessageCacheByMessageId(
                     messageContent.getAppId(), messageContent.getMessageId(), messageContent);
         });
 
         log.info("消息 ID [{}] 处理完成", messageContent.getMessageId());
     }
 
+    private OfflineMessageContent getOfflineMessage(MessageContent messageContent) {
+        OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+        offlineMessageContent.setAppId(messageContent.getAppId());
+        offlineMessageContent.setMessageKey(messageContent.getMessageKey());
+        offlineMessageContent.setMessageBody(messageContent.getMessageBody());
+        offlineMessageContent.setMessageTime(messageContent.getMessageTime());
+        offlineMessageContent.setExtra(messageContent.getExtra());
+        offlineMessageContent.setFromId(messageContent.getFromId());
+        offlineMessageContent.setToId(messageContent.getToId());
+        offlineMessageContent.setMessageSequence(messageContent.getMessageSequence());
+        return offlineMessageContent;
+    }
+
     /**
      * 线程池执行消息同步，发送，回应等任务流程
+     *
      * @param messageContent
      */
     private void doThreadPoolTask(MessageContent messageContent) {
@@ -130,7 +149,7 @@ public class P2PMessageService {
         message.setMessageTime(req.getMessageTime());
 
         //插入数据
-        messageStoreService.storeP2PMessage(message);
+        messageStoreImpl.storeP2PMessage(message);
         sendMessageResp.setMessageKey(message.getMessageKey());
         sendMessageResp.setMessageTime(System.currentTimeMillis());
 
@@ -152,11 +171,11 @@ public class P2PMessageService {
      * @return
      */
     public ResponseVO serverPermissionCheck(String fromId, String toId, Integer appId) {
-        ResponseVO responseVO = checkSendMessageService.checkSenderForbidAndMute(fromId, appId);
+        ResponseVO responseVO = checkSendMessageServiceImpl.checkSenderForbidAndMute(fromId, appId);
         if (!responseVO.isOk()) {
             return responseVO;
         }
-        responseVO = checkSendMessageService.checkFriendShip(fromId, toId, appId);
+        responseVO = checkSendMessageServiceImpl.checkFriendShip(fromId, toId, appId);
         return responseVO;
     }
 
@@ -183,18 +202,19 @@ public class P2PMessageService {
      * @param messageContent
      */
     public void receiveAckByServer(MessageContent messageContent) {
-        MessageReceiveAckPack pack = new MessageReceiveAckPack();
-        pack.setAppId(messageContent.getAppId());
-        pack.setClientType(messageContent.getClientType());
-        pack.setImei(messageContent.getImei());
+        MessageReceiveServerAckPack pack = new MessageReceiveServerAckPack();
         pack.setMessageKey(messageContent.getMessageKey());
         pack.setFromId(messageContent.getFromId());
         pack.setToId(messageContent.getToId());
+        pack.setMessageSequence(messageContent.getMessageSequence());
         // 服务端发送接收确认 ACK 数据包
         pack.setServerSend(true);
         // 确认接收 ACK 发送给发送方指定端
-        messageProducer.sendToUserOneClient(pack.getFromId(), MessageCommand.MSG_RECEIVE_ACK,
-                pack, new ClientInfo(pack.getAppId(), pack.getClientType(), pack.getImei()));
+        messageProducer.sendToUserOneClient(messageContent.getFromId(),
+                MessageCommand.MSG_RECEIVE_ACK, pack,
+                new ClientInfo(messageContent.getAppId(),
+                        messageContent.getClientType(), messageContent.getImei())
+        );
     }
 
     /**

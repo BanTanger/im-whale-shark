@@ -53,7 +53,14 @@ public class Constants {
          * 缓存客户端消息防重，格式： appId + :cacheMessage: + messageId
          */
         public static final String CacheMessage = ":cacheMessage:";
-
+        /**
+         * 缓存离线消息 获取用户消息队列 格式：appId + :offlineMessage: + fromId / toId
+         */
+        public static final String OfflineMessage = ":offlineMessage:";
+        /**
+         * 缓存群组成员列表
+         */
+        public static final String GroupMembers = ":groupMembers:";
     }
 
     public static class RabbitmqConstants {
@@ -130,6 +137,8 @@ public class Constants {
         public static final String MessageSeq = ":messageSeq:";
         /** 群聊消息有序 */
         public static final String GroupMessageSeq = ":groupMessageSeq:";
+        /** 会话消息有序 */
+        public static final String ConversationSeq = "conversationSeq";
     }
 
 }

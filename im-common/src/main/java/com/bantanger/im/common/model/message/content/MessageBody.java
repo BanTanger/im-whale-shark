@@ -1,4 +1,4 @@
-package com.bantanger.im.common.model.message;
+package com.bantanger.im.common.model.message.content;
 
 import lombok.Data;
 

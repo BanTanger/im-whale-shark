@@ -1,4 +1,4 @@
-package com.bantanger.im.common.model.message;
+package com.bantanger.im.common.model.message.content;
 
 import lombok.Data;
 
@@ -13,6 +13,6 @@ public class GroupChatMessageContent extends MessageContent {
 
     private String groupId;
 
-    private List<String> memberId;
+    private List<String> memberIds;
 
 }

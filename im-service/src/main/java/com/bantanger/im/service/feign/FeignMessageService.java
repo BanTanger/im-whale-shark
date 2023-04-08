@@ -12,12 +12,21 @@ import feign.RequestLine;
 public interface FeignMessageService {
 
     /**
-     * RPC 调度业务层的接口，接口职责为检查发送方是否有权限
+     * RPC 调度业务层的接口，接口职责为检查 [P2P] 发送方是否有权限
      * @param o
      * @return
      */
     @Headers({"Content-Type: application/json","Accept: application/json"})
-    @RequestLine("POST /message/checkSend")
-    ResponseVO checkSendMessage(CheckSendMessageReq o);
+    @RequestLine("POST /message/p2pCheckSend")
+    ResponseVO checkP2PSendMessage(CheckSendMessageReq o);
+
+    /**
+     * RPC 调度业务层的接口，接口职责为检查 [GROUP] 发送方是否有权限
+     * @param o
+     * @return
+     */
+    @Headers({"Content-Type: application/json","Accept: application/json"})
+    @RequestLine("POST /message/groupCheckSend")
+    ResponseVO checkGroupSendMessage(CheckSendMessageReq o);
 
 }

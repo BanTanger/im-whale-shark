@@ -50,6 +50,8 @@ appConfig:
   deleteGroupMemberAfterCallback: false # 删除群成员之后回调
   addGroupMemberAfterCallback: false # 拉人入群之后回调
   addGroupMemberBeforeCallback: false # 拉人入群之前回调
+  deleteConversationSyncMode: 1 # 1. 多端同步删除会话(默认) 2. 单端删除会话
+  offlineMessageCount: 1024 # 离线消息最大条数
 
 # logger 配置
 #logging:

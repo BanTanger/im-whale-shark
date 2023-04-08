@@ -1,4 +1,4 @@
-package com.bantanger.im.domain.message.service;
+package com.bantanger.im.domain.message.service.check;
 
 import com.bantanger.im.common.ResponseVO;
 

@@ -12,6 +12,10 @@ public class CheckSendMessageReq {
 
     private String fromId;
 
+    /**
+     * [P2P] toId 为目标用户
+     * [GROUP] toId 为目标群组
+     */
     private String toId;
 
     private Integer appId;

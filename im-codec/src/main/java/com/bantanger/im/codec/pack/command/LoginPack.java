@@ -1,4 +1,4 @@
-package com.bantanger.im.codec.pack;
+package com.bantanger.im.codec.pack.command;
 
 import lombok.Data;
 

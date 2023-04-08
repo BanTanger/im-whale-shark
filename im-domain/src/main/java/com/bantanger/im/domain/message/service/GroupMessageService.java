@@ -4,16 +4,24 @@ import com.bantanger.im.codec.proto.ChatMessageAck;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.GroupEventCommand;
-import com.bantanger.im.common.model.message.GroupChatMessageContent;
-import com.bantanger.im.common.model.message.MessageContent;
+import com.bantanger.im.common.model.message.content.GroupChatMessageContent;
+import com.bantanger.im.common.model.message.content.MessageContent;
+import com.bantanger.im.common.model.message.content.OfflineMessageContent;
 import com.bantanger.im.domain.group.model.req.SendGroupMessageReq;
+import com.bantanger.im.domain.group.service.ImGroupMemberService;
 import com.bantanger.im.domain.message.model.resp.SendMessageResp;
 import com.bantanger.im.domain.message.seq.RedisSequence;
+import com.bantanger.im.domain.message.service.check.CheckSendMessage;
+import com.bantanger.im.domain.message.service.store.MessageStoreService;
 import com.bantanger.im.service.sendmsg.MessageProducer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.types.RedisClientInfo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -30,16 +38,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GroupMessageService {
 
     @Resource
-    CheckSendMessageService checkSendMessageService;
+    CheckSendMessage checkSendMessageImpl;
 
     @Resource
     MessageProducer messageProducer;
 
     @Resource
-    MessageStoreService messageStoreService;
+    ImGroupMemberService imGroupMemberServiceImpl;
+
+    @Resource
+    MessageStoreService messageStoreServiceImpl;
 
     @Resource
     RedisSequence redisSequence;
+
+    @Resource
+    StringRedisTemplate stringRedisTemplate;
 
     /** 线程池优化单聊消息处理逻辑 */
     private final ThreadPoolExecutor threadPoolExecutor;
@@ -60,13 +74,12 @@ public class GroupMessageService {
         // 日志打印
         log.info("消息 ID [{}] 开始处理", messageContent.getMessageId());
 
-        GroupChatMessageContent messageCache = messageStoreService.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId(), GroupChatMessageContent.class);
+        GroupChatMessageContent messageCache = messageStoreServiceImpl.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId(), GroupChatMessageContent.class);
         if (messageCache != null) {
             threadPoolExecutor.execute(() -> {
                 // 线程池执行消息同步，发送，回应等任务流程
                 doThreadPoolTask(messageContent);
             });
-            return ;
         }
         // 定义群聊消息的 Sequence, 客户端根据 seq 进行排序
         // key: appId + Seq + (from + toId) / groupId
@@ -77,9 +90,33 @@ public class GroupMessageService {
 
         threadPoolExecutor.execute(() -> {
             // 1. 消息持久化落库
-            messageStoreService.storeGroupMessage(messageContent);
+            messageStoreServiceImpl.storeGroupMessage(messageContent);
+            List<String> groupMemberIds = null;
+            String groupMemberCacheKey = messageContent.getAppId() +
+                    Constants.RedisConstants.GroupMembers + messageContent.getGroupId();
+            // 使用缓存防止多次查询拖垮数据库
+            if (stringRedisTemplate.hasKey(groupMemberCacheKey)) {
+                groupMemberIds = stringRedisTemplate.opsForList().range(groupMemberCacheKey, 0, -1);
+            } else {
+                // 查询群组所有成员进行消息分发
+                groupMemberIds = imGroupMemberServiceImpl
+                        .getGroupMemberId(messageContent.getGroupId(), messageContent.getAppId());
+                if (groupMemberIds != null && groupMemberIds.isEmpty()) {
+                    stringRedisTemplate.opsForList().rightPushAll(groupMemberCacheKey,
+                            groupMemberIds.toArray(new String[0]));
+                }
+            }
+            messageContent.setMemberIds(groupMemberIds);
+
+            // 2.在异步持久化之后执行离线消息存储
+            OfflineMessageContent offlineMessage = getOfflineMessage(messageContent);
+            messageStoreServiceImpl.storeGroupOfflineMessage(offlineMessage, groupMemberIds);
+
             // 线程池执行消息同步，发送，回应等任务流程
             doThreadPoolTask(messageContent);
+
+            messageStoreServiceImpl.setMessageCacheByMessageId(
+                    messageContent.getAppId(), messageContent.getMessageId(), messageContent);
         });
 
         log.info("消息 ID [{}] 处理完成", messageContent.getMessageId());
@@ -94,6 +131,19 @@ public class GroupMessageService {
         dispatchMessage(messageContent);
     }
 
+    private OfflineMessageContent getOfflineMessage(GroupChatMessageContent messageContent) {
+        OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+        offlineMessageContent.setAppId(messageContent.getAppId());
+        offlineMessageContent.setMessageKey(messageContent.getMessageKey());
+        offlineMessageContent.setMessageBody(messageContent.getMessageBody());
+        offlineMessageContent.setMessageTime(messageContent.getMessageTime());
+        offlineMessageContent.setExtra(messageContent.getExtra());
+        offlineMessageContent.setFromId(messageContent.getFromId());
+        offlineMessageContent.setToId(messageContent.getToId());
+        offlineMessageContent.setMessageSequence(messageContent.getMessageSequence());
+        return offlineMessageContent;
+    }
+
     public SendMessageResp send(SendGroupMessageReq req) {
         SendMessageResp sendMessageResp = new SendMessageResp();
         GroupChatMessageContent message = new GroupChatMessageContent();
@@ -106,7 +156,7 @@ public class GroupMessageService {
         message.setMessageTime(req.getMessageTime());
         message.setGroupId(req.getGroupId());
 
-        messageStoreService.storeGroupMessage(message);
+        messageStoreServiceImpl.storeGroupMessage(message);
 
         sendMessageResp.setMessageKey(message.getMessageKey());
         sendMessageResp.setMessageTime(System.currentTimeMillis());
@@ -128,8 +178,8 @@ public class GroupMessageService {
      * @param appId
      * @return
      */
-    protected ResponseVO serverPermissionCheck(String fromId, String groupId, Integer appId) {
-        return checkSendMessageService.checkGroupMessage(fromId, groupId, appId);
+    public ResponseVO serverPermissionCheck(String fromId, String groupId, Integer appId) {
+        return checkSendMessageImpl.checkGroupMessage(fromId, groupId, appId);
     }
 
     /**
@@ -165,7 +215,7 @@ public class GroupMessageService {
      * @return
      */
     protected void dispatchMessage(GroupChatMessageContent messageContent) {
-        messageContent.getMemberId().stream()
+        messageContent.getMemberIds().stream()
                 // 排除自己
                 .filter(memberId -> !memberId.equals(messageContent.getFromId()))
                 .forEach(memberId -> messageProducer.sendToUserAllClient(
