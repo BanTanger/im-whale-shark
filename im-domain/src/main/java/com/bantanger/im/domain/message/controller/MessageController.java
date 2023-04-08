@@ -3,6 +3,7 @@ package com.bantanger.im.domain.message.controller;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.model.message.CheckSendMessageReq;
 import com.bantanger.im.domain.message.model.req.SendMessageReq;
+import com.bantanger.im.domain.message.service.GroupMessageService;
 import com.bantanger.im.domain.message.service.P2PMessageService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,9 @@ public class MessageController {
     @Resource
     P2PMessageService p2PMessageService;
 
+    @Resource
+    GroupMessageService groupMessageService;
+
     /**
      * 后台消息发送接口
      *
@@ -38,13 +42,24 @@ public class MessageController {
     }
 
     /**
-     * Feign RPC 调用内部接口
+     * Feign RPC 调用 [P2P] 内部接口
      * @param req
      * @return
      */
-    @RequestMapping("/checkSend")
-    public ResponseVO checkSend(@RequestBody @Validated CheckSendMessageReq req) {
+    @RequestMapping("/p2pCheckSend")
+    public ResponseVO checkP2PSend(@RequestBody @Validated CheckSendMessageReq req) {
         return p2PMessageService.serverPermissionCheck(
+                req.getFromId(), req.getToId(), req.getAppId());
+    }
+
+    /**
+     * Feign RPC 调用 [GROUP] 内部接口
+     * @param req
+     * @return
+     */
+    @RequestMapping("/groupCheckSend")
+    public ResponseVO checkGroupSend(@RequestBody @Validated CheckSendMessageReq req) {
+        return groupMessageService.serverPermissionCheck(
                 req.getFromId(), req.getToId(), req.getAppId());
     }
 

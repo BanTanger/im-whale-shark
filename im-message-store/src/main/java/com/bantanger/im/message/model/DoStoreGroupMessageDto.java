@@ -1,6 +1,6 @@
 package com.bantanger.im.message.model;
 
-import com.bantanger.im.common.model.message.GroupChatMessageContent;
+import com.bantanger.im.common.model.message.content.GroupChatMessageContent;
 import com.bantanger.im.message.dao.ImMessageBodyEntity;
 import lombok.Data;
 

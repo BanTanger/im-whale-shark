@@ -9,7 +9,7 @@ import lombok.Data;
  * @Date 2023/4/6 23:03
  */
 @Data
-public class MessageReceiveAckPack extends ClientInfo {
+public class MessageReceiveAckContent extends ClientInfo {
 
     /** 消息唯一标识 */
     private Long messageKey;

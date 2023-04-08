@@ -3,7 +3,7 @@ package com.bantanger.im.service.strategy.command.system;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.bantanger.im.codec.pack.LoginPack;
+import com.bantanger.im.codec.pack.command.LoginPack;
 import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.device.ConnectState;

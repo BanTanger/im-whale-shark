@@ -4,26 +4,62 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="feat: 消息逻辑改造,大幅提高消息实时性 #19&#10;1. 线程池优化串行化消息处理流程&#10;2. RPC 解耦消息合法性校验&#10;3. 使用 RabbitMQ 异步执行单聊、群聊消息的持久化, 降低平均响应时间&#10;4. 优化策略模式 systemStrategy 接口的传参结构, 便于后续维护">
-      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/MessageReceiveAckPack.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/seq/RedisSequence.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/MessageSyncService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/support/ids/ConversationIdGenerate.java" afterDir="false" />
+    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="feat: 消息逻辑改造,大幅提高消息可靠性、有序性、幂等性 #24&#10;1. 可靠性：应用层两次握手保证消息可靠(上行 ACK 和下行 ACK)&#10;2. 有序性：redis 原子操作 incr 保证消息绝对顺序, 并解决线上隐患&#10;3. 幂等性：SDK 和服务端分别做防重处理。并限制消息重试次数&#10;4. 更改同步单聊和群聊&#10;5. 修改用户无法正常下线的 bug">
+      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/pack/conversation/DeleteConversationPack.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/pack/conversation/UpdateConversationPack.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/pack/message/MessageReadPack.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/pack/message/MessageReceiveServerAckPack.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/command/ConversationEventCommand.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/conversation/ConversationTypeEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/error/ConversationErrorCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/content/OfflineMessageContent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/read/MessageReadContent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/controller/ConversationController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/dao/ImConversationSetEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/dao/mapper/ImConversationSetMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/model/DeleteConversationReq.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/model/UpdateConversationReq.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/service/ConversationService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/service/ConversationServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/store/MessageStoreService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/sync/MessageSyncService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/sync/MessageSyncServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/main/resources/mapper/ImConversationSetMapper.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-tcp/src/main/resources/WebSocket.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/pack/LoginPack.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/pack/command/LoginPack.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/constant/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/constant/Constants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/command/GroupEventCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/command/GroupEventCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/command/MessageCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/command/MessageCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/MessageContent.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/MessageContent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/interceptor/IdentityCheck.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/interceptor/IdentityCheck.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/CheckSendMessageReq.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/CheckSendMessageReq.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/GroupChatMessageContent.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/content/GroupChatMessageContent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/MessageBody.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/content/MessageBody.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/MessageContent.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/content/MessageContent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/MessageReceiveAckPack.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/MessageReceiveAckContent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/store/DoStoreGroupMessageDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/store/DoStoreGroupMessageDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/store/DoStoreP2PMessageDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/store/DoStoreP2PMessageDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/config/WebConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/config/WebConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupMemberServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupMemberServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/controller/MessageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/mq/AbstractChatOperateReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/mq/AbstractChatOperateReceiver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/mq/GroupChatOperateReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/mq/GroupChatOperateReceiver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/mq/P2PChatOperateReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/mq/P2PChatOperateReceiver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/CheckSendMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/check/CheckSendMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/CheckSendMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/check/CheckSendMessageImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/MessageStoreService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/MessageStoreService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/MessageStoreService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/store/MessageStoreServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/MessageSyncService.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/test/python/heartBeat.py" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/test/python/heartBeat.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-message-store/src/main/java/com/bantanger/im/message/model/DoStoreGroupMessageDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-message-store/src/main/java/com/bantanger/im/message/model/DoStoreGroupMessageDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-message-store/src/main/java/com/bantanger/im/message/model/DoStoreP2PMessageDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-message-store/src/main/java/com/bantanger/im/message/model/DoStoreP2PMessageDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-message-store/src/main/java/com/bantanger/im/message/service/StoreMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-message-store/src/main/java/com/bantanger/im/message/service/StoreMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/sendmsg/MessageProducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/sendmsg/MessageProducer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/UserChannelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/UserChannelRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/config/AppConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/config/AppConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/feign/FeignMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/feign/FeignMessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/message/GroupMsgCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/message/GroupMsgCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/message/P2PMsgCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/message/P2PMsgCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/system/LoginCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/system/LoginCommand.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +102,7 @@
     <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitRewordedCommitMessages">
-    <option name="onto" value="6855f0dff7e777757ed1cc2e4dc7d50a3cc0679c" />
+    <option name="onto" value="5b30a3bd1d957b2d3cf69e63aed281d2ede8733a" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -114,7 +150,7 @@
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
     <property name="database.data.extractors.current.export.id" value="SQL Inserts" />
     <property name="jdk.selected.PYTHON_MODULE" value="Python 3.9 (whale-shark)" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../im-system" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.1359375" />
     <property name="project.structure.side.proportion" value="0.22986425" />
@@ -129,11 +165,11 @@
       <recent name="com.bantanger.im.tcp.handler" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\JavaProjectManager\whale-shark\im-domain\src\main\java\com\bantanger\im\domain\conversation" />
+      <recent name="E:\JavaProjectManager\whale-shark\im-tcp\src\main\resources" />
+      <recent name="E:\JavaProjectManager\whale-shark\im-domain\src\main\resources\mapper" />
       <recent name="E:\JavaProjectManager\whale-shark\im-message-store\src\main\java\com\bantanger\im\message\model" />
       <recent name="E:\JavaProjectManager\whale-shark\im-message-store\src\main\java\com\bantanger\im\message" />
-      <recent name="E:\JavaProjectManager\whale-shark\im-message-store\src\main\resources" />
-      <recent name="E:\JavaProjectManager\whale-shark\im-tcp\src\main\resources" />
-      <recent name="E:\JavaProjectManager\whale-shark\im-codec\src\main\java\com\bantanger\im\codec" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="E:\JavaProjectManager\whale-shark\test_result" />
@@ -150,11 +186,11 @@
       <recent name="com.bantanger.im.domain.user.controller" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="com.bantanger.im.service.support.ids" />
-      <recent name="com.bantanger.im.common.enums.user" />
-      <recent name="com.bantanger.im.domain.interceptor" />
-      <recent name="com.bantanger.im.service.strategy.command.message" />
-      <recent name="com.bantanger.im.common.model.message" />
+      <recent name="com.bantanger.im.common.model.message.content" />
+      <recent name="com.bantanger.im.codec.pack.conversation" />
+      <recent name="com.bantanger.im.common.enums.command" />
+      <recent name="com.bantanger.im.common.enums.error" />
+      <recent name="com.bantanger.im.domain.conversation.dao" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -266,7 +302,7 @@
       <workItem from="1680334824202" duration="38037000" />
       <workItem from="1680509878917" duration="27133000" />
       <workItem from="1680618853196" duration="9639000" />
-      <workItem from="1680857331005" duration="7821000" />
+      <workItem from="1680857331005" duration="39006000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 采用策略模式重构命令执行逻辑">
       <created>1679715761283</created>
@@ -380,7 +416,14 @@
       <option name="project" value="LOCAL" />
       <updated>1680783035121</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="feat: 消息逻辑改造,大幅提高消息可靠性、有序性、幂等性 #19&#10;1. 可靠性：应用层两次握手保证消息可靠(上行 ACK 和下行 ACK)&#10;2. 有序性：redis 原子操作 incr 保证消息绝对顺序, 并解决线上隐患&#10;3. 幂等性：SDK 和服务端分别做防重处理。并限制消息重试次数">
+      <created>1680881571054</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1680881571054</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -436,7 +479,8 @@
     <MESSAGE value="feat: 增添单聊消息发送逻辑 #19&#10;1. RabbitMQ 连接 TCP 层和网关层, 将 MQ 消息从 Chat 发送给逻辑层进行进一步的业务处理&#10;2. 单聊消息发送的前置校验&#10;3. 单体消息发送时的消息多端同步" />
     <MESSAGE value="feat: 消息逻辑改造,大幅提高消息实时性 #19&#10;1. 线程池优化串行化消息处理流程&#10;2. RPC 解耦消息合法性校验&#10;3. 使用 RabbitMQ 异步执行单聊、群聊消息的持久化, 降低平均响应时间&#10;4. 优化策略模式 systemStrategy 接口的传参结构, 便于后续维护" />
     <MESSAGE value="feat: 消息逻辑改造,大幅提高消息实时性 #21&#10;1. 线程池优化串行化消息处理流程&#10;2. RPC 解耦消息合法性校验&#10;3. 使用 RabbitMQ 异步执行单聊、群聊消息的持久化, 降低平均响应时间&#10;4. 优化策略模式 systemStrategy 接口的传参结构, 便于后续维护&#10;5. 修复错误" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: 消息逻辑改造,大幅提高消息实时性 #19&#10;1. 线程池优化串行化消息处理流程&#10;2. RPC 解耦消息合法性校验&#10;3. 使用 RabbitMQ 异步执行单聊、群聊消息的持久化, 降低平均响应时间&#10;4. 优化策略模式 systemStrategy 接口的传参结构, 便于后续维护" />
+    <MESSAGE value="feat: 消息逻辑改造,大幅提高消息可靠性、有序性、幂等性 #24&#10;1. 可靠性：应用层两次握手保证消息可靠(上行 ACK 和下行 ACK)&#10;2. 有序性：redis 原子操作 incr 保证消息绝对顺序, 并解决线上隐患&#10;3. 幂等性：SDK 和服务端分别做防重处理。并限制消息重试次数&#10;4. 更改同步单聊和群聊&#10;5. 修改用户无法正常下线的 bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: 消息逻辑改造,大幅提高消息可靠性、有序性、幂等性 #24&#10;1. 可靠性：应用层两次握手保证消息可靠(上行 ACK 和下行 ACK)&#10;2. 有序性：redis 原子操作 incr 保证消息绝对顺序, 并解决线上隐患&#10;3. 幂等性：SDK 和服务端分别做防重处理。并限制消息重试次数&#10;4. 更改同步单聊和群聊&#10;5. 修改用户无法正常下线的 bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -460,6 +504,31 @@
           <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendServiceImpl.java</url>
           <line>109</line>
           <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupServiceImpl.java</url>
+          <line>418</line>
+          <option name="timeStamp" value="95" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/check/CheckSendMessageImpl.java</url>
+          <line>121</line>
+          <option name="timeStamp" value="96" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/message/GroupMsgCommand.java</url>
+          <line>34</line>
+          <option name="timeStamp" value="97" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/message/GroupMsgCommand.java</url>
+          <line>39</line>
+          <option name="timeStamp" value="98" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java</url>
+          <line>112</line>
+          <option name="timeStamp" value="106" />
         </line-breakpoint>
         <breakpoint type="java-exception">
           <properties class="org.apache.commons.lang.NullArgumentException" package="org.apache.commons.lang" />

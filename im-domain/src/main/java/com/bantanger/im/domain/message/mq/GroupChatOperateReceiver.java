@@ -1,10 +1,14 @@
 package com.bantanger.im.domain.message.mq;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.GroupEventCommand;
-import com.bantanger.im.common.model.message.GroupChatMessageContent;
+import com.bantanger.im.common.model.message.content.GroupChatMessageContent;
+import com.bantanger.im.common.model.message.read.MessageReadContent;
 import com.bantanger.im.domain.message.service.GroupMessageService;
+import com.bantanger.im.domain.message.service.sync.MessageSyncService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -32,6 +36,9 @@ public class GroupChatOperateReceiver extends AbstractChatOperateReceiver {
     @Resource
     GroupMessageService groupMessageService;
 
+    @Resource
+    MessageSyncService messageSyncServiceImpl;
+
     @RabbitListener(
             bindings = @QueueBinding(
                     value = @Queue(value = Constants.RabbitmqConstants.Im2GroupService, durable = "true"),
@@ -46,14 +53,20 @@ public class GroupChatOperateReceiver extends AbstractChatOperateReceiver {
     }
 
     @Override
-    protected void doStrategy(Integer command, JSONObject jsonObject) {
+    protected void doStrategy(Integer command, JSONObject jsonObject, String message) {
         if (command.equals(GroupEventCommand.MSG_GROUP.getCommand())) {
-            //处理消息
+            // 处理消息
             GroupChatMessageContent messageContent
                     = jsonObject.toJavaObject(GroupChatMessageContent.class);
             groupMessageService.processor(messageContent);
+        } else if (command.equals(GroupEventCommand.MSG_GROUP_READ.getCommand())) {
+            // 消息已读接收确认
+            MessageReadContent messageContent = JSON.parseObject(message, new TypeReference<MessageReadContent>() {
+            }.getType());
+            messageSyncServiceImpl.readMark(messageContent,
+                    GroupEventCommand.MSG_GROUP_READ_NOTIFY,
+                    GroupEventCommand.MSG_GROUP_READ_RECEIPT);
         }
     }
-
 
 }
