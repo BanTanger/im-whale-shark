@@ -4,50 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="feat:">
-      <change afterPath="$PROJECT_DIR$/assert/design/写扩散.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assert/design/多端消息同步改进.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assert/design/多端消息同步的弊端.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assert/design/数据库结构更变.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assert/design/消息拉取前后端联调设计.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assert/design/消息拉取架构设计.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assert/design/群聊消息同步流程.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assert/design/读扩散.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/SyncReq.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/SyncResp.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-domain/src/main/resources/mapper/ImGroupMapper.xml" afterDir="false" />
+    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/controller/ConversationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/controller/ConversationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/dao/mapper/ImConversationSetMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/dao/mapper/ImConversationSetMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/service/ConversationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/service/ConversationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/service/ConversationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/conversation/service/ConversationServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/controller/ImFriendShipController.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/controller/ImFriendShipController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/dao/mapper/ImFriendShipMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/dao/mapper/ImFriendShipMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/ImFriendService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/ImFriendService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/ImFriendShipGroupService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/ImFriendShipGroupService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendShipGroupMemberServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendShipGroupMemberServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendShipGroupServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendShipGroupServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendShipRequestServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendShipRequestServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/controller/ImGroupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/controller/ImGroupController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/dao/mapper/ImGroupMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/dao/mapper/ImGroupMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/dao/mapper/ImGroupMemberMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/dao/mapper/ImGroupMemberMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/ImGroupMemberService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/ImGroupMemberService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/ImGroupService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/ImGroupService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupMemberServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupMemberServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/controller/MessageController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/sync/MessageSyncService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/sync/MessageSyncService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/sync/MessageSyncServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/sync/MessageSyncServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/resources/mapper/ImConversationSetMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/resources/mapper/ImConversationSetMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/resources/mapper/ImFriendShipMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/resources/mapper/ImFriendShipMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/resources/mapper/ImGroupMemberMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/resources/mapper/ImGroupMemberMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-message-store/src/main/java/com/bantanger/im/message/service/StoreMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-message-store/src/main/java/com/bantanger/im/message/service/StoreMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/config/AppConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/config/AppConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/MqFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/MqFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/controller/ImUserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/controller/ImUserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/service/ImUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/service/ImUserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/service/impl/ImUserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/user/service/impl/ImUserServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,7 +53,7 @@
     <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitRewordedCommitMessages">
-    <option name="onto" value="5b30a3bd1d957b2d3cf69e63aed281d2ede8733a" />
+    <option name="onto" value="8df253cf2b15a57011e0fed369d53a8bc1a6ea18" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -99,6 +62,13 @@
       <filtered-out-file-type name="TAG" />
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
+  </component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="master" />
+      </list>
+    </option>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -293,7 +263,7 @@
       <workItem from="1680857331005" duration="39006000" />
       <workItem from="1681008036555" duration="8266000" />
       <workItem from="1681055472622" duration="9143000" />
-      <workItem from="1681368455405" duration="20305000" />
+      <workItem from="1681368455405" duration="25673000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 采用策略模式重构命令执行逻辑">
       <created>1679715761283</created>
@@ -421,7 +391,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681227039801</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取">
+      <created>1681473587111</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1681473587111</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -479,7 +456,8 @@
     <MESSAGE value="feat: 消息逻辑改造,大幅提高消息实时性 #21&#10;1. 线程池优化串行化消息处理流程&#10;2. RPC 解耦消息合法性校验&#10;3. 使用 RabbitMQ 异步执行单聊、群聊消息的持久化, 降低平均响应时间&#10;4. 优化策略模式 systemStrategy 接口的传参结构, 便于后续维护&#10;5. 修复错误" />
     <MESSAGE value="feat: 消息逻辑改造,大幅提高消息可靠性、有序性、幂等性 #24&#10;1. 可靠性：应用层两次握手保证消息可靠(上行 ACK 和下行 ACK)&#10;2. 有序性：redis 原子操作 incr 保证消息绝对顺序, 并解决线上隐患&#10;3. 幂等性：SDK 和服务端分别做防重处理。并限制消息重试次数&#10;4. 更改同步单聊和群聊&#10;5. 修改用户无法正常下线的 bug" />
     <MESSAGE value="feat:" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat:" />
+    <MESSAGE value="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

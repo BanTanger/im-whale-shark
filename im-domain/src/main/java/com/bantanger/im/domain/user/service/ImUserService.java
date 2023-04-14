@@ -47,5 +47,18 @@ public interface ImUserService {
      */
     ResponseVO modifyUserInfo(ModifyUserInfoReq req);
 
+    /**
+     * 用户登录功能
+     * @param req
+     * @return
+     */
     ResponseVO login(LoginReq req);
+
+    /**
+     * 客户端向服务端请求该用户各接口需要拉取的数量
+     * @param req
+     * @return
+     */
+    ResponseVO getUserSequence(GetUserSequenceReq req);
+
 }

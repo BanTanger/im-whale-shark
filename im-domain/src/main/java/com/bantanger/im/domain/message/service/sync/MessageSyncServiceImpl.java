@@ -74,9 +74,9 @@ public class MessageSyncServiceImpl implements MessageSyncService {
         SyncResp<OfflineMessageContent> resp = new SyncResp<>();
 
         String key = req.getAppId() + ":" + Constants.RedisConstants.OfflineMessage + ":" + req.getOperater();
-        //获取最大的seq
         Long maxSeq = 0L;
         ZSetOperations zSetOperations = redisTemplate.opsForZSet();
+        // 获取最大的 seq
         Set set = zSetOperations.reverseRangeWithScores(key, 0, 0);
         if(!CollectionUtils.isEmpty(set)){
             List list = new ArrayList(set);
