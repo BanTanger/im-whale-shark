@@ -101,4 +101,12 @@ public interface ImGroupMemberService {
      */
     ResponseVO speak(SpeaMemberReq req);
 
+    /**
+     * 增量拉取用户被拉入群聊通知最大条目数
+     * [边界情况：离开群聊但状态未更新的用户不能拉取数据]
+     * @param operater
+     * @param appId
+     * @return
+     */
+    ResponseVO<Collection<String>> syncMemberJoinedGroup(String operater, Integer appId);
 }

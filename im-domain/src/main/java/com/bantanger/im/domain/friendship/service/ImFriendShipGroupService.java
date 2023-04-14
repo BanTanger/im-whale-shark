@@ -17,4 +17,12 @@ public interface ImFriendShipGroupService {
 
     ResponseVO<ImFriendShipGroupEntity> getGroup(String fromId, String groupName, Integer appId);
 
+    /**
+     * redis 中的群组消息序列定期存储到数据库中
+     * @param fromId
+     * @param groupName
+     * @param appId
+     * @return
+     */
+    Long updateSeq(String fromId, String groupName, Integer appId);
 }

@@ -48,4 +48,12 @@ public interface ImGroupMemberMapper extends BaseMapper<ImGroupMemberEntity> {
      */
     List<GroupMemberDto> getGroupManager(String groupId, Integer appId);
 
+    /**
+     * 增量拉取用户加入群组的 Id
+     * @param appId
+     * @param memberId
+     * @param role
+     * @return
+     */
+    List<String> syncJoinedGroupId(Integer appId, String memberId, int role);
 }

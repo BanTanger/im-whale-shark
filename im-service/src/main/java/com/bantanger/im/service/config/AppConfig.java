@@ -125,4 +125,18 @@ public class AppConfig {
      */
     private Integer offlineMessageCount;
 
+    /**
+     * 好友关系每次增量拉取最大条目数
+     */
+    private Integer friendShipMaxCount;
+
+    /**
+     * 会话消息每次递增拉取最大条目数
+     */
+    private Integer conversationMaxCount;
+
+    /**
+     * 用户被拉入群通知每次递增拉取最大条目数
+     */
+    private Integer joinGroupMaxCount;
 }

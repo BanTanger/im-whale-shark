@@ -75,4 +75,9 @@
         on a.fromId = b.toId and b.fromId = a.toId
     </select>
 
+    <select id="getFriendShipMaxSeq" resultType="java.lang.Long">
+        select max(friend_sequence) from im_friendship
+        where app_id = #{appId} and from_id = #{fromId};
+    </select>
+
 </mapper>

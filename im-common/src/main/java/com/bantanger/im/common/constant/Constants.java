@@ -61,6 +61,10 @@ public class Constants {
          * 缓存群组成员列表
          */
         public static final String GroupMembers = ":groupMembers:";
+        /**
+         * 用户所有模块的偏序前缀
+         */
+        public static final String SeqPrefix = ":seq:";
     }
 
     public static class RabbitmqConstants {
@@ -133,12 +137,24 @@ public class Constants {
     }
 
     public static class SeqConstants {
+        // 保证消息有序性 Key
         /** 单聊消息有序 */
         public static final String MessageSeq = ":messageSeq:";
         /** 群聊消息有序 */
         public static final String GroupMessageSeq = ":groupMessageSeq:";
         /** 会话消息有序 */
         public static final String ConversationSeq = "conversationSeq";
+
+        // 用于消息数据同步 Key
+        /** 好友数量记录 */
+        public static final String FriendShipSeq = "friendShipSeq";
+        /** 好友申请记录 */
+        public static final String FriendShipRequestSeq = "friendShipRequestSeq";
+        /** 好友标签记录 */
+        public static final String FriendShipGroupSeq = "friendShipGroupSeq";
+        /** 群聊数量记录 */
+        public static final String GroupSeq = "groupSeq";
+
     }
 
 }

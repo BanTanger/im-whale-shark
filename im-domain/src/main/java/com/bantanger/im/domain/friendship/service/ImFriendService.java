@@ -1,5 +1,6 @@
 package com.bantanger.im.domain.friendship.service;
 
+import com.bantanger.im.common.model.SyncReq;
 import com.bantanger.im.domain.friendship.model.req.*;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.model.RequestBase;
@@ -55,4 +56,10 @@ public interface ImFriendService {
 
     ResponseVO checkBlck(CheckFriendShipReq req);
 
+    /**
+     * 增量拉取好友关系
+     * @param req
+     * @return
+     */
+    ResponseVO syncFriendShipList(SyncReq req);
 }

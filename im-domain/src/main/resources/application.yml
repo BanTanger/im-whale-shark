@@ -52,6 +52,9 @@ appConfig:
   addGroupMemberBeforeCallback: false # 拉人入群之前回调
   deleteConversationSyncMode: 1 # 1. 多端同步删除会话(默认) 2. 单端删除会话
   offlineMessageCount: 1024 # 离线消息最大条数
+  friendShipMaxCount: 100 # 好友关系每次增量拉取最大条目数
+  conversationMaxCount: 100 # 会话消息每次递增拉取最大条目数
+  joinGroupMaxCount: 100 # 用户被拉入群通知每次递增拉取最大条目数
 
 # logger 配置
 #logging:

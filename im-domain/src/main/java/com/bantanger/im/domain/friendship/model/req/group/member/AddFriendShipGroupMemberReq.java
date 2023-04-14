@@ -20,5 +20,4 @@ public class AddFriendShipGroupMemberReq extends RequestBase {
     @NotEmpty(message = "请选择用户")
     private List<String> toIds;
 
-
 }

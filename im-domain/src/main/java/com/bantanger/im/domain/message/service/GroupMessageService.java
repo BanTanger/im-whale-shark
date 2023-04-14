@@ -52,9 +52,6 @@ public class GroupMessageService {
     @Resource
     RedisSequence redisSequence;
 
-    @Resource
-    StringRedisTemplate stringRedisTemplate;
-
     /** 线程池优化单聊消息处理逻辑 */
     private final ThreadPoolExecutor threadPoolExecutor;
 
@@ -91,30 +88,22 @@ public class GroupMessageService {
         threadPoolExecutor.execute(() -> {
             // 1. 消息持久化落库
             messageStoreServiceImpl.storeGroupMessage(messageContent);
-            List<String> groupMemberIds = null;
-            String groupMemberCacheKey = messageContent.getAppId() +
-                    Constants.RedisConstants.GroupMembers + messageContent.getGroupId();
-            // 使用缓存防止多次查询拖垮数据库
-            if (stringRedisTemplate.hasKey(groupMemberCacheKey)) {
-                groupMemberIds = stringRedisTemplate.opsForList().range(groupMemberCacheKey, 0, -1);
-            } else {
-                // 查询群组所有成员进行消息分发
-                groupMemberIds = imGroupMemberServiceImpl
-                        .getGroupMemberId(messageContent.getGroupId(), messageContent.getAppId());
-                if (groupMemberIds != null && groupMemberIds.isEmpty()) {
-                    stringRedisTemplate.opsForList().rightPushAll(groupMemberCacheKey,
-                            groupMemberIds.toArray(new String[0]));
-                }
-            }
+
+            // 查询群组所有成员进行消息分发
+            List<String> groupMemberIds = imGroupMemberServiceImpl
+                    .getGroupMemberId(messageContent.getGroupId(), messageContent.getAppId());
+
             messageContent.setMemberIds(groupMemberIds);
 
             // 2.在异步持久化之后执行离线消息存储
             OfflineMessageContent offlineMessage = getOfflineMessage(messageContent);
+            offlineMessage.setToId(messageContent.getGroupId());
             messageStoreServiceImpl.storeGroupOfflineMessage(offlineMessage, groupMemberIds);
 
             // 线程池执行消息同步，发送，回应等任务流程
             doThreadPoolTask(messageContent);
 
+            // 消息缓存
             messageStoreServiceImpl.setMessageCacheByMessageId(
                     messageContent.getAppId(), messageContent.getMessageId(), messageContent);
         });

@@ -1,5 +1,6 @@
 package com.bantanger.im.domain.group.controller;
 
+import com.bantanger.im.common.model.SyncReq;
 import com.bantanger.im.domain.group.model.req.*;
 import com.bantanger.im.domain.group.service.ImGroupService;
 import com.bantanger.im.common.ResponseVO;
@@ -162,6 +163,12 @@ public class ImGroupController {
         req.setAppId(appId);
         req.setOperater(identifier);
         return ResponseVO.successResponse(groupMessageService.send(req));
+    }
+
+    @RequestMapping("/syncJoinedGroup")
+    public ResponseVO syncJoinedGroup(@RequestBody @Validated SyncReq req, Integer appId)  {
+        req.setAppId(appId);
+        return groupService.syncJoinedGroupList(req);
     }
 
 }

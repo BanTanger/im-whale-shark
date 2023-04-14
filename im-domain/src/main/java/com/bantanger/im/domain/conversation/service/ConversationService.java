@@ -1,9 +1,11 @@
 package com.bantanger.im.domain.conversation.service;
 
 import com.bantanger.im.common.ResponseVO;
+import com.bantanger.im.common.model.SyncReq;
 import com.bantanger.im.common.model.message.read.MessageReadContent;
 import com.bantanger.im.domain.conversation.model.DeleteConversationReq;
 import com.bantanger.im.domain.conversation.model.UpdateConversationReq;
+import com.sun.corba.se.impl.orbutil.concurrent.Sync;
 
 /**
  * @author BanTanger 半糖
@@ -31,4 +33,5 @@ public interface ConversationService {
      */
     ResponseVO updateConversation(UpdateConversationReq req);
 
+    ResponseVO syncConversationSet(SyncReq req);
 }

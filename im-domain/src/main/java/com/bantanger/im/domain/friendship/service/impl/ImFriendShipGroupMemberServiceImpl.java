@@ -9,8 +9,10 @@ import com.bantanger.im.domain.friendship.dao.ImFriendShipGroupMemberEntity;
 import com.bantanger.im.domain.friendship.dao.mapper.ImFriendShipGroupMemberMapper;
 import com.bantanger.im.domain.friendship.model.resp.AddGroupMemberResp;
 import com.bantanger.im.domain.friendship.service.ImFriendShipGroupMemberService;
+import com.bantanger.im.domain.message.seq.RedisSequence;
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.service.sendmsg.MessageProducer;
+import com.bantanger.im.service.utils.UserSequenceRepository;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.domain.friendship.model.req.group.member.AddFriendShipGroupMemberReq;
@@ -77,11 +79,14 @@ public class ImFriendShipGroupMemberServiceImpl
         resp.setSuccessId(successId);
         resp.setErrorId(errorId);
 
+        Long seq = imFriendShipGroupService.updateSeq(req.getFromId(), req.getGroupName(), req.getAppId());
+
         // 发送 TCP 通知
         AddFriendGroupMemberPack pack = new AddFriendGroupMemberPack();
         pack.setFromId(req.getFromId());
         pack.setGroupName(req.getGroupName());
         pack.setToIds(successId);
+        pack.setSequence(seq);
         messageProducer.sendToUserExceptClient(req.getFromId(), FriendshipEventCommand.FRIEND_GROUP_MEMBER_ADD,
                 pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
 
@@ -107,11 +112,14 @@ public class ImFriendShipGroupMemberServiceImpl
             }
         }
 
+        Long seq = imFriendShipGroupService.updateSeq(req.getFromId(), req.getGroupName(), req.getAppId());
+
         // 发送 TCP 通知
         DeleteFriendGroupMemberPack pack = new DeleteFriendGroupMemberPack();
         pack.setFromId(req.getFromId());
         pack.setGroupName(req.getGroupName());
         pack.setToIds(successId);
+        pack.setSequence(seq);
         messageProducer.sendToUserExceptClient(req.getFromId(), FriendshipEventCommand.FRIEND_GROUP_MEMBER_DELETE,
                 pack,new ClientInfo(req.getAppId(),req.getClientType(),req.getImei()));
 

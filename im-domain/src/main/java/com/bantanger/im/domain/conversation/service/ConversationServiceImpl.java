@@ -8,6 +8,8 @@ import com.bantanger.im.common.enums.command.ConversationEventCommand;
 import com.bantanger.im.common.enums.conversation.ConversationTypeEnum;
 import com.bantanger.im.common.enums.error.ConversationErrorCode;
 import com.bantanger.im.common.model.ClientInfo;
+import com.bantanger.im.common.model.SyncReq;
+import com.bantanger.im.common.model.SyncResp;
 import com.bantanger.im.common.model.message.read.MessageReadContent;
 import com.bantanger.im.domain.conversation.dao.ImConversationSetEntity;
 import com.bantanger.im.domain.conversation.dao.mapper.ImConversationSetMapper;
@@ -16,10 +18,13 @@ import com.bantanger.im.domain.conversation.model.UpdateConversationReq;
 import com.bantanger.im.domain.message.seq.RedisSequence;
 import com.bantanger.im.service.config.AppConfig;
 import com.bantanger.im.service.sendmsg.MessageProducer;
+import com.bantanger.im.service.utils.UserSequenceRepository;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author BanTanger 半糖
@@ -39,6 +44,9 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Resource
     AppConfig appConfig;
+
+    @Resource
+    UserSequenceRepository userSequenceRepository;
 
     public String convertConversationId(Integer type, String fromId, String toId) {
         return type + "_" + fromId + "_" + toId;
@@ -74,12 +82,18 @@ public class ConversationServiceImpl implements ConversationService {
             imConversationSetEntity.setReadSequence(messageReadContent.getMessageSequence());
 
             imConversationSetMapper.insert(imConversationSetEntity);
+
+            userSequenceRepository.writeUserSeq(messageReadContent.getAppId(),
+                    messageReadContent.getFromId(), Constants.SeqConstants.ConversationSeq, seq);
         } else {
             long seq = redisSequence.doGetSeq(
                     messageReadContent.getAppId() + ":" + Constants.SeqConstants.ConversationSeq);
             imConversationSetEntity.setSequence(seq);
             imConversationSetEntity.setReadSequence(messageReadContent.getMessageSequence());
             imConversationSetMapper.readMark(imConversationSetEntity);
+
+            userSequenceRepository.writeUserSeq(messageReadContent.getAppId(),
+                    messageReadContent.getFromId(), Constants.SeqConstants.ConversationSeq, seq);
         }
     }
 
@@ -118,6 +132,9 @@ public class ConversationServiceImpl implements ConversationService {
             imConversationSetEntity.setSequence(seq);
             imConversationSetMapper.update(imConversationSetEntity, query);
 
+            userSequenceRepository.writeUserSeq(req.getAppId(),
+                    req.getFromId(), Constants.SeqConstants.ConversationSeq, seq);
+
             UpdateConversationPack pack = new UpdateConversationPack();
             pack.setConversationId(req.getConversationId());
             pack.setIsMute(imConversationSetEntity.getIsMute());
@@ -132,4 +149,34 @@ public class ConversationServiceImpl implements ConversationService {
         return ResponseVO.successResponse();
     }
 
+    @Override
+    public ResponseVO syncConversationSet(SyncReq req) {
+        if (req.getMaxLimit() > appConfig.getConversationMaxCount()) {
+            req.setMaxLimit(appConfig.getConversationMaxCount());
+        }
+
+        SyncResp<ImConversationSetEntity> resp = new SyncResp<>();
+
+        QueryWrapper<ImConversationSetEntity> query = new QueryWrapper<>();
+        query.eq("from_id", req.getOperater());
+        query.gt("sequence", req.getLastSequence());
+        query.eq("app_id", req.getAppId());
+        query.last("limit " + req.getMaxLimit());
+        query.orderByAsc("sequence");
+        List<ImConversationSetEntity> list = imConversationSetMapper.selectList(query);
+
+        if (!CollectionUtils.isEmpty(list)) {
+            ImConversationSetEntity maxSeqEntity = list.get(list.size() - 1);
+            resp.setDataList(list);
+            // 设置最大 Seq
+            Long conversationMaxSeq = imConversationSetMapper
+                    .getConversationMaxSeq(req.getAppId());
+            resp.setMaxSequence(conversationMaxSeq);
+            // 设置是否拉取完毕
+            resp.setCompleted(maxSeqEntity.getSequence() >= conversationMaxSeq);
+            return ResponseVO.successResponse(resp);
+        }
+        resp.setCompleted(true);
+        return ResponseVO.successResponse(resp);
+    }
 }

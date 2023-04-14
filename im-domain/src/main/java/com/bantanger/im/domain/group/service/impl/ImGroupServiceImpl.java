@@ -7,12 +7,14 @@ import com.bantanger.im.codec.pack.group.UpdateGroupInfoPack;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.GroupEventCommand;
 import com.bantanger.im.common.model.ClientInfo;
-import com.bantanger.im.common.model.RequestBase;
+import com.bantanger.im.common.model.SyncReq;
+import com.bantanger.im.common.model.SyncResp;
 import com.bantanger.im.domain.group.model.req.*;
 import com.bantanger.im.domain.group.model.req.callback.DestroyGroupCallbackDto;
 import com.bantanger.im.domain.group.model.resp.GetGroupResp;
 import com.bantanger.im.domain.group.service.ImGroupService;
 import com.bantanger.im.domain.group.GroupMessageProducer;
+import com.bantanger.im.domain.message.seq.RedisSequence;
 import com.bantanger.im.service.callback.CallbackService;
 import com.bantanger.im.service.config.AppConfig;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -31,7 +33,6 @@ import com.bantanger.im.domain.group.model.resp.GetRoleInGroupResp;
 import com.bantanger.im.domain.group.service.ImGroupMemberService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,19 +47,22 @@ import java.util.*;
 public class ImGroupServiceImpl implements ImGroupService {
 
     @Resource
-    ImGroupMapper imGroupDataMapper;
+    ImGroupMapper imGroupMapper;
 
     @Resource
-    ImGroupMemberService groupMemberService;
+    ImGroupMemberService imGroupMemberService;
 
     @Resource
-    CallbackService callbackService;
+    CallbackService callbackServiceImpl;
 
     @Resource
     AppConfig appConfig;
 
-    @Autowired
+    @Resource
     GroupMessageProducer groupMessageProducer;
+
+    @Resource
+    RedisSequence redisSequence;
 
     @Override
     public ResponseVO importGroup(ImportGroupReq req) {
@@ -72,7 +76,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         } else {
             query.eq("group_id", req.getGroupId());
             query.eq("app_id", req.getAppId());
-            Integer integer = imGroupDataMapper.selectCount(query);
+            Integer integer = imGroupMapper.selectCount(query);
             if (integer > 0) {
                 throw new ApplicationException(GroupErrorCode.GROUP_IS_EXIST);
             }
@@ -102,7 +106,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         imGroupEntity.setExtra(req.getExtra());
         imGroupEntity.setStatus(GroupStatusEnum.NORMAL.getCode());
 
-        int insert = imGroupDataMapper.insert(imGroupEntity);
+        int insert = imGroupMapper.insert(imGroupEntity);
 
         if (insert != 1) {
             throw new ApplicationException(GroupErrorCode.IMPORT_GROUP_ERROR);
@@ -129,7 +133,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         } else {
             query.eq("group_id", req.getGroupId());
             query.eq("app_id", req.getAppId());
-            Integer integer = imGroupDataMapper.selectCount(query);
+            Integer integer = imGroupMapper.selectCount(query);
             if (integer > 0) {
                 throw new ApplicationException(GroupErrorCode.GROUP_IS_EXIST);
             }
@@ -140,7 +144,10 @@ public class ImGroupServiceImpl implements ImGroupService {
             throw new ApplicationException(GroupErrorCode.PUBLIC_GROUP_MUST_HAVE_OWNER);
         }
 
+        long seq = redisSequence.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.GroupSeq);
+
         ImGroupEntity imGroupEntity = new ImGroupEntity();
+        imGroupEntity.setSequence(seq);
         imGroupEntity.setGroupId(req.getGroupId());
         imGroupEntity.setAppId(req.getAppId());
         imGroupEntity.setOwnerId(req.getOwnerId());
@@ -156,18 +163,18 @@ public class ImGroupServiceImpl implements ImGroupService {
         imGroupEntity.setCreateTime(System.currentTimeMillis());
         imGroupEntity.setStatus(GroupStatusEnum.NORMAL.getCode());
 
-        int insert = imGroupDataMapper.insert(imGroupEntity);
+        int insert = imGroupMapper.insert(imGroupEntity);
 
         // 群主插入 GroupMember 表，并将其设置成 owner 权限
         GroupMemberDto groupMemberDto = new GroupMemberDto();
         groupMemberDto.setMemberId(req.getOwnerId());
         groupMemberDto.setRole(GroupMemberRoleEnum.OWNER.getCode());
         groupMemberDto.setJoinTime(System.currentTimeMillis());
-        groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), groupMemberDto);
+        imGroupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), groupMemberDto);
 
         //插入群成员
         for (GroupMemberDto dto : req.getMember()) {
-            groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), dto);
+            imGroupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), dto);
         }
 
         // 发送 TCP 通知
@@ -192,7 +199,7 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         // 之后回调
         if (appConfig.isCreateGroupAfterCallback()) {
-            callbackService.afterCallback(req.getAppId(),
+            callbackServiceImpl.afterCallback(req.getAppId(),
                     Constants.CallbackCommand.CreateGroupAfter,
                     JSONObject.toJSONString(imGroupEntity));
         }
@@ -208,7 +215,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         QueryWrapper<ImGroupEntity> query = new QueryWrapper<>();
         query.eq("group_id", req.getGroupId());
         query.eq("app_id", req.getAppId());
-        ImGroupEntity imGroupEntity = imGroupDataMapper.selectOne(query);
+        ImGroupEntity imGroupEntity = imGroupMapper.selectOne(query);
         if (imGroupEntity == null) {
             throw new ApplicationException(GroupErrorCode.GROUP_IS_EXIST);
         }
@@ -221,7 +228,7 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         if (!isAdmin) {
             //不是后台调用需要检查权限
-            ResponseVO<GetRoleInGroupResp> role = groupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+            ResponseVO<GetRoleInGroupResp> role = imGroupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
 
             if (!role.isOk()) {
                 // 用户不在群内
@@ -231,7 +238,7 @@ public class ImGroupServiceImpl implements ImGroupService {
             GetRoleInGroupResp data = role.getData();
             Integer roleInfo = data.getRole();
 
-            boolean isManager = roleInfo == GroupMemberRoleEnum.MANAGER.getCode() || roleInfo == GroupMemberRoleEnum.OWNER.getCode();
+            boolean isManager = Objects.equals(roleInfo, GroupMemberRoleEnum.MANAGER.getCode()) || Objects.equals(roleInfo, GroupMemberRoleEnum.OWNER.getCode());
 
             //公开群只能群主修改资料
             if (!isManager && GroupTypeEnum.PUBLIC.getCode() == imGroupEntity.getGroupType()) {
@@ -240,8 +247,30 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         }
 
+        long seq = redisSequence.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.GroupSeq);
+
+        ImGroupEntity update = new ImGroupEntity();
+        update.setSequence(seq);
+        update.setGroupId(req.getGroupId());
+        update.setAppId(req.getAppId());
+        update.setGroupName(req.getGroupName());
+        update.setMute(req.getMute());
+        update.setApplyJoinType(req.getApplyJoinType());
+        update.setIntroduction(req.getIntroduction());
+        update.setNotification(req.getNotification());
+        update.setPhoto(req.getPhoto());
+        update.setMaxMemberCount(req.getMaxMemberCount());
+        update.setExtra(req.getExtra());
+
+        update.setUpdateTime(System.currentTimeMillis());
+        int row = imGroupMapper.update(update, query);
+        if (row != 1) {
+            throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
+        }
+
         // 发送 TCP 通知
         UpdateGroupInfoPack pack = new UpdateGroupInfoPack();
+        pack.setSequence(seq);
         pack.setGroupId(req.getGroupId());
         pack.setGroupName(req.getGroupName());
         pack.setMute(req.getMute());
@@ -255,28 +284,10 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         // 之后回调
         if (appConfig.isModifyGroupAfterCallback()) {
-            callbackService.afterCallback(req.getAppId(),
+            callbackServiceImpl.afterCallback(req.getAppId(),
                     Constants.CallbackCommand.UpdateGroupAfter,
                     // 将修改之后的群聊信息查询给服务器 TCP 服务层
-                    JSONObject.toJSONString(imGroupDataMapper.selectOne(query)));
-        }
-
-        ImGroupEntity update = new ImGroupEntity();
-        update.setGroupId(req.getGroupId());
-        update.setAppId(req.getAppId());
-        update.setGroupName(req.getGroupName());
-        update.setMute(req.getMute());
-        update.setApplyJoinType(req.getApplyJoinType());
-        update.setIntroduction(req.getIntroduction());
-        update.setNotification(req.getNotification());
-        update.setPhoto(req.getPhoto());
-        update.setMaxMemberCount(req.getMaxMemberCount());
-        update.setExtra(req.getExtra());
-
-        update.setUpdateTime(System.currentTimeMillis());
-        int row = imGroupDataMapper.update(update, query);
-        if (row != 1) {
-            throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
+                    JSONObject.toJSONString(imGroupMapper.selectOne(query)));
         }
 
         return ResponseVO.successResponse();
@@ -286,7 +297,7 @@ public class ImGroupServiceImpl implements ImGroupService {
     public ResponseVO getJoinedGroup(GetJoinedGroupReq req) {
 
         // 1. 获取用户加入所有群 ID
-        ResponseVO<Collection<String>> memberJoinedGroup = groupMemberService.getMemberJoinedGroup(req);
+        ResponseVO<Collection<String>> memberJoinedGroup = imGroupMemberService.getMemberJoinedGroup(req);
         if (memberJoinedGroup.isOk()) {
 
             GetJoinedGroupResp resp = new GetJoinedGroupResp();
@@ -305,12 +316,12 @@ public class ImGroupServiceImpl implements ImGroupService {
                 query.in("group_type", req.getGroupType());
             }
 
-            List<ImGroupEntity> groupList = imGroupDataMapper.selectList(query);
+            List<ImGroupEntity> groupList = imGroupMapper.selectList(query);
             resp.setGroupList(groupList);
             if (req.getLimit() == null) {
                 resp.setTotalCount(groupList.size());
             } else {
-                resp.setTotalCount(imGroupDataMapper.selectCount(query));
+                resp.setTotalCount(imGroupMapper.selectCount(query));
             }
             return ResponseVO.successResponse(resp);
         } else {
@@ -327,7 +338,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         QueryWrapper<ImGroupEntity> objectQueryWrapper = new QueryWrapper<>();
         objectQueryWrapper.eq("group_id", req.getGroupId());
         objectQueryWrapper.eq("app_id", req.getAppId());
-        ImGroupEntity imGroupEntity = imGroupDataMapper.selectOne(objectQueryWrapper);
+        ImGroupEntity imGroupEntity = imGroupMapper.selectOne(objectQueryWrapper);
         if (imGroupEntity == null) {
             throw new ApplicationException(GroupErrorCode.PRIVATE_GROUP_CAN_NOT_DESTORY);
         }
@@ -347,25 +358,29 @@ public class ImGroupServiceImpl implements ImGroupService {
             }
         }
 
-        ImGroupEntity update = new ImGroupEntity();
+        long seq = redisSequence.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.GroupSeq);
 
+        ImGroupEntity update = new ImGroupEntity();
+        update.setSequence(seq);
         update.setStatus(GroupStatusEnum.DESTROY.getCode());
-        int update1 = imGroupDataMapper.update(update, objectQueryWrapper);
+        int update1 = imGroupMapper.update(update, objectQueryWrapper);
         if (update1 != 1) {
             throw new ApplicationException(GroupErrorCode.UPDATE_GROUP_BASE_INFO_ERROR);
         }
 
         // 发送 TCP 通知
         DestroyGroupPack pack = new DestroyGroupPack();
+        pack.setSequence(seq);
         pack.setGroupId(req.getGroupId());
         groupMessageProducer.producer(req.getOperater(),
-                GroupEventCommand.DESTROY_GROUP, pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
+                GroupEventCommand.DESTROY_GROUP, pack,
+                new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
 
         // 事件处理回调
         if (appConfig.isModifyGroupAfterCallback()) {
             DestroyGroupCallbackDto dto = new DestroyGroupCallbackDto();
             dto.setGroupId(req.getGroupId());
-            callbackService.afterCallback(req.getAppId()
+            callbackServiceImpl.afterCallback(req.getAppId()
                     , Constants.CallbackCommand.DestoryGroupAfter,
                     JSONObject.toJSONString(dto));
         }
@@ -377,16 +392,16 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Transactional
     public ResponseVO transferGroup(TransferGroupReq req) {
 
-        ResponseVO<GetRoleInGroupResp> roleInGroupOne = groupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+        ResponseVO<GetRoleInGroupResp> roleInGroupOne = imGroupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
         if (!roleInGroupOne.isOk()) {
             return roleInGroupOne;
         }
 
-        if (roleInGroupOne.getData().getRole() != GroupMemberRoleEnum.OWNER.getCode()) {
+        if (!Objects.equals(roleInGroupOne.getData().getRole(), GroupMemberRoleEnum.OWNER.getCode())) {
             return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
         }
 
-        ResponseVO<GetRoleInGroupResp> newOwnerRole = groupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOwnerId(), req.getAppId());
+        ResponseVO<GetRoleInGroupResp> newOwnerRole = imGroupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOwnerId(), req.getAppId());
         if (!newOwnerRole.isOk()) {
             return newOwnerRole;
         }
@@ -394,18 +409,21 @@ public class ImGroupServiceImpl implements ImGroupService {
         QueryWrapper<ImGroupEntity> objectQueryWrapper = new QueryWrapper<>();
         objectQueryWrapper.eq("group_id", req.getGroupId());
         objectQueryWrapper.eq("app_id", req.getAppId());
-        ImGroupEntity imGroupEntity = imGroupDataMapper.selectOne(objectQueryWrapper);
+        ImGroupEntity imGroupEntity = imGroupMapper.selectOne(objectQueryWrapper);
         if (imGroupEntity.getStatus() == GroupStatusEnum.DESTROY.getCode()) {
             throw new ApplicationException(GroupErrorCode.GROUP_IS_DESTROY);
         }
 
+        long seq = redisSequence.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.GroupSeq);
+
         ImGroupEntity updateGroup = new ImGroupEntity();
+        updateGroup.setSequence(seq);
         updateGroup.setOwnerId(req.getOwnerId());
         UpdateWrapper<ImGroupEntity> updateGroupWrapper = new UpdateWrapper<>();
         updateGroupWrapper.eq("app_id", req.getAppId());
         updateGroupWrapper.eq("group_id", req.getGroupId());
-        imGroupDataMapper.update(updateGroup, updateGroupWrapper);
-        groupMemberService.transferGroupMember(req.getOwnerId(), req.getGroupId(), req.getAppId());
+        imGroupMapper.update(updateGroup, updateGroupWrapper);
+        imGroupMemberService.transferGroupMember(req.getOwnerId(), req.getGroupId(), req.getAppId());
 
         return ResponseVO.successResponse();
     }
@@ -416,7 +434,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         QueryWrapper<ImGroupEntity> query = new QueryWrapper<>();
         query.eq("app_id", appId);
         query.eq("group_id", groupId);
-        ImGroupEntity imGroupEntity = imGroupDataMapper.selectOne(query);
+        ImGroupEntity imGroupEntity = imGroupMapper.selectOne(query);
 
         if (imGroupEntity == null) {
             return ResponseVO.errorResponse(GroupErrorCode.GROUP_IS_NOT_EXIST);
@@ -436,7 +454,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         GetGroupResp getGroupResp = new GetGroupResp();
         BeanUtils.copyProperties(group.getData(), getGroupResp);
         try {
-            ResponseVO<List<GroupMemberDto>> groupMember = groupMemberService.getGroupMember(req.getGroupId(), req.getAppId());
+            ResponseVO<List<GroupMemberDto>> groupMember = imGroupMemberService.getGroupMember(req.getGroupId(), req.getAppId());
             if (groupMember.isOk()) {
                 getGroupResp.setMemberList(groupMember.getData());
             }
@@ -462,7 +480,7 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         if (!isadmin) {
             //不是后台调用需要检查权限
-            ResponseVO<GetRoleInGroupResp> role = groupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+            ResponseVO<GetRoleInGroupResp> role = imGroupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
 
             if (!role.isOk()) {
                 return role;
@@ -471,7 +489,7 @@ public class ImGroupServiceImpl implements ImGroupService {
             GetRoleInGroupResp data = role.getData();
             Integer roleInfo = data.getRole();
 
-            boolean isManager = roleInfo == GroupMemberRoleEnum.MANAGER.getCode() || roleInfo == GroupMemberRoleEnum.OWNER.getCode();
+            boolean isManager = Objects.equals(roleInfo, GroupMemberRoleEnum.MANAGER.getCode()) || Objects.equals(roleInfo, GroupMemberRoleEnum.OWNER.getCode());
 
             //公开群只能群主修改资料
             if (!isManager) {
@@ -485,9 +503,46 @@ public class ImGroupServiceImpl implements ImGroupService {
         UpdateWrapper<ImGroupEntity> wrapper = new UpdateWrapper<>();
         wrapper.eq("group_id", req.getGroupId());
         wrapper.eq("app_id", req.getAppId());
-        imGroupDataMapper.update(update, wrapper);
+        imGroupMapper.update(update, wrapper);
 
         return ResponseVO.successResponse();
     }
 
+    @Override
+    public ResponseVO syncJoinedGroupList(SyncReq req) {
+        if (req.getMaxLimit() > appConfig.getJoinGroupMaxCount()) {
+            // 前端传输限制，保证一次增量拉取数据量不超过配置文件的值
+            req.setMaxLimit(appConfig.getJoinGroupMaxCount());
+        }
+
+        SyncResp<ImGroupEntity> resp = new SyncResp<>();
+
+        ResponseVO<Collection<String>> memberJoinedGroup = imGroupMemberService.syncMemberJoinedGroup(req.getOperater(), req.getAppId());
+        if(memberJoinedGroup.isOk()){
+
+            Collection<String> data = memberJoinedGroup.getData();
+            QueryWrapper<ImGroupEntity> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("app_id",req.getAppId());
+            queryWrapper.in("group_id", data);
+            queryWrapper.gt("sequence", req.getLastSequence());
+            queryWrapper.last(" limit " + req.getMaxLimit());
+            queryWrapper.orderByAsc("sequence");
+
+            List<ImGroupEntity> list = imGroupMapper.selectList(queryWrapper);
+
+            if(!CollectionUtils.isEmpty(list)){
+                ImGroupEntity maxSeqEntity = list.get(list.size() - 1);
+                resp.setDataList(list);
+                //设置最大seq
+                Long maxSeq = imGroupMapper.getJoinGroupMaxSeq(data, req.getAppId());
+                resp.setMaxSequence(maxSeq);
+                //设置是否拉取完毕
+                resp.setCompleted(maxSeqEntity.getSequence() >= maxSeq);
+                return ResponseVO.successResponse(resp);
+            }
+
+        }
+        resp.setCompleted(true);
+        return ResponseVO.successResponse(resp);
+    }
 }

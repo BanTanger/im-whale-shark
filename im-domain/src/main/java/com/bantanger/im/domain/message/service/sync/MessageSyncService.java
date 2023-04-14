@@ -1,6 +1,8 @@
 package com.bantanger.im.domain.message.service.sync;
 
+import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.command.Command;
+import com.bantanger.im.common.model.SyncReq;
 import com.bantanger.im.common.model.message.MessageReceiveAckContent;
 import com.bantanger.im.common.model.message.read.MessageReadContent;
 
@@ -31,4 +33,10 @@ public interface MessageSyncService {
      */
     void readMark(MessageReadContent messageContent, Command notify, Command receipt);
 
+    /**
+     * 增量拉取离线消息功能
+     * @param req
+     * @return
+     */
+    ResponseVO syncOfflineMessage(SyncReq req);
 }

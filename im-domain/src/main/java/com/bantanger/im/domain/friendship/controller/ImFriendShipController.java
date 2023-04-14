@@ -1,5 +1,6 @@
 package com.bantanger.im.domain.friendship.controller;
 
+import com.bantanger.im.common.model.SyncReq;
 import com.bantanger.im.domain.friendship.model.req.*;
 import com.bantanger.im.domain.friendship.model.req.friend.*;
 import com.bantanger.im.domain.friendship.service.ImFriendService;
@@ -109,5 +110,16 @@ public class ImFriendShipController {
         return imFriendShipService.checkBlck(req);
     }
 
+    /**
+     * 同步好友列表
+     * @param req
+     * @param appId
+     * @return
+     */
+    @RequestMapping("/syncFriendShipList")
+    public ResponseVO syncFriendShipList(@RequestBody @Validated SyncReq req, Integer appId){
+        req.setAppId(appId);
+        return imFriendShipService.syncFriendShipList(req);
+    }
 
 }
