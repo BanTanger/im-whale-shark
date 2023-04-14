@@ -20,6 +20,7 @@ import com.bantanger.im.common.enums.friend.DelFlagEnum;
 import com.bantanger.im.common.enums.user.UserErrorCode;
 import com.bantanger.im.common.exception.ApplicationException;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +51,9 @@ public class ImUserServiceImpl implements ImUserService {
 
     @Resource
     MessageProducer messageProducer;
+
+    @Resource
+    StringRedisTemplate stringRedisTemplate;
 
     @Override
     public ResponseVO importUser(ImportUserReq req) {
@@ -217,4 +221,13 @@ public class ImUserServiceImpl implements ImUserService {
         return ResponseVO.successResponse();
     }
 
+    @Override
+    public ResponseVO getUserSequence(GetUserSequenceReq req) {
+        // 将 redis 的缓存信息存入
+        Map<Object, Object> map = stringRedisTemplate.opsForHash().entries(
+                req.getAppId() + ":" + Constants.RedisConstants.SeqPrefix + ":" + req.getUserId());
+        Long groupSeq = imGroupService.getUserGroupMaxSeq(req.getUserId(), req.getAppId());
+        map.put(Constants.SeqConstants.GroupSeq, groupSeq);
+        return ResponseVO.successResponse(map);
+    }
 }

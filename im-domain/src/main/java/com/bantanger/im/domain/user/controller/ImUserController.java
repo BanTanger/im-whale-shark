@@ -2,6 +2,7 @@ package com.bantanger.im.domain.user.controller;
 
 import com.bantanger.im.common.enums.device.ClientType;
 import com.bantanger.im.domain.user.model.req.DeleteUserReq;
+import com.bantanger.im.domain.user.model.req.GetUserSequenceReq;
 import com.bantanger.im.domain.user.model.req.ImportUserReq;
 import com.bantanger.im.domain.user.model.req.LoginReq;
 import com.bantanger.im.domain.user.service.ImUserService;
@@ -66,6 +67,18 @@ public class ImUserController {
             return ResponseVO.successResponse(parse);
         }
         return ResponseVO.errorResponse();
+    }
+
+    /**
+     * 客户端向服务端请求该用户各接口需要拉取的数量
+     * @param req
+     * @param appId
+     * @return
+     */
+    @RequestMapping("/getUserSequence")
+    public ResponseVO getUserSequence(@RequestBody @Validated GetUserSequenceReq req, Integer appId) {
+        req.setAppId(appId);
+        return imUserService.getUserSequence(req);
     }
 
 }
