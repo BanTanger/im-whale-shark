@@ -621,5 +621,10 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         return ResponseVO.successResponse();
     }
 
-
+    @Override
+    public ResponseVO<Collection<String>> syncMemberJoinedGroup(String operater, Integer appId) {
+        // 离开群聊的用户无法获取数据
+        List<String> groupIds = imGroupMemberMapper.syncJoinedGroupId(appId, operater, GroupMemberRoleEnum.LEAVE.getCode());
+        return ResponseVO.successResponse(groupIds);
+    }
 }

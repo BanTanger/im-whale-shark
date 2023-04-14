@@ -1,10 +1,13 @@
 package com.bantanger.im.domain.message.controller;
 
 import com.bantanger.im.common.ResponseVO;
+import com.bantanger.im.common.model.SyncReq;
 import com.bantanger.im.common.model.message.CheckSendMessageReq;
 import com.bantanger.im.domain.message.model.req.SendMessageReq;
 import com.bantanger.im.domain.message.service.GroupMessageService;
 import com.bantanger.im.domain.message.service.P2PMessageService;
+import com.bantanger.im.domain.message.service.sync.MessageSyncService;
+import com.bantanger.im.domain.message.service.sync.MessageSyncServiceImpl;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +30,9 @@ public class MessageController {
 
     @Resource
     GroupMessageService groupMessageService;
+
+    @Resource
+    MessageSyncService messageSyncServiceImpl;
 
     /**
      * 后台消息发送接口
@@ -61,6 +67,13 @@ public class MessageController {
     public ResponseVO checkGroupSend(@RequestBody @Validated CheckSendMessageReq req) {
         return groupMessageService.serverPermissionCheck(
                 req.getFromId(), req.getToId(), req.getAppId());
+    }
+
+    @RequestMapping("/syncOfflineMessageList")
+    public ResponseVO syncP2POfflineMessageList(@RequestBody @Validated SyncReq req,
+                                             Integer appId) {
+        req.setAppId(appId);
+        return messageSyncServiceImpl.syncOfflineMessage(req);
     }
 
 }

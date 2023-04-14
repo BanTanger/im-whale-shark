@@ -115,6 +115,7 @@ public class StoreMessageService {
         imGroupMessageHistoryEntity.setFromId(messageContent.getFromId());
         imGroupMessageHistoryEntity.setGroupId(messageContent.getGroupId());
         imGroupMessageHistoryEntity.setMessageTime(messageContent.getMessageTime());
+        imGroupMessageHistoryEntity.setSequence(messageContent.getMessageSequence());
 
         imGroupMessageHistoryEntity.setMessageKey(imMessageBodyEntity.getMessageKey());
         imGroupMessageHistoryEntity.setMessageTime(imMessageBodyEntity.getMessageTime());

@@ -12,11 +12,17 @@
 
     <select id="getGroupMemberId" parameterType="map" resultType="java.lang.String">
         select member_id from im_group_member
-        where app_id = #{appId} AND group_id = #{groupId} and role != 3
+        where app_id = #{appId} and group_id = #{groupId} and role != 3
     </select>
 
     <select id="getGroupManager" parameterType="map" resultType="com.bantanger.im.domain.group.model.req.GroupMemberDto">
         select member_id, role from im_group_member
-        where app_id = #{appId} AND group_id = #{groupId} and role in (1,2)
+        where app_id = #{appId} and group_id = #{groupId} and role in (1,2)
     </select>
+
+    <select id="syncJoinedGroupId" parameterType="map" resultType="java.lang.String">
+        select group_id from im_group_member
+        where app_id = #{appId} and member_id = #{memberId} and role != #{role}
+    </select>
+
 </mapper>

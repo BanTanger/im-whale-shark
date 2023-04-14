@@ -13,4 +13,8 @@
         from im_conversation_set where app_id = #{appId} and from_id = #{fromId};
     </select>
 
+    <select id="getConversationMaxSeq" resultType="java.lang.Long">
+        select max(sequence) from im_conversation_set
+        where app_id = #{appId} and from_id = #{fromId};
+    </select>
 </mapper>

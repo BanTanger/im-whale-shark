@@ -1,5 +1,6 @@
 package com.bantanger.im.domain.group.service;
 
+import com.bantanger.im.common.model.SyncReq;
 import com.bantanger.im.domain.group.model.req.*;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.domain.group.dao.ImGroupEntity;
@@ -73,4 +74,5 @@ public interface ImGroupService {
 
     ResponseVO muteGroup(MuteGroupReq req);
 
+    ResponseVO syncJoinedGroupList(SyncReq req);
 }

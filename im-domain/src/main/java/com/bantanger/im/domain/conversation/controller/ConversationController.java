@@ -1,6 +1,7 @@
 package com.bantanger.im.domain.conversation.controller;
 
 import com.bantanger.im.common.ResponseVO;
+import com.bantanger.im.common.model.SyncReq;
 import com.bantanger.im.domain.conversation.model.DeleteConversationReq;
 import com.bantanger.im.domain.conversation.model.UpdateConversationReq;
 import com.bantanger.im.domain.conversation.service.ConversationService;
@@ -36,6 +37,13 @@ public class ConversationController {
         req.setAppId(appId);
 //        req.setOperater(identifier);
         return conversationServiceImpl.updateConversation(req);
+    }
+
+    @RequestMapping("/syncConversationList")
+    public ResponseVO syncConversationList(@RequestBody @Validated SyncReq req,
+                                           Integer appid) {
+        req.setAppId(appid);
+        return conversationServiceImpl.syncConversationSet(req);
     }
 
 }
