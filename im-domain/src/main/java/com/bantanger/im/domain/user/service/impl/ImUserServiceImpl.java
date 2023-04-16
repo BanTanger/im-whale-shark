@@ -223,9 +223,10 @@ public class ImUserServiceImpl implements ImUserService {
 
     @Override
     public ResponseVO getUserSequence(GetUserSequenceReq req) {
-        // 将 redis 的缓存信息存入
+        // 将 redis 的缓存信息取出
         Map<Object, Object> map = stringRedisTemplate.opsForHash().entries(
                 req.getAppId() + ":" + Constants.RedisConstants.SeqPrefix + ":" + req.getUserId());
+        // 由于群组信息不在 redis 里，需要通过数据库查询出来并返回给客户端
         Long groupSeq = imGroupService.getUserGroupMaxSeq(req.getUserId(), req.getAppId());
         map.put(Constants.SeqConstants.GroupSeq, groupSeq);
         return ResponseVO.successResponse(map);
