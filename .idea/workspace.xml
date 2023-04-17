@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取">
+    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取&#10;1. 服务端从 redis 中拉取出用户 userId 所需要拉取的消息偏序值&#10;2. 由于群组消息偏序不是存储在 redis 而是数据库中，因此要额外的查询数据库并存入到 map 中一并返回给客户端">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/test/java/SigApiTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/test/java/SigApiTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImServer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +41,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feat/message" />
+        <entry key="$PROJECT_DIR$" value="feat/v2_message" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -109,7 +108,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.1359375" />
     <property name="project.structure.side.proportion" value="0.22986425" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Java" />
+    <property name="settings.editor.selected.configurable" value="preferences.intentionPowerPack" />
   </component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
@@ -155,7 +154,7 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.SigApiTest.test_poolSizeCalculator">
+  <component name="RunManager" selected="Spring Boot.Message-Store">
     <configuration name="Starter" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.bantanger.im.tcp.Starter" />
       <module name="im-tcp" />
@@ -240,13 +239,15 @@
       <item itemvalue="Application.Starter2" />
       <item itemvalue="Application.Starter" />
       <item itemvalue="JUnit.SigApiTest.test_sigApi" />
+      <item itemvalue="JUnit.SigApiTest.test_poolSizeCalculator" />
       <item itemvalue="Python.login" />
       <item itemvalue="Spring Boot.Domain" />
       <item itemvalue="Spring Boot.Message-Store" />
-      <item itemvalue="JUnit.SigApiTest.test_poolSizeCalculator" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.login" />
+        <item itemvalue="JUnit.SigApiTest.test_sigApi" />
         <item itemvalue="JUnit.SigApiTest.test_poolSizeCalculator" />
         <item itemvalue="Python.login" />
         <item itemvalue="JUnit.SigApiTest.test_sigApi" />
@@ -273,7 +274,8 @@
       <workItem from="1681008036555" duration="8266000" />
       <workItem from="1681055472622" duration="9143000" />
       <workItem from="1681368455405" duration="25673000" />
-      <workItem from="1681632287601" duration="1447000" />
+      <workItem from="1681632287601" duration="2438000" />
+      <workItem from="1681718651255" duration="5466000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 采用策略模式重构命令执行逻辑">
       <created>1679715761283</created>
@@ -408,7 +410,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681473587111</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取&#10;1. 服务端从 redis 中拉取出用户 userId 所需要拉取的消息偏序值&#10;2. 由于群组消息偏序不是存储在 redis 而是数据库中，因此要额外的查询数据库并存入到 map 中一并返回给客户端">
+      <created>1681634120783</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1681634120783</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -467,7 +476,8 @@
     <MESSAGE value="feat: 消息逻辑改造,大幅提高消息可靠性、有序性、幂等性 #24&#10;1. 可靠性：应用层两次握手保证消息可靠(上行 ACK 和下行 ACK)&#10;2. 有序性：redis 原子操作 incr 保证消息绝对顺序, 并解决线上隐患&#10;3. 幂等性：SDK 和服务端分别做防重处理。并限制消息重试次数&#10;4. 更改同步单聊和群聊&#10;5. 修改用户无法正常下线的 bug" />
     <MESSAGE value="feat:" />
     <MESSAGE value="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取" />
+    <MESSAGE value="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取&#10;1. 服务端从 redis 中拉取出用户 userId 所需要拉取的消息偏序值&#10;2. 由于群组消息偏序不是存储在 redis 而是数据库中，因此要额外的查询数据库并存入到 map 中一并返回给客户端" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取&#10;1. 服务端从 redis 中拉取出用户 userId 所需要拉取的消息偏序值&#10;2. 由于群组消息偏序不是存储在 redis 而是数据库中，因此要额外的查询数据库并存入到 map 中一并返回给客户端" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -479,38 +489,38 @@
         </line-breakpoint>
         <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/UserChannelRepository.java</url>
-          <line>201</line>
+          <line>197</line>
           <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/sendmsg/MessageProducer.java</url>
-          <line>63</line>
+          <line>62</line>
           <option name="timeStamp" value="42" />
         </line-breakpoint>
         <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendServiceImpl.java</url>
-          <line>120</line>
+          <line>109</line>
           <option name="timeStamp" value="43" />
         </line-breakpoint>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/group/service/impl/ImGroupServiceImpl.java</url>
-          <line>436</line>
-          <option name="timeStamp" value="95" />
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java</url>
+          <line>108</line>
+          <option name="timeStamp" value="55" />
         </line-breakpoint>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/check/CheckSendMessageImpl.java</url>
-          <line>121</line>
-          <option name="timeStamp" value="96" />
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/MessageDecoderHandler.java</url>
+          <line>64</line>
+          <option name="timeStamp" value="69" />
         </line-breakpoint>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/message/GroupMsgCommand.java</url>
-          <line>34</line>
-          <option name="timeStamp" value="97" />
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImServer.java</url>
+          <line>51</line>
+          <option name="timeStamp" value="70" />
         </line-breakpoint>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/message/GroupMsgCommand.java</url>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/message/P2PMsgCommand.java</url>
           <line>39</line>
-          <option name="timeStamp" value="98" />
+          <option name="timeStamp" value="81" />
         </line-breakpoint>
         <breakpoint type="java-exception">
           <properties class="org.apache.commons.lang.NullArgumentException" package="org.apache.commons.lang" />

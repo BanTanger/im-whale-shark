@@ -53,8 +53,8 @@ public class ImServer {
                         // 消息解码
                         ch.pipeline().addLast(new MessageEncoderHandler());
                         // 心跳检测 保活
-//                        ch.pipeline().addLast(new IdleStateHandler(
-//                                0, 0, 1));
+                        ch.pipeline().addLast(new IdleStateHandler(
+                                0, 0, 1));
                         ch.pipeline().addLast(new HeartBeatHandler(config.getHeartBeatTime()));
                         // 用户逻辑执行
                         ch.pipeline().addLast(new NettyServerHandler(config.getBrokerId(), config.getLogicUrl()));
