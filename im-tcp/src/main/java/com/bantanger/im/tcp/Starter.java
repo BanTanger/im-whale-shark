@@ -38,7 +38,6 @@ public class Starter {
 
             new ImServer(config.getIm()).start();
             new ImWebSocketServer(config.getIm()).start();
-
             // redisson 在系统启动之初就初始化
             RedisManager.init(config);
             // 策略工厂初始化

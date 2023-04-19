@@ -4,9 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取&#10;1. 服务端从 redis 中拉取出用户 userId 所需要拉取的消息偏序值&#10;2. 由于群组消息偏序不是存储在 redis 而是数据库中，因此要额外的查询数据库并存入到 map 中一并返回给客户端">
+    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="update README.md">
+      <change afterPath="$PROJECT_DIR$/assert/design/websocket功能测试.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assert/design/websocket窗口功能讲解.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assert/sql/im_core.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/src/test/java/TwoPhaseTermination.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/interceptor/GateWayInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/interceptor/GateWayInterceptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/resources/WebSocket.html" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/resources/WebSocket.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,7 +111,8 @@
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
     <property name="database.data.extractors.current.export.id" value="SQL Inserts" />
     <property name="jdk.selected.PYTHON_MODULE" value="Python 3.9 (whale-shark)" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/im-domain/src/main/resources/mapper" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/assert/sql" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.1359375" />
     <property name="project.structure.side.proportion" value="0.22986425" />
@@ -154,7 +162,7 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.Message-Store">
+  <component name="RunManager" selected="Spring Boot.Domain">
     <configuration name="Starter" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.bantanger.im.tcp.Starter" />
       <module name="im-tcp" />
@@ -167,6 +175,13 @@
       <option name="MAIN_CLASS_NAME" value="com.bantanger.im.tcp.Starter" />
       <module name="im-tcp" />
       <option name="PROGRAM_PARAMETERS" value="E:\JavaProjectManager\whale-shark\im-tcp\src\main\resources\config2.yml" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TwoPhaseTermination" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="TwoPhaseTermination" />
+      <module name="im-domain" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -243,16 +258,26 @@
       <item itemvalue="Python.login" />
       <item itemvalue="Spring Boot.Domain" />
       <item itemvalue="Spring Boot.Message-Store" />
+      <item itemvalue="Application.TwoPhaseTermination" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.TwoPhaseTermination" />
         <item itemvalue="Python.login" />
         <item itemvalue="JUnit.SigApiTest.test_sigApi" />
         <item itemvalue="JUnit.SigApiTest.test_poolSizeCalculator" />
         <item itemvalue="Python.login" />
-        <item itemvalue="JUnit.SigApiTest.test_sigApi" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="SQLScriptSettings">
+    <option name="matrix">
+      <map>
+        <entry key="MYSQL.CreateComplete" value="CreateIfNotExists=1" />
+      </map>
+    </option>
+    <option name="outputLayout" value="File per object by schema.groovy" />
+    <option name="outputPath" value="E:\JavaProjectManager\whale-shark\assert\sql" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -275,7 +300,7 @@
       <workItem from="1681055472622" duration="9143000" />
       <workItem from="1681368455405" duration="25673000" />
       <workItem from="1681632287601" duration="2438000" />
-      <workItem from="1681718651255" duration="5466000" />
+      <workItem from="1681718651255" duration="16404000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 采用策略模式重构命令执行逻辑">
       <created>1679715761283</created>
@@ -417,7 +442,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681634120783</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="update README.md">
+      <created>1681744538769</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1681744538769</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -477,7 +509,8 @@
     <MESSAGE value="feat:" />
     <MESSAGE value="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取" />
     <MESSAGE value="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取&#10;1. 服务端从 redis 中拉取出用户 userId 所需要拉取的消息偏序值&#10;2. 由于群组消息偏序不是存储在 redis 而是数据库中，因此要额外的查询数据库并存入到 map 中一并返回给客户端" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取&#10;1. 服务端从 redis 中拉取出用户 userId 所需要拉取的消息偏序值&#10;2. 由于群组消息偏序不是存储在 redis 而是数据库中，因此要额外的查询数据库并存入到 map 中一并返回给客户端" />
+    <MESSAGE value="update README.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="update README.md" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -489,17 +522,17 @@
         </line-breakpoint>
         <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/utils/UserChannelRepository.java</url>
-          <line>197</line>
+          <line>201</line>
           <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/sendmsg/MessageProducer.java</url>
-          <line>62</line>
+          <line>63</line>
           <option name="timeStamp" value="42" />
         </line-breakpoint>
         <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendServiceImpl.java</url>
-          <line>109</line>
+          <line>120</line>
           <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -509,7 +542,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/MessageDecoderHandler.java</url>
-          <line>64</line>
+          <line>65</line>
           <option name="timeStamp" value="69" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -521,6 +554,11 @@
           <url>file://$PROJECT_DIR$/im-service/src/main/java/com/bantanger/im/service/strategy/command/message/P2PMsgCommand.java</url>
           <line>39</line>
           <option name="timeStamp" value="81" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/im-domain/src/test/java/TwoPhaseTermination.java</url>
+          <line>42</line>
+          <option name="timeStamp" value="99" />
         </line-breakpoint>
         <breakpoint type="java-exception">
           <properties class="org.apache.commons.lang.NullArgumentException" package="org.apache.commons.lang" />

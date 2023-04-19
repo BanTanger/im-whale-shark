@@ -42,6 +42,48 @@ im-system-whale-shark
 * [x] 实现单聊、群聊消息已读和已读回执功能
 * [x] 采用读扩散实现单聊、群聊离线消息拉取
 
+## 快速开始
+### 数据库环境
+导入 `whale-shark/assert/sql/im_core.sql` 文件
+
+### Docker 环境部署
+**如果是部署到服务端，注意防火墙是否拦截端口**
+
+redis:
+```shell
+docker run -d --name redis -p 6379:6379 redis
+```
+zookeeper:
+```shell
+docker run -d --name zookeeper -p 2181:2181 zookeeper
+```
+rabbitmq:
+```shell
+docker run -d -p 5672:5672 -p 15672:15672 --name rabbitmq
+```
++ 其中 15672 端口是连接 web 端页面的, 5672 端口是 Java 后端程序访问 rabbitmq 的
+
+### 后端启动
+后端有三个服务需要开启, 分别为:
++ im-tcp 包下的 Starter 程序 `com.bantanger.im.tcp.Starter`。它用于构建 TCP 网关服务, WebSocket、Socket 的连接, 消息发送, 回调以及路由等等基层操作。socket 的端口号是 `9001`, websocket 的端口号是 `19001`
++ im-domain 包下的 Application 程序 `com.bantanger.im.domain.Application`。它用于构建业务逻辑服务, 如用户、好友、群组的创建, 更改, 删除, 与数据库、缓存进行逻辑交互。端口号为 `8000`
++ im-message-store 包下的 Application 程序 `com.bantanger.im.message.Application`。它用于实现 MQ 异步消息落库存储服务。端口号为 `8001`
+
+### py 脚本测试
+`whale-shark/im-domain/src/test/python/` 包下所有测试文件都可运行
+
+具体功能可自行研究, 现已用 websocket 全面代替
+
+### websocket 测试
+`whale-shark/im-tcp/src/main/resources/WebSocket.html`
+暂时较为简陋, 本地测试, 需开启后端三个服务
+
+主要浏览方式通过 F12 查看服务端发送的 `json` 格式是否正确
+![](assert/design/websocket窗口功能讲解.png)
+
+如图所示: 平台 [appId = 10001] 的用户 [userId=10001] 向群组 [groupId = 27a35ff2f9be4cc9a8d3db1ad3322804] 发送一条群组消息
+![websocket功能测试](assert/design/websocket功能测试.png)
+
 ## 架构设计
 ### 私有协议
 IM 的私有协议确立信息如下：
@@ -70,3 +112,6 @@ IM 的私有协议确立信息如下：
 ![多端消息同步改进](assert/design/多端消息同步改进.png)
 群聊消息同步流程：
 ![群聊消息同步流程](assert/design/群聊消息同步流程.png)
+
+### 状态码定义
+TODO 
