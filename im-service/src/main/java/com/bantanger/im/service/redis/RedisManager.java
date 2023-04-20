@@ -1,7 +1,6 @@
 package com.bantanger.im.service.redis;
 
 import com.bantanger.im.codec.config.ImBootstrapConfig;
-import com.bantanger.im.service.rabbitmq.listener.UserLoginMessageListener;
 import org.redisson.api.RedissonClient;
 
 /**

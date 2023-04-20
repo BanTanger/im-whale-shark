@@ -1,4 +1,4 @@
-package com.bantanger.im.service.rabbitmq.listener;
+package com.bantanger.im.service.redis;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.common.constant.Constants;
