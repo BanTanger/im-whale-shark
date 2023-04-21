@@ -8,10 +8,10 @@
         <outputRelativeToContentRoot value="true" />
         <module name="im-domain" />
         <module name="im-message-store" />
+        <module name="im-infrastructure" />
         <module name="im-tcp" />
         <module name="im-common" />
         <module name="im-codec" />
-        <module name="im-service" />
       </profile>
     </annotationProcessing>
   </component>
@@ -20,8 +20,8 @@
       <module name="im-codec" options="-parameters" />
       <module name="im-common" options="-parameters" />
       <module name="im-domain" options="-parameters" />
+      <module name="im-infrastructure" options="-parameters" />
       <module name="im-message-store" options="-parameters" />
-      <module name="im-service" options="-parameters" />
       <module name="im-tcp" options="-parameters" />
     </option>
   </component>

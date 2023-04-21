@@ -77,10 +77,10 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
-        <!-- im-service -->
+        <!-- im-infrastructure -->
         <dependency>
             <groupId>com.bantanger</groupId>
-            <artifactId>im-service</artifactId>
+            <artifactId>im-infrastructure</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

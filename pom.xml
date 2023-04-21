@@ -18,9 +18,9 @@
         <module>im-codec</module>
         <module>im-common</module>
         <module>im-domain</module>
-        <module>im-tcp</module>
-        <module>im-service</module>
         <module>im-message-store</module>
+        <module>im-infrastructure</module>
+        <module>im-tcp</module>
     </modules>
 
     <dependencies>
