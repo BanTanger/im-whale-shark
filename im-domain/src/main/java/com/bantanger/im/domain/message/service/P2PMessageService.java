@@ -128,7 +128,7 @@ public class P2PMessageService {
         ack(messageContent, ResponseVO.successResponse());
         // 3. 发送消息，同步发送方多端设备
         syncToSender(messageContent);
-        // 4. 发送消息给对方所有在线端(TODO 离线端也要做消息同步)
+        // 4. 发送消息给对方所有在线端
         List<ClientInfo> clientInfos = dispatchMessage(messageContent);
         // 决策前移，因为离线用户无法走消息接收逻辑，也就无法识别命令
         // 这里将服务端接收确认迁移于此，保证离线用户也能实现消息可靠性
@@ -235,7 +235,7 @@ public class P2PMessageService {
     }
 
     /**
-     * [单聊] 消息发送【接收端所有端都需要接收消息】
+     * [单聊] 消息发送【接收端所有[在线]端都需要接收消息】
      *
      * @param messageContent
      * @return

@@ -116,7 +116,7 @@ public class GroupMessageService {
         ack(messageContent, ResponseVO.successResponse());
         // 3. 发送消息，同步发送方多端设备
         syncToSender(messageContent);
-        // 4. 发送消息给对方所有在线端(TODO 离线端也要做消息同步)
+        // 4. 发送消息给对方所有在线端
         dispatchMessage(messageContent);
     }
 
@@ -199,7 +199,7 @@ public class GroupMessageService {
     }
 
     /**
-     * [群聊] 消息发送【接收端所有端都需要接收消息】
+     * [群聊] 消息发送【接收端所有[在线]端都需要接收消息】
      * @param messageContent
      * @return
      */
