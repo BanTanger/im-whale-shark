@@ -4,30 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期，如果过期发送 ack 交付客户端处理">
-      <change afterPath="$PROJECT_DIR$/assert/design/消息幂等性保证.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assert/design/禁止客户端无限制重发.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/command/CommandType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期">
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assert/design/IM-WhaleShark.png" beforeDir="false" afterPath="$PROJECT_DIR$/assert/design/IM-WhaleShark.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-codec/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-codec/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/error/MessageErrorCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/error/MessageErrorCode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/content/MessageBody.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/content/MessageBody.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/store/MessageStoreService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/store/MessageStoreService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/store/MessageStoreServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/store/MessageStoreServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-infrastructure/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/rabbitmq/publish/MqMessageProducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/rabbitmq/publish/MqMessageProducer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-message-store/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-message-store/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-tcp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +45,7 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="MIXED" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitRewordedCommitMessages">
     <option name="onto" value="8df253cf2b15a57011e0fed369d53a8bc1a6ea18" />
@@ -328,7 +307,7 @@
       <workItem from="1682042056518" duration="99000" />
       <workItem from="1682042385450" duration="241000" />
       <workItem from="1682046857401" duration="8125000" />
-      <workItem from="1682135647380" duration="24068000" />
+      <workItem from="1682135647380" duration="24492000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 采用策略模式重构命令执行逻辑">
       <created>1679715761283</created>
@@ -554,7 +533,14 @@
       <option name="project" value="LOCAL" />
       <updated>1682397059812</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期">
+      <created>1682398268440</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1682398268440</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -592,7 +578,6 @@
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="feat: 采用策略模式重构命令执行逻辑" />
     <MESSAGE value="feat: 用户登出逻辑，调整包结构" />
     <MESSAGE value="feat: 心跳检测实现用户切后台逻辑" />
     <MESSAGE value="feat: Zookeeper 实现 TCP 网关服务注册中心的对接" />
@@ -617,7 +602,8 @@
     <MESSAGE value="update README.md" />
     <MESSAGE value="更改模块名称 im-service 为 im-infrastructure. 更符合模块职责定义" />
     <MESSAGE value="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期，如果过期发送 ack 交付客户端处理" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期，如果过期发送 ack 交付客户端处理" />
+    <MESSAGE value="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
