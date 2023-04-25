@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="更改模块名称 im-service 为 im-infrastructure. 更符合模块职责定义">
+    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期，如果过期发送 ack 交付客户端处理">
       <change afterPath="$PROJECT_DIR$/assert/design/消息幂等性保证.png" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/assert/design/禁止客户端无限制重发.png" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/command/CommandType.java" afterDir="false" />
@@ -18,7 +18,6 @@
       <change beforePath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/content/MessageBody.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/model/message/content/MessageBody.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/friendship/service/impl/ImFriendServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/interceptor/GateWayInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/interceptor/GateWayInterceptor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/store/MessageStoreService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/store/MessageStoreService.java" afterDir="false" />
@@ -68,7 +67,6 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="MIXED" />
-    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitRewordedCommitMessages">
     <option name="onto" value="8df253cf2b15a57011e0fed369d53a8bc1a6ea18" />
@@ -330,7 +328,7 @@
       <workItem from="1682042056518" duration="99000" />
       <workItem from="1682042385450" duration="241000" />
       <workItem from="1682046857401" duration="8125000" />
-      <workItem from="1682135647380" duration="20707000" />
+      <workItem from="1682135647380" duration="24068000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 采用策略模式重构命令执行逻辑">
       <created>1679715761283</created>
@@ -521,7 +519,42 @@
       <option name="project" value="LOCAL" />
       <updated>1682131833298</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期，如果过期发送 ack 交付客户端处理">
+      <created>1682394411536</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1682394411536</updated>
+    </task>
+    <task id="LOCAL-00029" summary="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期，如果过期发送 ack 交付客户端处理">
+      <created>1682396847089</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1682396847090</updated>
+    </task>
+    <task id="LOCAL-00030" summary="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期，如果过期发送 ack 交付客户端处理">
+      <created>1682396884586</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1682396884586</updated>
+    </task>
+    <task id="LOCAL-00031" summary="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期，如果过期发送 ack 交付客户端处理">
+      <created>1682396955726</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1682396955726</updated>
+    </task>
+    <task id="LOCAL-00032" summary="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期，如果过期发送 ack 交付客户端处理">
+      <created>1682397059812</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1682397059812</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -543,7 +576,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/feat/tcp_gateway" />
+                        <option value="master" />
                       </list>
                     </value>
                   </entry>
@@ -583,7 +616,8 @@
     <MESSAGE value="feat: 全量拉取、增量拉取接口实现，客户端主动向服务端发送本地 seq 大小进行增量消息拉取&#10;1. 服务端从 redis 中拉取出用户 userId 所需要拉取的消息偏序值&#10;2. 由于群组消息偏序不是存储在 redis 而是数据库中，因此要额外的查询数据库并存入到 map 中一并返回给客户端" />
     <MESSAGE value="update README.md" />
     <MESSAGE value="更改模块名称 im-service 为 im-infrastructure. 更符合模块职责定义" />
-    <option name="LAST_COMMIT_MESSAGE" value="更改模块名称 im-service 为 im-infrastructure. 更符合模块职责定义" />
+    <MESSAGE value="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期，如果过期发送 ack 交付客户端处理" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期，如果过期发送 ack 交付客户端处理" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -615,13 +649,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java</url>
-          <line>106</line>
+          <line>107</line>
           <option name="timeStamp" value="103" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java</url>
-          <line>76</line>
-          <option name="timeStamp" value="107" />
         </line-breakpoint>
         <breakpoint type="java-exception">
           <properties class="org.apache.commons.lang.NullArgumentException" package="org.apache.commons.lang" />

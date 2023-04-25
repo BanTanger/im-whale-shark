@@ -77,7 +77,8 @@ public class GroupMessageService {
         String messageCacheByMessageId = messageStoreServiceImpl.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId());
         if (messageCacheByMessageId.equals(MessageErrorCode.MESSAGE_CACHE_EXPIRE.getError())) {
             // 说明缓存过期，服务端向客户端发送 ack 要求客户端重新生成 messageId
-            ack(messageContent, ResponseVO.errorResponse(MessageErrorCode.MESSAGE_CACHE_EXPIRE));
+            // 不做处理。直到客户端计时器超时
+            return ;
         }
         GroupChatMessageContent messageCache = JSON.parseObject(messageCacheByMessageId, GroupChatMessageContent.class);
         if (messageCache != null) {
