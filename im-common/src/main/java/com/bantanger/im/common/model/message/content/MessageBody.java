@@ -3,9 +3,8 @@ package com.bantanger.im.common.model.message.content;
 import lombok.Data;
 
 /**
- * @description:
- * @author: lld
- * @version: 1.0
+ * @author BanTanger 半糖
+ * @Date 2023/4/4 11:22
  */
 @Data
 public class MessageBody {

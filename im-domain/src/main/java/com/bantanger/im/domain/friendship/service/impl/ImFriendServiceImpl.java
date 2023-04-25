@@ -162,7 +162,7 @@ public class ImFriendServiceImpl implements ImFriendService {
                 return ResponseVO.errorResponse(FriendShipErrorCode.TO_IS_YOUR_FRIEND);
             }
         }
-        return ResponseVO.successResponse();
+        return ResponseVO.successResponse(data);
     }
 
     @Override

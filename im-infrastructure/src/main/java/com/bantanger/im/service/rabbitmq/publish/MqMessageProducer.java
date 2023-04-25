@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.common.constant.Constants;
+import com.bantanger.im.common.enums.command.CommandType;
 import com.bantanger.im.service.utils.MqFactory;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +18,15 @@ public class MqMessageProducer {
 
     public static void sendMessage(Message message, Integer command) {
         Channel channel = null;
-        String channelName = Constants.RabbitmqConstants.Im2MessageService;
+        String num = command.toString();
+        String substring = num.substring(0, 1);
+        CommandType commandType = CommandType.getCommandType(substring);
+        String channelName = null;
 
-        if (command.toString().startsWith("2")) {
+        assert commandType != null;
+        if (commandType.equals(CommandType.MESSAGE)) {
+            channelName = Constants.RabbitmqConstants.Im2MessageService;
+        } else if (commandType.equals(CommandType.GROUP)) {
             channelName = Constants.RabbitmqConstants.Im2GroupService;
         }
 
@@ -33,6 +40,7 @@ public class MqMessageProducer {
             o.put("imei", message.getMessageHeader().getImei());
             o.put("appId", message.getMessageHeader().getAppId());
 
+            // TODO 开启镜像队列防止 MQ 丢失数据
             channel.basicPublish(channelName, "",
                     null, o.toJSONString().getBytes());
         } catch (Exception e) {

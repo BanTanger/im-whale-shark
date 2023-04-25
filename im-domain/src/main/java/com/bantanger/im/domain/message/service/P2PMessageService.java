@@ -1,12 +1,13 @@
 package com.bantanger.im.domain.message.service;
 
+import com.alibaba.fastjson.JSON;
 import com.bantanger.im.codec.pack.message.MessageReceiveServerAckPack;
 import com.bantanger.im.codec.proto.ChatMessageAck;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.MessageCommand;
+import com.bantanger.im.common.enums.error.MessageErrorCode;
 import com.bantanger.im.common.model.ClientInfo;
-import com.bantanger.im.common.model.SyncReq;
 import com.bantanger.im.common.model.message.content.MessageContent;
 import com.bantanger.im.common.model.message.content.OfflineMessageContent;
 import com.bantanger.im.domain.message.model.req.SendMessageReq;
@@ -43,7 +44,7 @@ public class P2PMessageService {
     MessageProducer messageProducer;
 
     @Resource
-    MessageStoreServiceImpl messageStoreImpl;
+    MessageStoreServiceImpl messageStoreServiceImpl;
 
     @Resource
     RedisSequence redisSequence;
@@ -70,13 +71,18 @@ public class P2PMessageService {
         log.info("消息 ID [{}] 开始处理", messageContent.getMessageId());
 
         // 设置临时缓存，避免消息无限制重发，当缓存失效，直接重新构建新消息进行处理
-        MessageContent messageCache = messageStoreImpl.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId(), MessageContent.class);
-        if (messageCache != null) {
+        String messageCacheByMessageId = messageStoreServiceImpl.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId());
+        if (messageCacheByMessageId.equals(MessageErrorCode.MESSAGE_CACHE_EXPIRE.getError())) {
+            // 说明缓存过期，服务端向客户端发送 ack 要求客户端重新生成 messageId
+            ack(messageContent, ResponseVO.errorResponse(MessageErrorCode.MESSAGE_CACHE_EXPIRE));
+        }
+        MessageContent messageCache = JSON.parseObject(messageCacheByMessageId, MessageContent.class);
+        if (messageCache != null){
             threadPoolExecutor.execute(() -> {
                 // 线程池执行消息同步，发送，回应等任务流程
-                doThreadPoolTask(messageContent);
+                doThreadPoolTask(messageCache);
             });
-            return;
+            return ;
         }
 
         // TODO 外提 Seq 存储，因为 seq 生成策略可以是 redis，也可以是一个新的服务专门处理。
@@ -91,18 +97,18 @@ public class P2PMessageService {
 
         threadPoolExecutor.execute(() -> {
             // 1. 消息持久化落库(MQ 异步)
-            messageStoreImpl.storeP2PMessage(messageContent);
+            messageStoreServiceImpl.storeP2PMessage(messageContent);
             // 2. 在异步持久化之后执行离线消息存储
             OfflineMessageContent offlineMessage = getOfflineMessage(messageContent);
-            messageStoreImpl.storeOfflineMessage(offlineMessage);
+            messageStoreServiceImpl.storeOfflineMessage(offlineMessage);
             // 线程池执行消息同步，发送，回应等任务流程
             doThreadPoolTask(messageContent);
             // 缓存消息
-            messageStoreImpl.setMessageCacheByMessageId(
+            messageStoreServiceImpl.setMessageCacheByMessageId(
                     messageContent.getAppId(), messageContent.getMessageId(), messageContent);
-        });
 
-        log.info("消息 ID [{}] 处理完成", messageContent.getMessageId());
+            log.info("消息 ID [{}] 处理完成", messageContent.getMessageId());
+        });
     }
 
     private OfflineMessageContent getOfflineMessage(MessageContent messageContent) {
@@ -139,7 +145,6 @@ public class P2PMessageService {
     }
 
     public SendMessageResp send(SendMessageReq req) {
-
         SendMessageResp sendMessageResp = new SendMessageResp();
         MessageContent message = new MessageContent();
         message.setAppId(req.getAppId());
@@ -152,7 +157,7 @@ public class P2PMessageService {
         message.setMessageTime(req.getMessageTime());
 
         //插入数据
-        messageStoreImpl.storeP2PMessage(message);
+        messageStoreServiceImpl.storeP2PMessage(message);
         sendMessageResp.setMessageKey(message.getMessageKey());
         sendMessageResp.setMessageTime(System.currentTimeMillis());
 

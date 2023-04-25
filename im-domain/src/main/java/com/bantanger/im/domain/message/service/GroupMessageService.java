@@ -1,9 +1,11 @@
 package com.bantanger.im.domain.message.service;
 
+import com.alibaba.fastjson.JSON;
 import com.bantanger.im.codec.proto.ChatMessageAck;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.GroupEventCommand;
+import com.bantanger.im.common.enums.error.MessageErrorCode;
 import com.bantanger.im.common.model.message.content.GroupChatMessageContent;
 import com.bantanger.im.common.model.message.content.MessageContent;
 import com.bantanger.im.common.model.message.content.OfflineMessageContent;
@@ -71,12 +73,19 @@ public class GroupMessageService {
         // 日志打印
         log.info("消息 ID [{}] 开始处理", messageContent.getMessageId());
 
-        GroupChatMessageContent messageCache = messageStoreServiceImpl.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId(), GroupChatMessageContent.class);
+        // 设置临时缓存，避免消息无限制重发，当缓存失效，直接重新构建新消息进行处理
+        String messageCacheByMessageId = messageStoreServiceImpl.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId());
+        if (messageCacheByMessageId.equals(MessageErrorCode.MESSAGE_CACHE_EXPIRE.getError())) {
+            // 说明缓存过期，服务端向客户端发送 ack 要求客户端重新生成 messageId
+            ack(messageContent, ResponseVO.errorResponse(MessageErrorCode.MESSAGE_CACHE_EXPIRE));
+        }
+        GroupChatMessageContent messageCache = JSON.parseObject(messageCacheByMessageId, GroupChatMessageContent.class);
         if (messageCache != null) {
             threadPoolExecutor.execute(() -> {
                 // 线程池执行消息同步，发送，回应等任务流程
-                doThreadPoolTask(messageContent);
+                doThreadPoolTask(messageCache);
             });
+            return ;
         }
         // 定义群聊消息的 Sequence, 客户端根据 seq 进行排序
         // key: appId + Seq + (from + toId) / groupId
@@ -106,9 +115,9 @@ public class GroupMessageService {
             // 消息缓存
             messageStoreServiceImpl.setMessageCacheByMessageId(
                     messageContent.getAppId(), messageContent.getMessageId(), messageContent);
-        });
 
-        log.info("消息 ID [{}] 处理完成", messageContent.getMessageId());
+            log.info("消息 ID [{}] 处理完成", messageContent.getMessageId());
+        });
     }
 
     private void doThreadPoolTask(GroupChatMessageContent messageContent) {

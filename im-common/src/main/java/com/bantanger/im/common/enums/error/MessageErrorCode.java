@@ -22,6 +22,8 @@ public enum MessageErrorCode implements ApplicationExceptionEnum {
 
     MESSAGEHISTORY_PERSISTENCE_ERROR(51002, "历史消息持久化失败"),
 
+    MESSAGE_CACHE_EXPIRE(52001, "消息缓存已过期");
+
     ;
 
     private int code;

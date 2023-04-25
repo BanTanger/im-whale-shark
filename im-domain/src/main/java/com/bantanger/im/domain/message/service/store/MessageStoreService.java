@@ -36,11 +36,9 @@ public interface MessageStoreService {
      * 通过 MessageId 获取消息缓存
      * @param appId
      * @param messageId
-     * @param clazz
-     * @param <T>
      * @return
      */
-    <T> T getMessageCacheByMessageId(Integer appId, String messageId, Class<T> clazz);
+    String getMessageCacheByMessageId(Integer appId, String messageId);
 
     /**
      * 【读扩散】存储单聊离线消息

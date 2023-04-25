@@ -2,8 +2,8 @@ package com.bantanger.im.domain.message.service.store;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.common.constant.Constants;
-import com.bantanger.im.common.enums.command.Command;
 import com.bantanger.im.common.enums.conversation.ConversationTypeEnum;
+import com.bantanger.im.common.enums.error.MessageErrorCode;
 import com.bantanger.im.common.enums.friend.DelFlagEnum;
 import com.bantanger.im.common.model.message.content.OfflineMessageContent;
 import com.bantanger.im.common.model.message.store.DoStoreGroupMessageDto;
@@ -79,13 +79,23 @@ public class MessageStoreServiceImpl implements MessageStoreService {
     }
 
     @Override
-    public <T> T getMessageCacheByMessageId(Integer appId, String messageId, Class<T> clazz) {
+    public String getMessageCacheByMessageId(Integer appId, String messageId) {
         String key = appId + Constants.RedisConstants.CacheMessage + messageId;
-        String msgCache = stringRedisTemplate.opsForValue().get(key);
-        if (StringUtils.isBlank(msgCache)) {
+        // 先判断是否有这个键值，由于 redis 惰性删除，键值过期依然会有 key，当有线程获取 value 才会删除 key
+        Boolean hasKey = stringRedisTemplate.hasKey(key);
+        if (hasKey == null || !hasKey) {
+            // 没有 key，说明根本没有缓存，或者是定期删除恰好删除了，直接返回 null
             return null;
         }
-        return JSONObject.parseObject(msgCache, clazz);
+        Long expireTime = stringRedisTemplate.getExpire(key);
+        // 键值已过期
+        if (expireTime <= 0) {
+            stringRedisTemplate.delete(key);
+            return MessageErrorCode.MESSAGE_CACHE_EXPIRE.getError();
+        }
+
+        String msgCache = stringRedisTemplate.opsForValue().get(key);
+        return msgCache;
     }
 
     @Override

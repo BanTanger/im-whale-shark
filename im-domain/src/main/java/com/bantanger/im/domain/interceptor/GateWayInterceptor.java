@@ -28,11 +28,10 @@ public class GateWayInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        /*// 先放权进行内部代码测试
+        // 先放权进行内部代码测试
         if (true) {
             return true;
         }
-        */
         //获取 appId 操作人 userSign
         String appIdStr = request.getParameter("appId");
         if (StringUtils.isBlank(appIdStr)) {
