@@ -157,7 +157,7 @@ public class GroupMessageService {
 
         messageStoreServiceImpl.storeGroupMessage(message);
 
-        sendMessageResp.setMessageKey(message.getMessageKey());
+        sendMessageResp.setMessageId(message.getMessageId());
         sendMessageResp.setMessageTime(System.currentTimeMillis());
         //2.发消息给同步在线端
         syncToSender(message);

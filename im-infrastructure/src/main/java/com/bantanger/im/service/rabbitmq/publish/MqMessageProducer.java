@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.CommandType;
-import com.bantanger.im.service.utils.MqFactory;
+import com.bantanger.im.service.rabbitmq.MqFactory;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 

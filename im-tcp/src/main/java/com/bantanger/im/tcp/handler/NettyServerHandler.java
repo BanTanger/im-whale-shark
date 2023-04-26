@@ -24,8 +24,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
     private Integer brokerId;
 
-    private String logicUrl;
-
     private FeignMessageService feignMessageService;
 
     public NettyServerHandler(Integer brokerId, String logicUrl) {

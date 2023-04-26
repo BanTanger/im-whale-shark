@@ -24,6 +24,9 @@ public abstract class AbstractMessageSend implements MessageSend {
     @Resource
     RabbitTemplate rabbitTemplate;
 
+    /**
+     * 队列：服务端与客户端之间的消息投递
+     */
     private final String queueName = Constants.RabbitmqConstants.MessageService2Im;
 
     @Override
@@ -54,12 +57,13 @@ public abstract class AbstractMessageSend implements MessageSend {
         try {
             log.info("send message {} ", msg);
             // MQ 发送消息
-            rabbitTemplate.convertAndSend(queueName, session.getBrokerId() + "", msg);
+            rabbitTemplate.convertAndSend(queueName, String.valueOf(session.getBrokerId()), msg);
             return true;
         } catch (AmqpException e) {
             log.error("send error {} ", e.getMessage());
             return false;
         }
+        // 每一台机器都能绑定自己各自的 queue 队列，绑定格式为 queueName + brokerId
     }
 
     /**

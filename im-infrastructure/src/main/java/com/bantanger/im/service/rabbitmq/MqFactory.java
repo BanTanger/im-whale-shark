@@ -1,4 +1,4 @@
-package com.bantanger.im.service.utils;
+package com.bantanger.im.service.rabbitmq;
 
 import com.bantanger.im.codec.config.ImBootstrapConfig;
 import com.rabbitmq.client.Channel;

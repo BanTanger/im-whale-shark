@@ -5,7 +5,7 @@ import com.bantanger.im.codec.proto.MessagePack;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.service.rabbitmq.process.BaseProcess;
 import com.bantanger.im.service.rabbitmq.process.ProcessFactory;
-import com.bantanger.im.service.utils.MqFactory;
+import com.bantanger.im.service.rabbitmq.MqFactory;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
@@ -25,6 +25,9 @@ public class MqMessageListener {
 
     public static String brokerId;
 
+    /**
+     * 每一个服务器节点，都绑定一个对应的queue，格式为 MessageService2Im + brokerId（每一个服务端的唯一编号）
+     */
     private static void startListenerMessage() {
         try {
             Channel channel = MqFactory.getChannel(Constants.RabbitmqConstants.MessageService2Im + brokerId);

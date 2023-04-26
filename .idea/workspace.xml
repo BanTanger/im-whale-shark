@@ -5,7 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期">
+      <change afterPath="$PROJECT_DIR$/im-domain/src/test/java/SendApiTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/controller/MessageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/model/resp/SendMessageResp.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/model/resp/SendMessageResp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/store/MessageStoreServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/store/MessageStoreServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/rabbitmq/listener/MqMessageListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/rabbitmq/listener/MqMessageListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/rabbitmq/publish/MqMessageProducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/rabbitmq/publish/MqMessageProducer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/sendmsg/AbstractMessageSend.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/sendmsg/AbstractMessageSend.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/utils/MqFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/rabbitmq/MqFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,13 +80,13 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/im-domain/pom.xml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/im-tcp/pom.xml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/proto/ChatMessageAck.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/im-infrastructure/pom.xml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/im-domain/pom.xml" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/device/ClientType.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/im-common/src/main/java/com/bantanger/im/common/enums/group/GroupErrorCode.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/pom.xml" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/im-tcp/pom.xml" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/im-codec/src/main/java/com/bantanger/im/codec/proto/ChatMessageAck.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -114,7 +127,7 @@
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
     <property name="database.data.extractors.current.export.id" value="SQL Inserts" />
     <property name="jdk.selected.PYTHON_MODULE" value="Python 3.9 (whale-shark)" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../im-system" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.1359375" />
@@ -169,7 +182,7 @@
     <configuration name="Starter" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.bantanger.im.tcp.Starter" />
       <module name="im-tcp" />
-      <option name="PROGRAM_PARAMETERS" value="E:\JavaProjectManager\whale-shark\im-tcp\src\main\resources\config.yml" />
+      <option name="PROGRAM_PARAMETERS" value="E:\JavaProjectManager\im-whale-shark\im-tcp\src\main\resources\config.yml" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -307,7 +320,8 @@
       <workItem from="1682042056518" duration="99000" />
       <workItem from="1682042385450" duration="241000" />
       <workItem from="1682046857401" duration="8125000" />
-      <workItem from="1682135647380" duration="24492000" />
+      <workItem from="1682135647380" duration="28865000" />
+      <workItem from="1682411217831" duration="16591000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 采用策略模式重构命令执行逻辑">
       <created>1679715761283</created>
@@ -540,11 +554,21 @@
       <option name="project" value="LOCAL" />
       <updated>1682398268440</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期">
+      <created>1682398708982</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1682398708982</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="config.yml" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -624,19 +648,19 @@
           <option name="timeStamp" value="42" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImServer.java</url>
-          <line>51</line>
-          <option name="timeStamp" value="70" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/im-domain/src/test/java/TwoPhaseTermination.java</url>
           <line>42</line>
           <option name="timeStamp" value="99" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java</url>
-          <line>107</line>
+          <line>108</line>
           <option name="timeStamp" value="103" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/server/ImServer.java</url>
+          <line>51</line>
+          <option name="timeStamp" value="108" />
         </line-breakpoint>
         <breakpoint type="java-exception">
           <properties class="org.apache.commons.lang.NullArgumentException" package="org.apache.commons.lang" />

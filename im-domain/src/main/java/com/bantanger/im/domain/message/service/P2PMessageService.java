@@ -70,11 +70,12 @@ public class P2PMessageService {
         // 日志打印
         log.info("消息 ID [{}] 开始处理", messageContent.getMessageId());
 
-        // 设置临时缓存，避免消息无限制重发，当缓存失效，直接重新构建新消息进行处理
+        // 设置临时缓存，避免消息无限制重发，当缓存失效. 不做处理
         String messageCacheByMessageId = messageStoreServiceImpl.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId());
         if (messageCacheByMessageId.equals(MessageErrorCode.MESSAGE_CACHE_EXPIRE.getError())) {
             // 说明缓存过期，服务端向客户端发送 ack 要求客户端重新生成 messageId
-            // 不做处理。直到客户端计时器超时
+            // 不做处理。直到客户端计时器超时, 重投次数 超过了 最大重投次数
+            // 客户端 本地，重新生成 messageId
             return ;
         }
         MessageContent messageCache = JSON.parseObject(messageCacheByMessageId, MessageContent.class);
@@ -97,7 +98,7 @@ public class P2PMessageService {
         messageContent.setMessageSequence(seq);
 
         threadPoolExecutor.execute(() -> {
-            // 1. 消息持久化落库(MQ 异步)
+            // 1. 消息持久化落库(MQ 异步) id 防重处理，通过唯一键，做一个防重处理
             messageStoreServiceImpl.storeP2PMessage(messageContent);
             // 2. 在异步持久化之后执行离线消息存储
             OfflineMessageContent offlineMessage = getOfflineMessage(messageContent);
@@ -159,7 +160,7 @@ public class P2PMessageService {
 
         //插入数据
         messageStoreServiceImpl.storeP2PMessage(message);
-        sendMessageResp.setMessageKey(message.getMessageKey());
+        sendMessageResp.setMessageId(message.getMessageId());
         sendMessageResp.setMessageTime(System.currentTimeMillis());
 
         //2.发消息给同步在线端
@@ -232,7 +233,7 @@ public class P2PMessageService {
      * @param messageContent
      */
     public void syncToSender(MessageContent messageContent) {
-        log.info("[P2P] 发送方消息同步");
+        log.debug("[P2P] 发送方消息同步");
         messageProducer.sendToUserExceptClient(
                 messageContent.getFromId(),
                 MessageCommand.MSG_P2P,

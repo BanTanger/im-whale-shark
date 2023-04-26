@@ -42,8 +42,8 @@ public class MessageController {
      * @return
      */
     @RequestMapping("/send")
-    public ResponseVO send(@RequestBody @Validated SendMessageReq req, Integer appId) {
-        req.setAppId(appId);
+    public ResponseVO send(@RequestBody @Validated SendMessageReq req) {
+//        req.setAppId(appId);
         return ResponseVO.successResponse(p2PMessageService.send(req));
     }
 
