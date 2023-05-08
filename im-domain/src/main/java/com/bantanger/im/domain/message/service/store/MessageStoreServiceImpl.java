@@ -81,7 +81,8 @@ public class MessageStoreServiceImpl implements MessageStoreService {
     @Override
     public String getMessageCacheByMessageId(Integer appId, String messageId) {
         String key = appId + Constants.RedisConstants.CacheMessage + messageId;
-        // 先判断是否有这个键值，由于 redis 两种删除策略：惰性删除、定期删除，惰性删除，键值过期依然会有 key，当有线程获取 value 才会删除 key
+        // 先判断是否有这个键值，由于 redis 两种删除策略：惰性删除、定期删除
+        // 惰性删除，键值过期依然会有 key，当有线程获取 value 才会删除 key
         // 两种情况：redis 获取不到 value
         // 1. 首次进入，没有设置缓存，not set， getMessageCacheByMessageId == null
         // 2. 重复进入，但是缓存过期，value = null
