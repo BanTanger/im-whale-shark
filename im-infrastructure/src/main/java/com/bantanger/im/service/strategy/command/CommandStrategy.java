@@ -1,7 +1,7 @@
 package com.bantanger.im.service.strategy.command;
 
 
-import com.bantanger.im.service.strategy.command.model.CommandExecutionRequest;
+import com.bantanger.im.service.strategy.command.model.CommandExecution;
 
 /**
  * @author BanTanger 半糖
@@ -11,8 +11,8 @@ public interface CommandStrategy {
 
     /**
      * 系统命令执行策略接口
-     * @param commandExecutionRequest
+     * @param commandExecution
      */
-    void systemStrategy(CommandExecutionRequest commandExecutionRequest);
+    void systemStrategy(CommandExecution commandExecution);
 
 }

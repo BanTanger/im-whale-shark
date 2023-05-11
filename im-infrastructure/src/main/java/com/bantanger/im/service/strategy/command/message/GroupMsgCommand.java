@@ -11,7 +11,7 @@ import com.bantanger.im.common.model.message.CheckSendMessageReq;
 import com.bantanger.im.service.feign.FeignMessageService;
 import com.bantanger.im.service.rabbitmq.publish.MqMessageProducer;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
-import com.bantanger.im.service.strategy.command.model.CommandExecutionRequest;
+import com.bantanger.im.service.strategy.command.model.CommandExecution;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
@@ -22,10 +22,10 @@ import io.netty.channel.ChannelHandlerContext;
 public class GroupMsgCommand extends BaseCommandStrategy {
 
     @Override
-    public void systemStrategy(CommandExecutionRequest commandExecutionRequest) {
-        ChannelHandlerContext ctx = commandExecutionRequest.getCtx();
-        Message msg = commandExecutionRequest.getMsg();
-        FeignMessageService feignMessageService = commandExecutionRequest.getFeignMessageService();
+    public void systemStrategy(CommandExecution commandExecution) {
+        ChannelHandlerContext ctx = commandExecution.getCtx();
+        Message msg = commandExecution.getMsg();
+        FeignMessageService feignMessageService = commandExecution.getFeignMessageService();
 
         CheckSendMessageReq req = new CheckSendMessageReq();
         req.setAppId(msg.getMessageHeader().getAppId());

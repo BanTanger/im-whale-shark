@@ -10,7 +10,7 @@ import lombok.Data;
  * @Date 2023/4/6 10:28
  */
 @Data
-public class CommandExecutionRequest {
+public class CommandExecution {
 
     private ChannelHandlerContext ctx;
 

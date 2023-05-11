@@ -11,7 +11,7 @@ import com.bantanger.im.common.model.UserClientDto;
 import com.bantanger.im.common.model.UserSession;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
 import com.bantanger.im.service.redis.RedisManager;
-import com.bantanger.im.service.strategy.command.model.CommandExecutionRequest;
+import com.bantanger.im.service.strategy.command.model.CommandExecution;
 import com.bantanger.im.service.utils.UserChannelRepository;
 import io.netty.channel.ChannelHandlerContext;
 import org.redisson.api.RMap;
@@ -29,10 +29,10 @@ import java.net.UnknownHostException;
 public class LoginCommand extends BaseCommandStrategy {
 
     @Override
-    public void systemStrategy(CommandExecutionRequest commandExecutionRequest) {
-        ChannelHandlerContext ctx = commandExecutionRequest.getCtx();
-        Message msg = commandExecutionRequest.getMsg();
-        Integer brokeId = commandExecutionRequest.getBrokeId();
+    public void systemStrategy(CommandExecution commandExecution) {
+        ChannelHandlerContext ctx = commandExecution.getCtx();
+        Message msg = commandExecution.getMsg();
+        Integer brokeId = commandExecution.getBrokeId();
 
         // 解析 msg
         LoginPack loginPack = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()),

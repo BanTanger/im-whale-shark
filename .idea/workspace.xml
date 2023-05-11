@@ -5,10 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期">
+      <change afterPath="$PROJECT_DIR$/.idea/ApifoxUploaderProjectSetting.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assert/design/有了TCP为什么还要保证可靠性传达.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/P2PMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/store/MessageStoreServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/store/MessageStoreServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assert/design/消息流转.png" beforeDir="false" afterPath="$PROJECT_DIR$/assert/design/消息流转.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/CommandStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/CommandStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/message/GroupMsgCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/message/GroupMsgCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/message/P2PMsgCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/message/P2PMsgCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/model/CommandExecutionRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/model/CommandExecution.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/system/LoginCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/system/LoginCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/system/LogoutCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/system/LogoutCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/system/PingCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/system/PingCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -169,7 +184,7 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.Domain">
+  <component name="RunManager" selected="Application.Starter">
     <configuration name="Starter" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.bantanger.im.tcp.Starter" />
       <module name="im-tcp" />
@@ -315,6 +330,7 @@
       <workItem from="1682411217831" duration="16591000" />
       <workItem from="1683375995431" duration="900000" />
       <workItem from="1683379751098" duration="2477000" />
+      <workItem from="1683726400031" duration="6510000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 采用策略模式重构命令执行逻辑">
       <created>1679715761283</created>

@@ -4,7 +4,7 @@ import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.service.rabbitmq.publish.MqMessageProducer;
 import com.bantanger.im.service.strategy.command.CommandStrategy;
 import com.bantanger.im.service.strategy.command.factory.CommandFactory;
-import com.bantanger.im.service.strategy.command.model.CommandExecutionRequest;
+import com.bantanger.im.service.strategy.command.model.CommandExecution;
 import com.bantanger.im.service.utils.UserChannelRepository;
 import com.bantanger.im.service.feign.FeignMessageService;
 import feign.Feign;
@@ -14,6 +14,10 @@ import feign.jackson.JacksonEncoder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.pool2.BasePooledObjectFactory;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 
 /**
  * @author BanTanger 半糖
@@ -36,29 +40,58 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
                 .target(FeignMessageService.class, logicUrl);
     }
 
+    /**
+     * 采用对象池复用对象，防止在启动项目时 CPU 占用率飙升
+     */
+    private final GenericObjectPool<CommandExecution> commandExecutionRequestPool
+            = new GenericObjectPool<>(new CommandExecutionFactory());
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
         Integer command = parseCommand(msg);
-        CommandFactory commandFactory = new CommandFactory();
+        CommandFactory commandFactory = CommandFactory.getInstance();
         CommandStrategy commandStrategy = commandFactory.getCommandStrategy(command);
 
-        // 使用 req 包装参数内部传参，避免后期新增参数需要扩展接口字段
-        CommandExecutionRequest commandExecutionRequest = new CommandExecutionRequest();
-        commandExecutionRequest.setCtx(ctx);
-        commandExecutionRequest.setBrokeId(brokerId);
-        commandExecutionRequest.setMsg(msg);
-        commandExecutionRequest.setFeignMessageService(feignMessageService);
+        CommandExecution commandExecution = null;
+        try {
+            // 从对象池中获取 CommandExecution 对象
+            commandExecution = commandExecutionRequestPool.borrowObject();
+            commandExecution.setCtx(ctx);
+            commandExecution.setBrokeId(brokerId);
+            commandExecution.setMsg(msg);
+            commandExecution.setFeignMessageService(feignMessageService);
 
-        if (commandStrategy != null) {
-            // 执行策略
-            commandStrategy.systemStrategy(commandExecutionRequest);
-        } else {
-            MqMessageProducer.sendMessage(msg, command);
+            if (commandStrategy != null) {
+                // 执行策略
+                commandStrategy.systemStrategy(commandExecution);
+            } else {
+                MqMessageProducer.sendMessage(msg, command);
+            }
+        } finally {
+            // 将对象归还给对象池
+            if (commandExecution != null) {
+                commandExecutionRequestPool.returnObject(commandExecution);
+            }
         }
     }
 
     protected Integer parseCommand(Message msg) {
         return msg.getMessageHeader().getCommand();
+    }
+
+    /**
+     * CommandExecution 对象工厂
+     */
+    private static class CommandExecutionFactory extends BasePooledObjectFactory<CommandExecution> {
+        @Override
+        public CommandExecution create() throws Exception {
+            return new CommandExecution();
+        }
+
+        @Override
+        public PooledObject<CommandExecution> wrap(CommandExecution obj) {
+            return new DefaultPooledObject<>(obj);
+        }
     }
 
     @Override

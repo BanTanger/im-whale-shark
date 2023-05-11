@@ -75,7 +75,8 @@ public class GroupMessageService {
 
         // 设置临时缓存，避免消息无限制重发，当缓存失效，直接重新构建新消息进行处理
         String messageCacheByMessageId = messageStoreServiceImpl.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId());
-        if (messageCacheByMessageId.equals(MessageErrorCode.MESSAGE_CACHE_EXPIRE.getError())) {
+        if (messageCacheByMessageId != null &&
+                messageCacheByMessageId.equals(MessageErrorCode.MESSAGE_CACHE_EXPIRE.getError())) {
             // 说明缓存过期，服务端向客户端发送 ack 要求客户端重新生成 messageId
             // 不做处理。直到客户端计时器超时
             return ;
