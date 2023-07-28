@@ -28,7 +28,7 @@ spring:
   application:
     name: im-core
 
-appConfig:
+appconfig:
   privateKey: bantanger
   zkAddr: 127.0.0.1:2181 # zk 连接地址
   zkConnectTimeOut: 5000 # zk 超时时间

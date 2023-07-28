@@ -12,12 +12,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "httpclient")
 public class GlobalHttpClientConfig {
-	private Integer maxTotal; // 最大连接数
-	private Integer defaultMaxPerRoute; // 最大并发链接数
-	private Integer connectTimeout; // 创建链接的最大时间
-	private Integer connectionRequestTimeout; // 链接获取超时时间
-	private Integer socketTimeout; // 数据传输最长时间
-	private boolean staleConnectionCheckEnabled; // 提交时检查链接是否可用
+	private Integer maxTotal = 100; // 最大连接数
+	private Integer defaultMaxPerRoute = 50; // 最大并发链接数
+	private Integer connectTimeout = 2000; // 创建链接的最大时间
+	private Integer connectionRequestTimeout = 2000; // 链接获取超时时间
+	private Integer socketTimeout = 5000; // 数据传输最长时间
+	private boolean staleConnectionCheckEnabled = true; // 提交时检查链接是否可用
 
 	PoolingHttpClientConnectionManager manager = null;
 	HttpClientBuilder httpClientBuilder = null;
@@ -85,6 +85,11 @@ public class GlobalHttpClientConfig {
 	@Bean(name = "builder")
 	public RequestConfig.Builder getBuilder() {
 		RequestConfig.Builder builder = RequestConfig.custom();
+		System.out.println("connectTimeout: " + connectTimeout);
+		System.out.println("connectionRequestTimeout: " + connectionRequestTimeout);
+		System.out.println("socketTimeout: " + socketTimeout);
+		System.out.println("staleConnectionCheckEnabled: " + staleConnectionCheckEnabled);
+
 		return builder.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectionRequestTimeout)
 				.setSocketTimeout(socketTimeout).setStaleConnectionCheckEnabled(staleConnectionCheckEnabled);
 	}
