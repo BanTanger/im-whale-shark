@@ -3,7 +3,7 @@ package com.bantanger.im.tcp;
 import com.bantanger.im.codec.config.ImBootstrapConfig;
 import com.bantanger.im.service.rabbitmq.listener.MqMessageListener;
 import com.bantanger.im.service.redis.RedisManager;
-import com.bantanger.im.service.strategy.command.factory.CommandFactoryConfig;
+import com.bantanger.im.service.strategy.command.CommandFactoryConfig;
 import com.bantanger.im.service.strategy.login.factory.LoginStatusFactoryConfig;
 import com.bantanger.im.service.rabbitmq.MqFactory;
 import com.bantanger.im.service.zookeeper.ZkManager;

@@ -1,0 +1,142 @@
+version: '3.8'
+
+services:
+  # MySQL 容器
+  im-mysql:
+    container_name: im-mysql
+    image: mysql:8.0.11
+    restart: always
+    volumes:
+      - ./docker/mysql/conf:/etc/mysql/conf.d
+      - ./docker/mysql/logs:/logs
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/db:/docker-entrypoint-initdb.d/
+    command: [
+      'mysqld',
+      '--innodb-buffer-pool-size=80M',
+      '--character-set-server=utf8mb4',
+      '--collation-server=utf8mb4_unicode_ci',
+      '--default-time-zone=+8:00',
+      '--lower-case-table-names=1'
+    ]
+    environment:
+      MYSQL_ROOT_PASSWORD: 'whalesharkim'
+      MYSQL_DATABASE: 'im_core'
+      MYSQL_USER: 'root'
+      MYSQL_PASSWORD: 'whalesharkim'
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    ports:
+      - "3306:3306"
+    networks:
+      - im-network
+
+  # ZooKeeper 容器
+  im-zookeeper:
+    container_name: im-zookeeper
+    image: zookeeper:latest
+    restart: always
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=localhost:2888:3888
+    healthcheck:
+      test: ["CMD-SHELL", "zkOk=$(echo stat | nc localhost 2181 | grep Mode); if [ -z \"$zkOk\" ]; then exit 1; fi"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    ports:
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+    networks:
+      - im-network
+
+  # RabbitMQ 容器
+  im-rabbitmq:
+    container_name: im-rabbitmq
+    image: rabbitmq:management
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - im-network
+
+  # Redis 容器
+  im-redis:
+    container_name: im-redis
+    image: redis:6.0.8
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./docker/redis/conf/redis.conf:/home/order/redis/redis.conf
+      - ./docker/redis/data:/data
+    networks:
+      - im-network
+
+  # IM Domain 容器
+  im-domain:
+    container_name: im_domain
+    image: im_domain
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - im-mysql
+      - im-zookeeper
+      - im-redis
+      - im-rabbitmq
+    links:
+      - im-mysql
+      - im-zookeeper
+      - im-redis
+      - im-rabbitmq
+    networks:
+      - im-network
+
+  # IM Message Store 容器
+  im-message-store:
+    container_name: im-message-store
+    image: im_message_store
+    restart: always
+    depends_on:
+      - im-mysql
+      - im-redis
+      - im-rabbitmq
+    links:
+      - im-mysql
+      - im-redis
+      - im-rabbitmq
+    ports:
+      - "8001:8001"
+    networks:
+      - im-network
+
+  # IM TCP 容器
+  im-tcp:
+    container_name: im-tcp
+    image: im_tcp
+    restart: always
+    depends_on:
+      - im-redis
+      - im-rabbitmq
+      - im-zookeeper
+    links:
+      - im-redis
+      - im-rabbitmq
+      - im-zookeeper
+    ports:
+      - "9001:9001" # tcp 端口
+      - "19001:19001" # ws 端口
+    networks:
+      - im-network
+
+networks:
+  im-network:

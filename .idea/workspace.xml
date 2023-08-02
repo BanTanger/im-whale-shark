@@ -4,25 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期">
-      <change afterPath="$PROJECT_DIR$/.idea/ApifoxUploaderProjectSetting.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assert/design/有了TCP为什么还要保证可靠性传达.png" afterDir="false" />
+    <list default="true" id="3431669e-a84a-4e6a-a42b-133685b07059" name="Changes" comment="feat: 新增 docker 方式部署">
+      <change afterPath="$PROJECT_DIR$/deploy.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker/mysql/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker/mysql/db/im_core.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker/redis/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker/redis/conf/redis.conf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-domain/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/pay/说明.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-message-store/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/im-tcp/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/logback-spring.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assert/design/消息流转.png" beforeDir="false" afterPath="$PROJECT_DIR$/assert/design/消息流转.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/message/service/GroupMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-infrastructure/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/CommandStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/CommandStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assert/sql/im_core.sql" beforeDir="false" afterPath="$PROJECT_DIR$/assert/sql/im_core.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/java/com/bantanger/im/domain/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-domain/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/im-domain/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/message/GroupMsgCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/message/GroupMsgCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/message/P2PMsgCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/message/P2PMsgCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/model/CommandExecutionRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/model/CommandExecution.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/system/LoginCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/system/LoginCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/system/LogoutCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/system/LogoutCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/system/PingCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/system/PingCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/factory/CommandFactoryConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/command/CommandFactoryConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/pay/PaymentConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-infrastructure/src/main/java/com/bantanger/im/service/strategy/pay/PaymentConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/Starter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/im-tcp/src/main/java/com/bantanger/im/tcp/handler/NettyServerHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -55,15 +56,23 @@
       </map>
     </option>
   </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="false" />
+    <option name="myAllFileTypesSelected" value="true" />
+    <option name="mySelectedFileTypes">
+      <set />
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feat/v2_message" />
+        <entry key="$PROJECT_DIR$" value="70f7df5c1a5d3d85aa8327cdde3649aea0331e88" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="MIXED" />
     <option name="UPDATE_TYPE" value="REBASE" />
+    <option name="WARN_ABOUT_DETACHED_HEAD" value="false" />
   </component>
   <component name="GitRewordedCommitMessages">
     <option name="onto" value="8df253cf2b15a57011e0fed369d53a8bc1a6ea18" />
@@ -106,6 +115,13 @@
       </MavenGeneralSettings>
     </option>
   </component>
+  <component name="OptimizeOnSaveOptions">
+    <option name="myRunOnSave" value="false" />
+    <option name="myAllFileTypesSelected" value="true" />
+    <option name="mySelectedFileTypes">
+      <set />
+    </option>
+  </component>
   <component name="ProjectId" id="2NS18NXAqjmnDI55tGLx4bj55K0" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -113,7 +129,6 @@
   <component name="ProjectViewState">
     <option name="abbreviatePackageNames" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="false" />
     <option name="showLibraryContents" value="true" />
     <option name="sortByType" value="true" />
   </component>
@@ -132,13 +147,16 @@
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
     <property name="database.data.extractors.current.export.id" value="SQL Inserts" />
+    <property name="go.format.on.save.advertiser.fired" value="true" />
+    <property name="go.formatter.settings.were.checked" value="true" />
+    <property name="go.import.settings.migrated" value="true" />
     <property name="jdk.selected.PYTHON_MODULE" value="Python 3.9 (whale-shark)" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.1359375" />
     <property name="project.structure.side.proportion" value="0.22986425" />
-    <property name="settings.editor.selected.configurable" value="preferences.intentionPowerPack" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
@@ -149,18 +167,18 @@
       <recent name="com.bantanger.im.tcp.handler" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="E:\JavaProjectManager\whale-shark\assert\design" />
-      <recent name="E:\JavaProjectManager\whale-shark\im-domain\src\main\resources\mapper" />
-      <recent name="E:\JavaProjectManager\whale-shark\im-domain\src\main\java\com\bantanger\im\domain\conversation" />
-      <recent name="E:\JavaProjectManager\whale-shark\im-tcp\src\main\resources" />
-      <recent name="E:\JavaProjectManager\whale-shark\im-message-store\src\main\java\com\bantanger\im\message\model" />
+      <recent name="E:\JavaProjectManager\im-whale-shark" />
+      <recent name="E:\JavaProjectManager\im-whale-shark\im-domain\src\main\resources" />
+      <recent name="E:\JavaProjectManager\im-whale-shark\im-tcp" />
+      <recent name="E:\JavaProjectManager\im-whale-shark\im-message-store" />
+      <recent name="E:\JavaProjectManager\im-whale-shark\im-domain" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\JavaProjectManager\im-whale-shark" />
+      <recent name="E:\JavaProjectManager\im-whale-shark\docker" />
+      <recent name="E:\JavaProjectManager\im-whale-shark\docker\mysql" />
+      <recent name="E:\JavaProjectManager\im-whale-shark\docker\db" />
       <recent name="E:\JavaProjectManager\whale-shark\assert\design" />
-      <recent name="E:\JavaProjectManager\whale-shark\test_result" />
-      <recent name="E:\JavaProjectManager\whale-shark\im-domain\src\test\python" />
-      <recent name="E:\JavaProjectManager\whale-shark\im-domain\src\test" />
-      <recent name="E:\JavaProjectManager\whale-shark\im-domain\src" />
     </key>
     <key name="CreateTestDialog.Recents.Supers">
       <recent name="" />
@@ -184,7 +202,7 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Starter">
+  <component name="RunManager" selected="Spring Boot.Domain">
     <configuration name="Starter" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.bantanger.im.tcp.Starter" />
       <module name="im-tcp" />
@@ -204,6 +222,16 @@
     <configuration name="TwoPhaseTermination" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="TwoPhaseTermination" />
       <module name="im-domain" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PayTest.Test_Payment" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="im-domain" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="PayTest" />
+      <option name="METHOD_NAME" value="Test_Payment" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -278,17 +306,16 @@
       <item itemvalue="Application.TwoPhaseTermination" />
       <item itemvalue="JUnit.SigApiTest.test_sigApi" />
       <item itemvalue="JUnit.SigApiTest.test_poolSizeCalculator" />
-      <item itemvalue="Python.login" />
+      <item itemvalue="JUnit.PayTest.Test_Payment" />
       <item itemvalue="Spring Boot.Domain" />
       <item itemvalue="Spring Boot.Message-Store" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.TwoPhaseTermination" />
-        <item itemvalue="Python.login" />
-        <item itemvalue="JUnit.SigApiTest.test_sigApi" />
+        <item itemvalue="JUnit.PayTest.Test_Payment" />
         <item itemvalue="JUnit.SigApiTest.test_poolSizeCalculator" />
-        <item itemvalue="Python.login" />
+        <item itemvalue="JUnit.SigApiTest.test_sigApi" />
+        <item itemvalue="Application.TwoPhaseTermination" />
       </list>
     </recent_temporary>
   </component>
@@ -331,6 +358,7 @@
       <workItem from="1683375995431" duration="900000" />
       <workItem from="1683379751098" duration="2477000" />
       <workItem from="1683726400031" duration="6510000" />
+      <workItem from="1690771508929" duration="14186000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 采用策略模式重构命令执行逻辑">
       <created>1679715761283</created>
@@ -570,7 +598,21 @@
       <option name="project" value="LOCAL" />
       <updated>1682398708982</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="工厂模式 + 策略模式最优实践（ServiceLocatorFactoryBean）">
+      <created>1690550037426</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1690550037426</updated>
+    </task>
+    <task id="LOCAL-00036" summary="feat: 新增 docker 方式部署">
+      <created>1690989862918</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1690989862918</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -595,7 +637,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="master" />
+                        <option value="feat/230728_Update" />
                       </list>
                     </value>
                   </entry>
@@ -611,8 +653,6 @@
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="feat: 用户登出逻辑，调整包结构" />
-    <MESSAGE value="feat: 心跳检测实现用户切后台逻辑" />
     <MESSAGE value="feat: Zookeeper 实现 TCP 网关服务注册中心的对接" />
     <MESSAGE value="Revert &quot;fix: 修复用户登出逻辑错误。重构user和channel的双向绑定关系，提升程序健壮性, #2&quot;&#10;&#10;This reverts commit 5820c217a0dd6080b0d3a2535fc54d0b665afe8a." />
     <MESSAGE value="feat: 用户关系模块导入 #15&#10;具体为：用户信息模块、好友模块、群组模块" />
@@ -636,7 +676,9 @@
     <MESSAGE value="更改模块名称 im-service 为 im-infrastructure. 更符合模块职责定义" />
     <MESSAGE value="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期，如果过期发送 ack 交付客户端处理" />
     <MESSAGE value="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改幂等性逻辑，通过 ttl 判断当前缓存是否过期" />
+    <MESSAGE value="工厂模式 + 策略模式最优实践（ServiceLocatorFactoryBean）" />
+    <MESSAGE value="feat: 新增 docker 方式部署" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: 新增 docker 方式部署" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -693,7 +735,6 @@
     <select />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/whale_shark$login.coverage" NAME="login Coverage Results" MODIFIED="1680567093697" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/im-domain/src/test/python" />
-    <SUITE FILE_PATH="coverage/whale_shark$test_route__1_.coverage" NAME="test_route (1) Coverage Results" MODIFIED="1680101927939" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/im-domain/src/py_test" />
+    <SUITE FILE_PATH="coverage/im_whale_shark$Starter.ic" NAME="Starter Coverage Results" MODIFIED="1690553167108" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>

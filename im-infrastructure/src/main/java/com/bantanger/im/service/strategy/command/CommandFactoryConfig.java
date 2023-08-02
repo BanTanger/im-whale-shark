@@ -1,18 +1,15 @@
-package com.bantanger.im.service.strategy.command.factory;
+package com.bantanger.im.service.strategy.command;
 
 import com.bantanger.im.common.enums.command.GroupEventCommand;
 import com.bantanger.im.common.enums.command.MessageCommand;
 import com.bantanger.im.common.enums.command.SystemCommand;
 import com.bantanger.im.service.strategy.command.message.GroupMsgCommand;
 import com.bantanger.im.service.strategy.command.message.P2PMsgCommand;
-import com.bantanger.im.service.strategy.command.system.PingCommand;
-import com.bantanger.im.service.strategy.command.CommandStrategy;
 import com.bantanger.im.service.strategy.command.system.LoginCommand;
 import com.bantanger.im.service.strategy.command.system.LogoutCommand;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.bantanger.im.service.strategy.command.system.PingCommand;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

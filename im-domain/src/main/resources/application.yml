@@ -57,8 +57,8 @@ appconfig:
   joinGroupMaxCount: 100 # 用户被拉入群通知每次递增拉取最大条目数
 
 # logger 配置
-#logging:
-#  config: classpath:logback-spring.xml
+logging:
+  config: logback-spring.xml
 
 server:
   port: 8000

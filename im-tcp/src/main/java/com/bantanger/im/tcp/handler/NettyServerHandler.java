@@ -1,7 +1,11 @@
 package com.bantanger.im.tcp.handler;
 
 import com.bantanger.im.codec.proto.Message;
+import com.bantanger.im.common.enums.command.GroupEventCommand;
+import com.bantanger.im.common.enums.command.MessageCommand;
+import com.bantanger.im.common.enums.command.SystemCommand;
 import com.bantanger.im.service.rabbitmq.publish.MqMessageProducer;
+import com.bantanger.im.service.strategy.command.CommandFactoryConfig;
 import com.bantanger.im.service.strategy.command.CommandStrategy;
 import com.bantanger.im.service.strategy.command.factory.CommandFactory;
 import com.bantanger.im.service.strategy.command.model.CommandExecution;
@@ -18,6 +22,10 @@ import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author BanTanger 半糖
@@ -55,11 +63,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
         CommandExecution commandExecution = null;
         try {
             // 从对象池中获取 CommandExecution 对象
-            commandExecution = commandExecutionRequestPool.borrowObject();
-            commandExecution.setCtx(ctx);
-            commandExecution.setBrokeId(brokerId);
-            commandExecution.setMsg(msg);
-            commandExecution.setFeignMessageService(feignMessageService);
+            commandExecution = getCommandExecution(ctx, msg);
 
             if (commandStrategy != null) {
                 // 执行策略
@@ -73,6 +77,16 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
                 commandExecutionRequestPool.returnObject(commandExecution);
             }
         }
+    }
+
+    private CommandExecution getCommandExecution(ChannelHandlerContext ctx, Message msg) throws Exception {
+        CommandExecution commandExecution;
+        commandExecution = commandExecutionRequestPool.borrowObject();
+        commandExecution.setCtx(ctx);
+        commandExecution.setBrokeId(brokerId);
+        commandExecution.setMsg(msg);
+        commandExecution.setFeignMessageService(feignMessageService);
+        return commandExecution;
     }
 
     protected Integer parseCommand(Message msg) {
