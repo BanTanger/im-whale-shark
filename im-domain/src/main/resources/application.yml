@@ -28,7 +28,7 @@ spring:
   application:bo
     name: im-core
 
-appConfig:
+appconfig:
   privateKey: bantanger
   zkAddr: 127.0.0.1:2181 # zk 连接地址
   zkConnectTimeOut: 5000 # zk 超时时间
@@ -57,8 +57,8 @@ appConfig:
   joinGroupMaxCount: 100 # 用户被拉入群通知每次递增拉取最大条目数
 
 # logger 配置
-#logging:
-#  config: classpath:logback-spring.xml
+logging:
+  config: logback-spring.xml
 
 server:
   port: 8000
