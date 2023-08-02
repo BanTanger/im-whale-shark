@@ -1,0 +1,48 @@
+#fixme  Clone openIM Server project before using docker-compose,project address：https://github.com/OpenIMSDK/Open-IM-Server.git
+version: "3"
+services:
+  mysql:
+    image: mysql:5.7
+    ports:
+      - 13306:3306
+      - 23306:33060
+    container_name: mysql
+    volumes:
+      - ${DATA_DIR}/components/mysql/data:/var/lib/mysql
+      - /etc/localtime:/etc/localtime
+    environment:
+      MYSQL_ROOT_PASSWORD: ${PASSWORD}
+    restart: always
+
+
+  redis:
+    image: redis:7.0.0
+    ports:
+      - 16379:6379
+    container_name: redis
+    volumes:
+      - ${DATA_DIR}/components/redis/data:/data
+      #redis config file
+      - ${DATA_DIR}/components/redis/config/redis.conf:/usr/local/redis/config/redis.conf
+    environment:
+      TZ: Asia/Shanghai
+    restart: always
+    sysctls:
+      net.core.somaxconn: 1024
+    command: redis-server --requirepass ${PASSWORD} --appendonly yes
+
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - 2181:2181
+    container_name: zookeeper
+    volumes:
+      - /etc/localtime:/etc/localtime
+    environment:
+      TZ: Asia/Shanghai
+    restart: always
+
+
+  rabbitmq:
+    image:

@@ -25,7 +25,7 @@ spring:
     username: admin
     password: admin
 
-  application:bo
+  application:
     name: im-core
 
 appconfig:

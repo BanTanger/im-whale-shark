@@ -23,6 +23,7 @@
       <module name="im-infrastructure" options="-parameters" />
       <module name="im-message-store" options="-parameters" />
       <module name="im-tcp" options="-parameters" />
+      <module name="im-whale-shark" options="" />
     </option>
   </component>
 </project>

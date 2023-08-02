@@ -4,6 +4,7 @@ import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.service.config.AppConfig;
 import com.bantanger.im.service.utils.HttpRequestUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
