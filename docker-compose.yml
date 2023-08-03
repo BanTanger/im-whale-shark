@@ -33,14 +33,14 @@ services:
       timeout: 5s
       retries: 3
     ports:
-      - "13306:3306"
+      - "3306:3306"
     networks:
       - im-network
 
   # ZooKeeper 容器
   im-zookeeper:
     container_name: im-zookeeper
-    image: zookeeper:latest
+    image: wurstmeister/zookeeper:latest
     restart: always
     privileged: true
     environment:
