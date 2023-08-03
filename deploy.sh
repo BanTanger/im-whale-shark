@@ -4,8 +4,8 @@
 usage(){
   echo "--------------------------------"
   echo "::: Welcome to IM-WhaleShark :::"
-	echo "Usage: sh running.sh [base|services|stop|rm]"
-	exit 1
+  echo "Usage: sh running.sh [base|services|stop|rm|rmi]"
+  exit 1
 }
 
 # Check if Docker is installed
@@ -30,39 +30,49 @@ fi
 
 # 启动基础环境（必须）
 base(){
-	$COMPOSE_COMMAND up -d im-mysql im-redis im-zookeeper im-rabbitmq
+  $COMPOSE_COMMAND up -d im-mysql im-redis im-zookeeper im-rabbitmq
 }
 
 # 启动程序模块（必须）
 services(){
-	$COMPOSE_COMMAND up -d im-domain im-message-store im-tcp
+  $COMPOSE_COMMAND up -d im-domain im-message-store im-tcp
 }
 
 # 关闭所有环境/模块
 stop(){
-	$COMPOSE_COMMAND stop
+  $COMPOSE_COMMAND stop
 }
 
 # 删除所有环境/模块
 rm(){
-	$COMPOSE_COMMAND rm
+  $COMPOSE_COMMAND rm
+}
+
+# 删除所有未使用的镜像
+rmi(){
+  echo "开始删除未使用的镜像 .."
+  docker image prune -a -f
+  echo "镜像删除成功"
 }
 
 # 根据输入参数，选择执行对应方法，不输入则执行使用说明
 case "$1" in
 "base")
-	base
+  base
 ;;
 "services")
-	services
+  services
 ;;
 "stop")
-	stop
+  stop
 ;;
 "rm")
-	rm
+  rm
+;;
+"rmi")
+  rmi
 ;;
 *)
-	usage
+  usage
 ;;
 esac
