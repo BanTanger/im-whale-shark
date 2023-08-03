@@ -6,7 +6,7 @@ MAINTAINER BanTanger
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN echo 'Asia/Shanghai' >/etc/timezone
 
-COPY ../docker/im-whale-shark/domain/jar/im-message-store.jar /opt/application/im-message-store.jar
-COPY /main/resources/application.yml application.yml
+COPY docker/build/domain/jar/im-message-store.jar /opt/application/im-message-store.jar
+COPY src/main/resources/application.yml application.yml
 
 ENTRYPOINT ["java", "-jar" ,"/opt/application/im-message-store.jar"]
