@@ -6,17 +6,25 @@ usage(){
 	exit 1
 }
 
-# 检查是否存在docker-compose或docker compose命令
-check_compose_command(){
-	if command -v docker-compose >/dev/null 2>&1; then
-		COMPOSE_COMMAND="docker-compose"
-	elif command -v "docker compose" >/dev/null 2>&1; then
-		COMPOSE_COMMAND="docker compose"
-	else
-		echo "Error: docker-compose or docker compose not found. Please install Docker Compose."
-		exit 1
-	fi
-}
+# Check if Docker is installed
+if ! command -v docker >/dev/null 2>&1; then
+  echo "Error: Docker is not installed. Please install Docker before running this script."
+  exit 1
+fi
+
+# Check if Docker Compose is installed and set the appropriate command
+if command -v docker-compose &> /dev/null
+then
+    COMPOSE_COMMAND="docker-compose"
+else
+    if command -v "docker compose" &> /dev/null
+    then
+        COMPOSE_COMMAND="docker compose"
+    else
+        echo "Error: Docker Compose is not installed. Please install Docker Compose before running this script."
+        exit 1
+    fi
+fi
 
 # 启动基础环境（必须）
 base(){
@@ -41,19 +49,15 @@ rm(){
 # 根据输入参数，选择执行对应方法，不输入则执行使用说明
 case "$1" in
 "base")
-	check_compose_command
 	base
 ;;
 "services")
-	check_compose_command
 	services
 ;;
 "stop")
-	check_compose_command
 	stop
 ;;
 "rm")
-	check_compose_command
 	rm
 ;;
 *)
