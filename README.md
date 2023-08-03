@@ -96,6 +96,11 @@ sh deploy.sh serives
 ```
 - 将后端的三个模块部署到 docker
 
+5. 开启防火墙
+```bash
+./open_port.sh
+```
+
 停用、删除: 
 ```bash
 sh deploy.sh stop
@@ -106,6 +111,11 @@ sh deploy.sh stop
 sh deploy.sh rm
 ```
 - 将 docker 的所有容器删除
+
+清空 build 文件夹:
+```bash
+./clean.sh
+```
 
 ### 本地方式部署
 
