@@ -6,8 +6,9 @@ services:
     container_name: im-mysql
     image: mysql:8.0.11
     build:
-      context: ./build/mysql
+      context: ./mysql
     restart: always
+    privileged: true
     volumes:
       - ./docker/mysql/conf:/etc/mysql/conf.d
       - ./docker/mysql/logs:/logs
@@ -29,10 +30,10 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
-      timeout: 5s
+      timeout: 20s
       retries: 3
     ports:
-      - "3306:3306"
+      - "13306:3306"
     networks:
       - im-network
 
@@ -41,13 +42,14 @@ services:
     container_name: im-zookeeper
     image: zookeeper:latest
     restart: always
+    privileged: true
     environment:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=localhost:2888:3888
     healthcheck:
       test: ["CMD-SHELL", "zkOk=$(echo stat | nc localhost 2181 | grep Mode); if [ -z \"$zkOk\" ]; then exit 1; fi"]
       interval: 10s
-      timeout: 5s
+      timeout: 20s
       retries: 3
     ports:
       - "2181:2181"
@@ -75,7 +77,7 @@ services:
     container_name: im-redis
     image: redis:6.0.8
     build:
-      context: ./build/redis
+      context: ./redis
     restart: always
     ports:
       - "6379:6379"

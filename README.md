@@ -53,10 +53,76 @@ im-system-whale-shark
 * [x] 采用读扩散实现单聊、群聊离线消息拉取
 
 ## 快速开始
-### 数据库环境
+
+### 服务器方式部署
+
+> 采用 docker compose 实现快速部署
+
+首先要确保您的服务器上有 git、docker 以及 docker-compose
+
+可参考自行下载: [服务器下载 Git、Docker、Docker-Compose](docker/docker.md)
+
+1. 克隆本项目
+
+```bash
+git clone https://github.com/BanTanger/im-whale-shark.git
+```
+2. 项目打包
+
+```bash
+mvn clean package
+```
+
+此过程可能有点长，请耐心等待
+
+3. 为脚本执行赋予权限并执行
+
+```bash
+chmod +x *.sh
+```
+```bash
+./copy.sh
+```
+- 将各个模块的 jar 包和 Dockerfile 移动到 docker/build 包下
+
+4. 部署项目
+
+```bash
+sh deploy.sh base
+```
+- 将基础组件部署到 docker
+```bash
+sh deploy.sh serives
+```
+- 将后端的三个模块部署到 docker
+
+5. 开启防火墙
+```bash
+./open_port.sh
+```
+
+停用、删除: 
+```bash
+sh deploy.sh stop
+```
+- 将 docker 的所有容器停用
+
+```bash
+sh deploy.sh rm
+```
+- 将 docker 的所有容器删除
+
+清空 build 文件夹:
+```bash
+./clean.sh
+```
+
+### 本地方式部署
+
+#### 数据库环境
 导入 `whale-shark/assert/sql/im_core.sql` 文件
 
-### Docker 环境部署
+#### Docker 环境部署
 **如果是部署到服务端，注意防火墙是否拦截端口**
 
 redis:
@@ -73,7 +139,7 @@ docker run -d -p 5672:5672 -p 15672:15672 --name rabbitmq
 ```
 + 其中 15672 端口是连接 web 端页面的, 5672 端口是 Java 后端程序访问 rabbitmq 的
 
-### 后端启动
+#### 后端启动
 后端有三个服务需要开启, 分别为:
 + im-tcp 包下的 Starter 程序 `com.bantanger.im.tcp.Starter`。它用于构建 TCP 网关服务, WebSocket、Socket 的连接, 消息发送, 回调以及路由等等基层操作。socket 的端口号是 `9001`, websocket 的端口号是 `19001`
 + im-domain 包下的 Application 程序 `com.bantanger.im.domain.Application`。它用于构建业务逻辑服务, 如用户、好友、群组的创建, 更改, 删除, 与数据库、缓存进行逻辑交互。端口号为 `8000`
