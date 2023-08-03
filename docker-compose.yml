@@ -6,7 +6,7 @@ services:
     container_name: im-mysql
     image: mysql:8.0.11
     build:
-      context: ./docker/mysql
+      context: ./build/mysql
     restart: always
     volumes:
       - ./docker/mysql/conf:/etc/mysql/conf.d
@@ -75,7 +75,7 @@ services:
     container_name: im-redis
     image: redis:6.0.8
     build:
-      context: ./docker/mysql
+      context: ./build/mysql
     restart: always
     ports:
       - "6379:6379"
