@@ -2,6 +2,7 @@
 
 # 使用说明，用来提示输入参数
 usage(){
+  echo "::: Welcome to IM-WhaleShark :::"
 	echo "Usage: sh 执行脚本.sh [base|services|stop|rm]"
 	exit 1
 }
@@ -17,7 +18,7 @@ if command -v docker-compose &> /dev/null
 then
     COMPOSE_COMMAND="docker-compose"
 else
-    if command -v "docker compose" &> /dev/null
+    if command -v docker compose &> /dev/null
     then
         COMPOSE_COMMAND="docker compose"
     else

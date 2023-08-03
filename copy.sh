@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "::: Welcome to IM-WhaleShark :::"
 # 创建目标目录
 mkdir -p docker/build/domain/jar
 mkdir -p docker/build/message-store/jar
