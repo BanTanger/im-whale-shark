@@ -1,0 +1,22 @@
+*/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.DS_Store
