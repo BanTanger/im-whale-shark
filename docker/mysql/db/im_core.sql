@@ -170,10 +170,10 @@ CREATE TABLE im_message_body
 
 CREATE TABLE im_message_history
 (
-    app_id         INT(20)     NOT NULL COMMENT 'APP_ID',
-    from_id        VARCHAR(50) NOT NULL COMMENT 'FROM_ID',
-    to_id          VARCHAR(50) NOT NULL COMMENT 'TO_ID',
-    owner_id       VARCHAR(50) NOT NULL COMMENT 'OWNER_ID',
+    app_id         INT(20)     NOT NULL COMMENT 'app_id',
+    from_id        VARCHAR(50) NOT NULL COMMENT 'from_id',
+    to_id          VARCHAR(50) NOT NULL COMMENT 'to_id',
+    owner_id       VARCHAR(50) NOT NULL COMMENT 'owner_id',
     message_key    BIGINT(50)  NOT NULL COMMENT 'messageBodyId',
     create_time    BIGINT      NULL,
     sequence       BIGINT      NULL,
