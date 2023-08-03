@@ -2,7 +2,8 @@
 
 # 删除jar文件
 echo "开始清理jar文件"
-rm -f ../im-whale-shark/domain/jar/im-domain.jar
-rm -f ../im-whale-shark/message-store/jar/im-message-store.jar
-rm -f ../im-whale-shark/tcp/jar/im-tcp.jar
+rm -f ../build/domain/jar/im-domain.jar
+rm -f ../build/message-store/jar/im-message-store.jar
+rm -f ../build/tcp/jar/im-tcp.jar
+rm -rf ../build
 echo "清理完成"
