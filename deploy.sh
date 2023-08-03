@@ -8,22 +8,22 @@ usage(){
 
 # 启动基础环境（必须）
 base(){
-	docker-compose up -d mysql redis zookeeper rabbitmq
+	docker compose up -d mysql redis zookeeper rabbitmq
 }
 
 # 启动程序模块（必须）
 services(){
-	docker-compose up -d im-domain im-message-store im-tcp
+	docker compose up -d im-domain im-message-store im-tcp
 }
 
 # 关闭所有环境/模块
 stop(){
-	docker-compose stop
+	docker compose stop
 }
 
 # 删除所有环境/模块
 rm(){
-	docker-compose rm
+	docker compose rm
 }
 
 # 根据输入参数，选择执行对应方法，不输入则执行使用说明
