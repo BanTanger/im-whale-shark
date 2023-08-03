@@ -6,7 +6,7 @@ services:
     container_name: im-mysql
     image: mysql:8.0.11
     build:
-      context: ./docker/mysql
+      context: ./build/mysql
     restart: always
     volumes:
       - ./docker/mysql/conf:/etc/mysql/conf.d
@@ -75,7 +75,7 @@ services:
     container_name: im-redis
     image: redis:6.0.8
     build:
-      context: ./docker/mysql
+      context: ./build/redis
     restart: always
     ports:
       - "6379:6379"
@@ -89,10 +89,10 @@ services:
   im-domain:
     container_name: im_domain
     build:
-      context: ./im-domain
+      context: ./docker/build/domain
     restart: always
     ports:
-      - "8000:8000"
+      - "18000:18000"
     depends_on:
       - im-mysql
       - im-zookeeper
@@ -110,8 +110,10 @@ services:
   im-message-store:
     container_name: im-message-store
     build:
-      context: ./im-message-store
+      context: ./docker/build/message-store
     restart: always
+    ports:
+      - "18001:18001"
     depends_on:
       - im-mysql
       - im-redis
@@ -120,8 +122,6 @@ services:
       - im-mysql
       - im-redis
       - im-rabbitmq
-    ports:
-      - "8001:8001"
     networks:
       - im-network
 
@@ -129,8 +129,11 @@ services:
   im-tcp:
     container_name: im-tcp
     build:
-      context: ./im-tcp
+      context: ./docker/build/tcp
     restart: always
+    ports:
+      - "19001:19001" # tcp 端口
+      - "19002:19002" # ws 端口
     depends_on:
       - im-redis
       - im-rabbitmq
@@ -139,9 +142,6 @@ services:
       - im-redis
       - im-rabbitmq
       - im-zookeeper
-    ports:
-      - "9001:9001" # tcp 端口
-      - "19001:19001" # ws 端口
     networks:
       - im-network
 

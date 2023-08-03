@@ -8,7 +8,7 @@ usage(){
 
 # 启动基础环境（必须）
 base(){
-	docker compose up -d mysql redis zookeeper rabbitmq
+	docker compose up -d im-mysql im-redis im-zookeeper im-rabbitmq
 }
 
 # 启动程序模块（必须）

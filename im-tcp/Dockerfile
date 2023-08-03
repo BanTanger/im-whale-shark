@@ -6,7 +6,6 @@ MAINTAINER BanTanger
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN echo 'Asia/Shanghai' >/etc/timezone
 
-COPY im-tcp-1.0-SNAPSHOT.jar /opt/application/im-tcp-1.0-SNAPSHOT.jar
-COPY config.yml config.yml
+COPY ./jar/im-tcp.jar /opt/application/im-tcp.jar
 
-ENTRYPOINT ["java", "-jar" ,"/opt/application/im-tcp-1.0-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar" ,"/opt/application/im-tcp.jar"]
