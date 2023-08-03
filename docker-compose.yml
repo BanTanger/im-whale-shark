@@ -92,7 +92,7 @@ services:
       context: ./docker/build/domain
     restart: always
     ports:
-      - "8000:8000"
+      - "18000:18000"
     depends_on:
       - im-mysql
       - im-zookeeper
@@ -121,7 +121,7 @@ services:
       - im-redis
       - im-rabbitmq
     ports:
-      - "8001:8001"
+      - "18001:18001"
     networks:
       - im-network
 
@@ -140,8 +140,8 @@ services:
       - im-rabbitmq
       - im-zookeeper
     ports:
-      - "9001:9001" # tcp 端口
-      - "19001:19001" # ws 端口
+      - "19001:19001" # tcp 端口
+      - "19002:19002" # ws 端口
     networks:
       - im-network
 

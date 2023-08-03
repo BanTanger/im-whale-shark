@@ -61,7 +61,7 @@ logging:
   config: logback-spring.xml
 
 server:
-  port: 8000
+  port: 18000
 
 mybatis-plus:
   configuration:
