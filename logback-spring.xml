@@ -13,7 +13,8 @@
     <springProperty scope="context" name="springAppEnv" source="spring.profiles.active"/>
     <!--     <springProperty scope="context" name="logFile" source="logging.file"/> -->
 
-    <property name="logFile" value="logs/mylog.log"/>
+
+    <property name="logFile" value="logs/whalesharkIM"/>
     <!--日志在工程中的输出位置-->
     <property name="LOG_FILE" value="${logFile}"/>
     <!-- 彩色日志依赖的渲染类 -->

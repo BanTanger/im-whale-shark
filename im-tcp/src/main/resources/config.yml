@@ -1,6 +1,6 @@
 im:
   tcpPort: 9001
-  webSocketPort: 19001
+  webSocketPort: 19002
   bossThreadSize: 1
   workThreadSize: 8
   heartBeatTime: 3000 # 心跳超时时间 单位毫秒

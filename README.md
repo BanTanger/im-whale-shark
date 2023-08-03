@@ -53,10 +53,76 @@ im-system-whale-shark
 * [x] 采用读扩散实现单聊、群聊离线消息拉取
 
 ## 快速开始
-### 数据库环境
+
+### 服务器方式部署（该方式暂时有问题）
+
+> 采用 docker compose 实现快速部署
+
+首先要确保您的服务器上有 git、docker 以及 docker-compose
+
+可参考自行下载: [服务器下载 Git、Docker、Docker-Compose](docker/docker.md)
+
+1. 克隆本项目
+
+```bash
+git clone https://github.com/BanTanger/im-whale-shark.git
+```
+2. 项目打包
+
+```bash
+mvn clean package
+```
+
+此过程可能有点长，请耐心等待
+
+3. 为脚本执行赋予权限并执行
+
+```bash
+chmod +x *.sh
+```
+```bash
+./copy.sh
+```
+- 将各个模块的 jar 包和 Dockerfile 移动到 docker/build 包下
+
+4. 部署项目
+
+```bash
+sh deploy.sh base
+```
+- 将基础组件部署到 docker
+```bash
+sh deploy.sh serives
+```
+- 将后端的三个模块部署到 docker
+
+5. 开启防火墙
+```bash
+./open_port.sh
+```
+
+停用、删除: 
+```bash
+sh deploy.sh stop
+```
+- 将 docker 的所有容器停用
+
+```bash
+sh deploy.sh rm
+```
+- 将 docker 的所有容器删除
+
+清空 build 文件夹:
+```bash
+./clean.sh
+```
+
+### 本地方式部署
+
+#### 数据库环境
 导入 `whale-shark/assert/sql/im_core.sql` 文件
 
-### Docker 环境部署
+#### Docker 环境部署
 **如果是部署到服务端，注意防火墙是否拦截端口**
 
 redis:
@@ -73,7 +139,7 @@ docker run -d -p 5672:5672 -p 15672:15672 --name rabbitmq
 ```
 + 其中 15672 端口是连接 web 端页面的, 5672 端口是 Java 后端程序访问 rabbitmq 的
 
-### 后端启动
+#### 后端启动
 后端有三个服务需要开启, 分别为:
 + im-tcp 包下的 Starter 程序 `com.bantanger.im.tcp.Starter`。它用于构建 TCP 网关服务, WebSocket、Socket 的连接, 消息发送, 回调以及路由等等基层操作。socket 的端口号是 `9001`, websocket 的端口号是 `19001`
 + im-domain 包下的 Application 程序 `com.bantanger.im.domain.Application`。它用于构建业务逻辑服务, 如用户、好友、群组的创建, 更改, 删除, 与数据库、缓存进行逻辑交互。端口号为 `8000`
@@ -242,7 +308,7 @@ IM 的私有协议确立信息如下：
 
 + 在传输层，TCP的三次握手保证了双方通讯的可靠性，稳定性。简而言之，用户发送的消息，
 在忽视应用层的情况下，无论如何都会从自身主机的 “发送缓冲区” 抵达对方主机的 “接收缓冲区”
-+ 在应用层，数据包有可能因为用户突然的切后台或者是弱网状态导致没法抵达操作系统内核，反之也是如此,
++ 在应用层，数据包有可能因为用户突然的切后台或者是弱网状态导致没法从操作系统内核抵达应用层，反之也是如此,
 为此,我们需要在应用层做好可靠传输协议的保证，防止数据丢失的情况
 
 > 如果只是单台机器进行双向通信，则不会经历传输层拆包装包的过程，而是直接将数据包通过内核拷贝到另一个进程进行通讯
@@ -255,6 +321,15 @@ IM 的私有协议确立信息如下：
 > ACK 应答报文中的数据格式：
 > 
 > CheckACK(String messageId, String messageSequence)
+
+ps: 其实这个下行 ACK 的设计有点多余，我的处理是消费者成功消费 mq 消息之后回返一个确认 ACK 给发送方,
+但 MQ 中间件到消费者, 本身就是一个强可靠保证，如果出现消息丢失，
+MQ 中间件方面，我们可以在 MQ 中间件开启持久化和镜像队列,
+消费者方面，取消自动提交而转为消息成功消费后手动提交的方式
+
+ps: 上行 ACK 也同理, 服务端的消息发送实际抵达 MQ 时有一个偏移量返回值，我们可以拿返回值做文章，如果说返回值 > 0
+代表这条消息已经成功从服务端抵达 MQ 了, 接着就是 message 数据架构体新增几个字段 
+RecvID, ServerID, ClientID, SendTime 做冗余避免查库提升性能
 
 #### 在线用户消息接收
 ![在线用户消息确认](assert/design/在线用户消息确认.png)
