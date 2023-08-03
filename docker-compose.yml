@@ -75,7 +75,7 @@ services:
     container_name: im-redis
     image: redis:6.0.8
     build:
-      context: ./build/mysql
+      context: ./build/redis
     restart: always
     ports:
       - "6379:6379"
@@ -112,6 +112,8 @@ services:
     build:
       context: ./docker/build/message-store
     restart: always
+    ports:
+      - "18001:18001"
     depends_on:
       - im-mysql
       - im-redis
@@ -120,8 +122,6 @@ services:
       - im-mysql
       - im-redis
       - im-rabbitmq
-    ports:
-      - "18001:18001"
     networks:
       - im-network
 
@@ -131,6 +131,9 @@ services:
     build:
       context: ./docker/build/tcp
     restart: always
+    ports:
+      - "19001:19001" # tcp 端口
+      - "19002:19002" # ws 端口
     depends_on:
       - im-redis
       - im-rabbitmq
@@ -139,9 +142,6 @@ services:
       - im-redis
       - im-rabbitmq
       - im-zookeeper
-    ports:
-      - "19001:19001" # tcp 端口
-      - "19002:19002" # ws 端口
     networks:
       - im-network
 
