@@ -8,6 +8,7 @@ services:
     build:
       context: ./build/mysql
     restart: always
+    privileged: true
     volumes:
       - ./docker/mysql/conf:/etc/mysql/conf.d
       - ./docker/mysql/logs:/logs
@@ -41,6 +42,7 @@ services:
     container_name: im-zookeeper
     image: zookeeper:latest
     restart: always
+    privileged: true
     environment:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=localhost:2888:3888
