@@ -2,8 +2,9 @@
 
 # 使用说明，用来提示输入参数
 usage(){
+  echo "--------------------------------"
   echo "::: Welcome to IM-WhaleShark :::"
-	echo "Usage: sh 执行脚本.sh [base|services|stop|rm]"
+	echo "Usage: sh running.sh [base|services|stop|rm]"
 	exit 1
 }
 
