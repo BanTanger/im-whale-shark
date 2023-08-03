@@ -89,7 +89,7 @@ services:
   im-domain:
     container_name: im_domain
     build:
-      context: ./im-domain
+      context: ./docker/build/domain
     restart: always
     ports:
       - "8000:8000"
@@ -110,7 +110,7 @@ services:
   im-message-store:
     container_name: im-message-store
     build:
-      context: ./im-message-store
+      context: ./docker/build/message-store
     restart: always
     depends_on:
       - im-mysql
@@ -129,7 +129,7 @@ services:
   im-tcp:
     container_name: im-tcp
     build:
-      context: ./im-tcp
+      context: ./docker/build/tcp
     restart: always
     depends_on:
       - im-redis
