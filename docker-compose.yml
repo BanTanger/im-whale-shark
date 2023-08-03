@@ -88,7 +88,8 @@ services:
   # IM Domain 容器
   im-domain:
     container_name: im_domain
-    image: im_domain
+    build:
+      context: ./im-domain
     restart: always
     ports:
       - "8000:8000"
@@ -108,7 +109,8 @@ services:
   # IM Message Store 容器
   im-message-store:
     container_name: im-message-store
-    image: im_message_store
+    build:
+      context: ./im-message-store
     restart: always
     depends_on:
       - im-mysql
@@ -126,7 +128,8 @@ services:
   # IM TCP 容器
   im-tcp:
     container_name: im-tcp
-    image: im_tcp
+    build:
+      context: ./im-tcp
     restart: always
     depends_on:
       - im-redis
