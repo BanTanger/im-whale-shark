@@ -6,7 +6,7 @@ MAINTAINER BanTanger
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN echo 'Asia/Shanghai' >/etc/timezone
 
-COPY im-domain-1.0-SNAPSHOT.jar /opt/application/im-domain-1.0-SNAPSHOT.jar
-COPY application.yml application.yml
+COPY ../docker/im-whale-shark/domain/jar/im-domain.jar /opt/application/im-domain.jar
+COPY /main/resources/application.yml application.yml
 
-ENTRYPOINT ["java", "-jar" ,"/opt/application/im-domain-1.0-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar" ,"/opt/application/im-domain.jar"]
