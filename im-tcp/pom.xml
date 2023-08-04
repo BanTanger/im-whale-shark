@@ -38,24 +38,17 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.3.0</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.bantanger.im.tcp.Starter</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <!-- 指定该Main Class为全局的唯一入口 -->
+                    <mainClass>com.bantanger.im.tcp.Starter</mainClass>
+                    <layout>ZIP</layout>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>repackage</goal><!--可以把依赖的包都打包到生成的Jar包中-->
                         </goals>
                     </execution>
                 </executions>
