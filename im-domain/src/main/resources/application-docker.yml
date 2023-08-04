@@ -1,0 +1,86 @@
+server:
+  port: 8000
+
+spring:
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: 123456
+    url: jdbc:mysql://127.0.0.1:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
+    username: root
+  # redis
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    jedis:
+      pool:
+        max-active: 100
+        max-idle: 100
+        max-wait: 1000
+        min-idle: 10
+    password:
+  # rabbitmq
+  rabbitmq:
+    host: localhost
+    port: 5672
+    addresses: localhost
+    username: admin
+    password: admin
+
+  application:
+    name: im-core
+
+appconfig:
+  privateKey: bantanger
+  zkAddr: 127.0.0.1:2181 # zk 连接地址
+  zkConnectTimeOut: 5000 # zk 超时时间
+  imRouteModel: 3 # 路由策略 1.轮询 2.随机 3.一致性hash
+  consistentHashModel: 1 # 一致性哈希底层调用数据结构 1.TreeMap 2.自定义 Map 3.待扩展
+  sendMessageCheckFriend: true # 发送消息是否校验关系链
+  sendMessageCheckBlack: true # 发送消息是否校验黑名单
+  callbackUrl: http://127.0.0.1:8989/callback
+  modifyUserAfterCallback: true # 用户资料变更之后回调开关
+  addFriendAfterCallback: false # 添加好友之后回调开关
+  addFriendBeforeCallback: false # 添加好友之前回调开关
+  modifyFriendAfterCallback: false # 修改好友之后回调开关
+  deleteFriendAfterCallback: false # 删除好友之后回调开关
+  addFriendShipBlackAfterCallback: false #添加黑名单之后回调开关
+  deleteFriendShipBlackAfterCallback: false #删除黑名单之后回调开关
+  createGroupAfterCallback: false # 创建群聊之后回调开关
+  modifyGroupAfterCallback: false # 修改群聊之后回调开关
+  destroyGroupAfterCallback: false # 解散群聊之后回调开关
+  deleteGroupMemberAfterCallback: false # 删除群成员之后回调
+  addGroupMemberAfterCallback: false # 拉人入群之后回调
+  addGroupMemberBeforeCallback: false # 拉人入群之前回调
+  deleteConversationSyncMode: 1 # 1. 多端同步删除会话(默认) 2. 单端删除会话
+  offlineMessageCount: 1024 # 离线消息最大条数
+  friendShipMaxCount: 100 # 好友关系每次增量拉取最大条目数
+  conversationMaxCount: 100 # 会话消息每次递增拉取最大条目数
+  joinGroupMaxCount: 100 # 用户被拉入群通知每次递增拉取最大条目数
+
+# logger 配置
+logging:
+  config: logback-spring.xml
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath*:mapper/*.xml
+  global-config:
+    db-config:
+      update-strategy: NOT_EMPTY
+  type-aliases-package: com.bantanger.im.domain
+
+#mybatis:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 配置全局 httpClient 设置
+httpclient:
+  maxTotal: 100
+  defaultMaxPerRoute: 50
+  connectTimeout: 2000
+  connectionRequestTimeout: 2000
+  socketTimeout: 5000
+  staleConnectionCheckEnabled: true
