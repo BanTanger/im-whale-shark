@@ -9,11 +9,14 @@ target_directories=(
     "docker/build/tcp"
 )
 
-# 复制 Dockerfile 文件
 docker_files=(
     "im-domain/Dockerfile"
     "im-message-store/Dockerfile"
     "im-tcp/Dockerfile"
+    "im-tcp/src/main/resources/config-docker.yml"
+    "im-domain/src/main/resources/application-docker.yml"
+    "im-message-store/src/main/resources/application-docker.yml"
+    "logback-spring.xml"
 )
 
 for dir in "${target_directories[@]}"; do
@@ -24,6 +27,7 @@ done
 
 echo ">>>>>>>>>>>>>>>>>"
 
+# 复制 Dockerfile 文件 and 配置文件
 for index in "${!docker_files[@]}"; do
     target_file="${target_directories[$index]}/$(basename "${docker_files[$index]}")"
     echo "开始复制 ${docker_files[$index]} .."
