@@ -19,7 +19,7 @@ spring:
         max-idle: 100
         max-wait: 1000
         min-idle: 10
-    password:
+    password: whalesharkim
   rabbitmq:
     host: localhost
     port: 5672

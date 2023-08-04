@@ -10,4 +10,4 @@ COPY jar/im-tcp.jar /opt/application/im-tcp.jar
 # 复制配置文件到 /opt/application 目录下
 COPY config-docker.yml /opt/application/config.yml
 
-ENTRYPOINT ["java", "-cp", "/opt/application/im-tcp.jar", "--spring.config.location=/opt/application/config.yml"]
+ENTRYPOINT ["java", "-jar", "/opt/application/im-tcp.jar", "/opt/application/config.yml"]

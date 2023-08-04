@@ -64,8 +64,8 @@ services:
     image: rabbitmq:management
     restart: always
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -79,6 +79,7 @@ services:
     build:
       context: ./docker/redis
     restart: always
+    command: redis-server /home/order/redis/redis.conf  # 指定 Redis 使用配置文件
     ports:
       - "6379:6379"
     volumes:
