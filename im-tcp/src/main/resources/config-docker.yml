@@ -1,12 +1,12 @@
 im:
-  tcpPort: 9002
+  tcpPort: 19001
   webSocketPort: 19002
   bossThreadSize: 1
   workThreadSize: 8
   heartBeatTime: 3000 # 心跳超时时间 单位毫秒
-  brokerId: 1002
-  logicUrl: http://127.0.0.1:8000/v1 # Feign RPC 调用业务层
-  loginModel: 1
+  brokerId: 1001
+  logicUrl: http://127.0.0.1:18000/v1 # Feign RPC 调用业务层
+  loginModel: 3
   # 多端同步模式: 1 只允许一端在线，手机/电脑/web 踢掉除了本 client+imei 的设备
   #             2 允许手机/电脑的一台设备 + web 在线 踢掉除了本 client+imei 的非 web 端设备
   #             3 允许手机和电脑单设备 + web 同时在线 踢掉非本 client+imei 的同端设备
