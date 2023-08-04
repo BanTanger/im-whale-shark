@@ -9,16 +9,6 @@ target_directories=(
     "docker/build/tcp"
 )
 
-docker_files=(
-    "im-domain/Dockerfile"
-    "im-message-store/Dockerfile"
-    "im-tcp/Dockerfile"
-    "im-tcp/src/main/resources/config-docker.yml"
-    "im-domain/src/main/resources/application-docker.yml"
-    "im-message-store/src/main/resources/application-docker.yml"
-    "logback-spring.xml"
-)
-
 for dir in "${target_directories[@]}"; do
     echo "开始创建目标目录 $dir/jar .."
     mkdir -p "$dir/jar"
@@ -27,12 +17,35 @@ done
 
 echo ">>>>>>>>>>>>>>>>>"
 
-# 复制 Dockerfile 文件 and 配置文件
+docker_files=(
+    "im-domain/Dockerfile"
+    "im-message-store/Dockerfile"
+    "im-tcp/Dockerfile"
+)
+
+# 复制 Dockerfile
 for index in "${!docker_files[@]}"; do
     target_file="${target_directories[$index]}/$(basename "${docker_files[$index]}")"
     echo "开始复制 ${docker_files[$index]} .."
     cp "${docker_files[$index]}" "$target_file"
     echo "复制 ${docker_files[$index]} 到 $target_file 完成"
+done
+
+echo ">>>>>>>>>>>>>>>>>"
+
+config_files=(
+    "im-message-store/src/main/resources/application-docker.yml"
+    "im-domain/src/main/resources/application-docker.yml"
+    "im-tcp/src/main/resources/config-docker.yml"
+)
+
+# 复制配置文件
+for index in "${!config_files[@]}"; do
+    target_file="${target_directories[$index]}/$(basename "${config_files[$index]}")"
+    echo "开始复制 ${config_files[$index]} .."
+    cp "${config_files[$index]}" "$target_file"
+    cp "logback-spring.xml" "${target_directories[$index]}"
+    echo "复制 ${config_files[$index]} 到 $target_file 完成"
 done
 
 echo ">>>>>>>>>>>>>>>>>"
