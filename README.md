@@ -54,7 +54,7 @@ im-system-whale-shark
 
 ## 快速开始
 
-### 服务器方式部署
+### 服务器方式部署（该方式暂时有问题）
 
 > 采用 docker compose 实现快速部署
 
