@@ -136,7 +136,8 @@ services:
     restart: always
     ports:
       - "19001:19001" # tcp 端口
-      - "19002:19002" # ws 端口
+      - "19003:19003" # ws 端口
+      - "5005:5005"
     depends_on:
       - im-redis
       - im-rabbitmq

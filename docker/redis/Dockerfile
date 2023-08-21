@@ -3,6 +3,7 @@ FROM redis:6.0.8
 # author
 MAINTAINER BanTanger
 
+EXPOSE 6379
 # 挂载目录
 VOLUME /home/order/redis
 # 创建目录
