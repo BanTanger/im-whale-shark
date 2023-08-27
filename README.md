@@ -70,12 +70,7 @@ git clone https://github.com/BanTanger/im-whale-shark.git
 2. 项目打包
 
 ```bash
-mvn clean package -pl im-common
-mvn clean package -pl im-codec
-mvn clean package -pl im-infrastructure
-mvn clean package -pl im-tcp
-mvn clean package -pl im-domain
-mvn clean package -pl im-message-store
+mvn clean package
 ```
 
 此过程可能有点长，请耐心等待

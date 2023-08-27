@@ -5,16 +5,16 @@
     <update id="readMark" parameterType="com.bantanger.im.domain.conversation.dao.ImConversationSetEntity">
         update im_conversation_set
         set read_sequence = #{readSequence}, sequence = #{sequence}
-        where conversation_id = #{conversationId} and app_id = #{appId} and read_sequence <![CDATA[<]]> #{readSequence};
+        where app_id = #{appId} and conversation_id = #{conversationId} and read_sequence <![CDATA[<]]> #{sequence};
     </update>
 
     <select id="getConversationSetMaxSeq" parameterType="map" resultType="java.lang.Long">
-        select max(sequence)
-        from im_conversation_set where app_id = #{appId} and from_id = #{fromId};
+        select max(sequence) from im_conversation_set
+        where app_id = #{appId} and from_id = #{fromId};
     </select>
 
     <select id="getConversationMaxSeq" resultType="java.lang.Long">
         select max(sequence) from im_conversation_set
-        where app_id = #{appId} and from_id = #{fromId};
+        where app_id = #{appId};
     </select>
 </mapper>
