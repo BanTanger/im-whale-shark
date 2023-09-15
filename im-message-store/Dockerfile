@@ -10,4 +10,4 @@ COPY ./jar/im-message-store.jar /opt/application/im-message-store.jar
 COPY application-docker.yml /opt/application/application.yml
 COPY logback-spring.xml /opt/application/logback-spring.xml
 
-ENTRYPOINT ["java", "-jar" ,"/opt/application/im-message-store.jar"]
+ENTRYPOINT ["java", "-jar" ,"/opt/application/im-message-store.jar", "--logging.config=/opt/application/logback-spring.xml"]
