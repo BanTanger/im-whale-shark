@@ -54,12 +54,15 @@ echo ">>>>>>>>>>>>>>>>>"
 jar_files=(
     "im-domain/target/im-domain-1.0-SNAPSHOT.jar"
     "im-message-store/target/im-message-store-1.0-SNAPSHOT.jar"
-    "im-tcp/target/im-tcp-1.0-SNAPSHOT.jar"
+    "im-tcp/target/im-tcp-1.0-SNAPSHOT-jar-with-dependencies.jar"
 )
 
 for index in "${!jar_files[@]}"; do
     target_file="${target_directories[$index]}/jar/$(basename "${jar_files[$index]}")"
     target_file_without_version="${target_directories[$index]}/jar/$(basename "${jar_files[$index]}" "-1.0-SNAPSHOT.jar").jar"
+    if [[ "${jar_files[$index]}" == *"jar-with-dependencies.jar" ]]; then
+        target_file_without_version="${target_directories[$index]}/jar/$(basename "${jar_files[$index]}" "-1.0-SNAPSHOT-jar-with-dependencies.jar").jar"
+    fi
     echo "开始复制 ${jar_files[$index]} .."
     cp "${jar_files[$index]}" "$target_file"
     mv "$target_file" "$target_file_without_version"
