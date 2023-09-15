@@ -44,7 +44,13 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.1.77.Final</version>
+            <version>4.1.94.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <version>4.1.94.Final</version>
+            <classifier>osx-aarch_64</classifier>
         </dependency>
         <!-- commons-lang3 -->
         <dependency>

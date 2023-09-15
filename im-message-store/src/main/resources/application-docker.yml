@@ -6,8 +6,8 @@ spring:
     active: dev
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    password: 123456
-    url: jdbc:mysql://im-mysql:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
+    password: whalesharkim
+    url: jdbc:mysql://im-mysql:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
     username: root
 
   redis:
