@@ -34,8 +34,8 @@ done
 echo ">>>>>>>>>>>>>>>>>"
 
 config_files=(
-    "im-message-store/src/main/resources/application-docker.yml"
     "im-domain/src/main/resources/application-docker.yml"
+    "im-message-store/src/main/resources/application-docker.yml"
     "im-tcp/src/main/resources/config-docker.yml"
 )
 

@@ -5,10 +5,9 @@ spring:
   profiles:
     active: dev
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver`
+    driver-class-name: com.mysql.cj.jdbc.Driver
     password: whalesharkim
     url: jdbc:mysql://im-mysql:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
-
     username: root
   # redis
   redis:
@@ -73,9 +72,9 @@ mybatis-plus:
       update-strategy: NOT_EMPTY
   type-aliases-package: com.bantanger.im.domain
 
-#mybatis:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 # 配置全局 httpClient 设置
 httpclient:

@@ -72,9 +72,9 @@ mybatis-plus:
       update-strategy: NOT_EMPTY
   type-aliases-package: com.bantanger.im.domain
 
-#mybatis:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 # 配置全局 httpClient 设置
 httpclient:
