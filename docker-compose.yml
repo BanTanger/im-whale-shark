@@ -151,4 +151,4 @@ services:
 
 networks:
   im-network:
-    driver: host
+    driver: bridge
