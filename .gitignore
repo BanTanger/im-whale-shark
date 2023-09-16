@@ -23,3 +23,5 @@
 /docker/mysql/data/
 /docker/redis/data/
 /logs/
+/docker/build/
+/docker/mysql/logs/
