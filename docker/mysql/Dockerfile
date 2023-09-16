@@ -1,5 +1,5 @@
 # 基础镜像
-FROM mysql:8.0.11
+FROM mysql:8.0.33
 
 # author
 MAINTAINER BanTanger

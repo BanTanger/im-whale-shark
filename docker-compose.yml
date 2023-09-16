@@ -4,7 +4,7 @@ services:
   # MySQL 容器
   im-mysql:
     container_name: im-mysql
-    image: mysql:8.0.11
+    image: mysql:8.0.33
     build:
       context: ./docker/mysql
     restart: always
@@ -151,3 +151,4 @@ services:
 
 networks:
   im-network:
+    driver: host

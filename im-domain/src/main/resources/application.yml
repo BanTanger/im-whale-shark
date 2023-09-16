@@ -6,8 +6,8 @@ spring:
     active: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: 123456
-    url: jdbc:mysql://127.0.0.1:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
+    password: whalesharkim
+    url: jdbc:mysql://127.0.0.1:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
     username: root
   # redis
   redis:
@@ -19,7 +19,7 @@ spring:
         max-idle: 100
         max-wait: 1000
         min-idle: 10
-    password:
+    password: whalesharkim
   # rabbitmq
   rabbitmq:
     host: localhost

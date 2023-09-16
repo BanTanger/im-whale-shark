@@ -1,17 +1,17 @@
 server:
-  port: 8000
+  port: 18000
 
 spring:
   profiles:
     active: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: 123456
-    url: jdbc:mysql://127.0.0.1:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
+    password: whalesharkim
+    url: jdbc:mysql://im-mysql:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
     username: root
   # redis
   redis:
-    host: 127.0.0.1
+    host: im-redis
     port: 6379
     jedis:
       pool:
@@ -22,9 +22,9 @@ spring:
     password: whalesharkim
   # rabbitmq
   rabbitmq:
-    host: localhost
+    host: im-rabbitmq
     port: 5672
-    addresses: localhost
+    addresses: im-rabbitmq
     username: admin
     password: admin
 
@@ -33,7 +33,7 @@ spring:
 
 appconfig:
   privateKey: bantanger
-  zkAddr: 127.0.0.1:2181 # zk 连接地址
+  zkAddr: im-zookeeper:2181 # zk 连接地址
   zkConnectTimeOut: 5000 # zk 超时时间
   imRouteModel: 3 # 路由策略 1.轮询 2.随机 3.一致性hash
   consistentHashModel: 1 # 一致性哈希底层调用数据结构 1.TreeMap 2.自定义 Map 3.待扩展

@@ -20,3 +20,6 @@
 *.njsproj
 *.sln
 .DS_Store
+/docker/mysql/data/
+/docker/redis/data/
+/logs/
