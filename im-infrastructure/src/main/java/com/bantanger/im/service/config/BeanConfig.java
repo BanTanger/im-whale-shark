@@ -4,6 +4,8 @@ import com.bantanger.im.common.enums.route.RouteHashMethodEnum;
 import com.bantanger.im.common.enums.route.UrlRouteModelEnum;
 import com.bantanger.im.service.route.RouteHandler;
 import com.bantanger.im.service.route.algroithm.hash.AbstractConsistentHash;
+import com.bantanger.im.service.strategy.command.CommandFactoryConfig;
+import com.bantanger.im.service.strategy.login.factory.LoginStatusFactoryConfig;
 import com.bantanger.im.service.support.ids.SnowflakeIdWorker;
 import org.I0Itec.zkclient.ZkClient;
 import org.springframework.context.annotation.Bean;
@@ -22,9 +24,24 @@ public class BeanConfig {
     @Resource
     private AppConfig appConfig;
 
+    @Resource
+    private IMConfig imConfig;
+
     @Bean
     public ZkClient buildZkClient() {
         return new ZkClient(appConfig.getZkAddr(), appConfig.getZkConnectTimeOut());
+    }
+
+    public void buildTCPClient() {
+        // 策略工厂初始化
+        CommandFactoryConfig.init();
+        LoginStatusFactoryConfig.init();
+        // MQ 工厂初始化
+        // MqFactory.init();
+        // MQ 监听器初始化
+        // MqMessageListener.init(String.valueOf(config.getIm().getBrokerId()));
+        // 每个服务器都注册 Zk
+        // registerZk(config);
     }
 
     @Bean

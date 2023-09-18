@@ -8,6 +8,9 @@ import com.bantanger.im.common.enums.command.CommandType;
 import com.bantanger.im.service.rabbitmq.MqFactory;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * @author BanTanger 半糖
@@ -16,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MqMessageProducer {
 
-    public static void sendMessage(Message message, Integer command) {
+    public void sendMessage(Message message, Integer command) {
         Channel channel = null;
         String num = command.toString();
         String substring = num.substring(0, 1);

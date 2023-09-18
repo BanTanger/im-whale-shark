@@ -5,7 +5,7 @@ import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.device.ConnectState;
 import com.bantanger.im.common.model.UserClientDto;
 import com.bantanger.im.common.model.UserSession;
-import com.bantanger.im.service.redis.RedisManager;
+import com.bantanger.im.service.redis.RedissonManager;
 import io.netty.channel.Channel;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
@@ -122,7 +122,7 @@ public class UserChannelRepository extends Constants {
     }
 
     private static void removeSession(UserClientDto userInfo) {
-        RedissonClient redissonClient = RedisManager.getRedissonClient();
+        RedissonClient redissonClient = RedissonManager.getRedissonClient();
         RMap<String, String> map = redissonClient.getMap(userInfo.getAppId() + RedisConstants.UserSessionConstants + userInfo.getUserId());
         // 删除 Hash 里的 key：clientType:imei，key 存放用户的 Session
         map.remove(userInfo.getClientType() + ":" + userInfo.getImei());
@@ -150,7 +150,7 @@ public class UserChannelRepository extends Constants {
     public static void forceOffLine(UserClientDto userClientDto) {
         Channel channel = isBind(userClientDto);
         if (ObjectUtils.isEmpty(channel)) {
-            RedissonClient redissonClient = RedisManager.getRedissonClient();
+            RedissonClient redissonClient = RedissonManager.getRedissonClient();
             RMap<String, String> map = redissonClient.getMap(userClientDto.getAppId() + RedisConstants.UserSessionConstants + userClientDto.getUserId());
             String key = userClientDto.getClientType() + ":" + userClientDto.getImei();
             String userSessionValue = map.get(key);

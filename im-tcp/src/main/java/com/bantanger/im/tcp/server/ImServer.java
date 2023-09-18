@@ -3,6 +3,7 @@ package com.bantanger.im.tcp.server;
 import com.bantanger.im.codec.MessageDecoderHandler;
 import com.bantanger.im.codec.MessageEncoderHandler;
 import com.bantanger.im.codec.config.ImBootstrapConfig;
+import com.bantanger.im.service.config.IMConfig;
 import com.bantanger.im.tcp.handler.HeartBeatHandler;
 import com.bantanger.im.tcp.handler.NettyServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -23,17 +24,17 @@ import org.slf4j.LoggerFactory;
 @Slf4j
 public class ImServer {
 
-    private ImBootstrapConfig.TcpConfig config;
+    private IMConfig imConfig;
 
     private NioEventLoopGroup mainGroup;
     private NioEventLoopGroup subGroup;
     private ServerBootstrap bootstrap;
 
-    public ImServer(ImBootstrapConfig.TcpConfig config) {
-        this.config = config;
+    public ImServer(IMConfig imConfig) {
+        this.imConfig = imConfig;
         // 创建主从线程组
-        mainGroup = new NioEventLoopGroup(config.getBossThreadSize());
-        subGroup = new NioEventLoopGroup(config.getWorkThreadSize());
+        mainGroup = new NioEventLoopGroup(imConfig.getBossThreadSize());
+        subGroup = new NioEventLoopGroup(imConfig.getWorkThreadSize());
         bootstrap = new ServerBootstrap();
         bootstrap.group(mainGroup, subGroup)
                 .channel(NioServerSocketChannel.class)
@@ -55,16 +56,16 @@ public class ImServer {
                         // 心跳检测 保活
                         ch.pipeline().addLast(new IdleStateHandler(
                                 0, 0, 1));
-                        ch.pipeline().addLast(new HeartBeatHandler(config.getHeartBeatTime()));
+                        ch.pipeline().addLast(new HeartBeatHandler(imConfig.getHeartBeatTime()));
                         // 用户逻辑执行
-                        ch.pipeline().addLast(new NettyServerHandler(config.getBrokerId(), config.getLogicUrl()));
+                        ch.pipeline().addLast(new NettyServerHandler(imConfig.getBrokerId(), imConfig.getLogicUrl()));
                     }
                 });
     }
 
     public void start() {
         // 启动服务端
-        this.bootstrap.bind(config.getTcpPort());
+        this.bootstrap.bind(imConfig.getTcpPort());
         log.info("tcp start success");
     }
 

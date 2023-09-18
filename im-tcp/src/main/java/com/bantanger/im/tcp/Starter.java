@@ -2,14 +2,11 @@ package com.bantanger.im.tcp;
 
 import com.bantanger.im.codec.config.ImBootstrapConfig;
 import com.bantanger.im.service.rabbitmq.listener.MqMessageListener;
-import com.bantanger.im.service.redis.RedisManager;
 import com.bantanger.im.service.strategy.command.CommandFactoryConfig;
 import com.bantanger.im.service.strategy.login.factory.LoginStatusFactoryConfig;
 import com.bantanger.im.service.rabbitmq.MqFactory;
 import com.bantanger.im.service.zookeeper.ZkManager;
 import com.bantanger.im.service.zookeeper.ZkRegistry;
-import com.bantanger.im.tcp.server.ImServer;
-import com.bantanger.im.tcp.server.ImWebSocketServer;
 import org.I0Itec.zkclient.ZkClient;
 import org.yaml.snakeyaml.Yaml;
 
@@ -36,10 +33,12 @@ public class Starter {
             FileInputStream is = new FileInputStream(path);
             ImBootstrapConfig config = yaml.loadAs(is, ImBootstrapConfig.class);
 
-            new ImServer(config.getIm()).start();
-            new ImWebSocketServer(config.getIm()).start();
+            // new ImServer(config.getIm()).start();
+            // new ImWebSocketServer(config.getIm()).start();
+
             // redisson 在系统启动之初就初始化
-            RedisManager.init(config);
+            // RedissonManager.init(config);
+
             // 策略工厂初始化
             CommandFactoryConfig.init();
             LoginStatusFactoryConfig.init();

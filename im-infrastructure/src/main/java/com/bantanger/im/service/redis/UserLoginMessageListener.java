@@ -3,11 +3,9 @@ package com.bantanger.im.service.redis;
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.model.UserClientDto;
-import com.bantanger.im.service.redis.RedisManager;
 import com.bantanger.im.service.strategy.login.factory.LoginStatusFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RTopic;
-import org.redisson.api.listener.MessageListener;
 
 /**
  * 多端同步：
@@ -30,7 +28,7 @@ public class UserLoginMessageListener {
 
     public void listenerUserLogin() {
         // 监听者监听 UserLoginChannel 队列
-        RTopic topic = RedisManager.getRedissonClient().getTopic(Constants.RedisConstants.UserLoginChannel);
+        RTopic topic = RedissonManager.getRedissonClient().getTopic(Constants.RedisConstants.UserLoginChannel);
         topic.addListener(String.class, (CharSequence charSequence, String msg) -> {
             log.info("收到用户上线通知 {}", msg);
             UserClientDto dto = JSONObject.parseObject(msg, UserClientDto.class);

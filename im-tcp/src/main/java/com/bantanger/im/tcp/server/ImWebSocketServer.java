@@ -3,6 +3,7 @@ package com.bantanger.im.tcp.server;
 import com.bantanger.im.codec.WebSocketMessageDecoderHandler;
 import com.bantanger.im.codec.WebSocketMessageEncoderHandler;
 import com.bantanger.im.codec.config.ImBootstrapConfig;
+import com.bantanger.im.service.config.IMConfig;
 import com.bantanger.im.tcp.handler.NettyServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -29,14 +30,14 @@ import org.slf4j.LoggerFactory;
 @Slf4j
 public class ImWebSocketServer {
 
-    private ImBootstrapConfig.TcpConfig config;
+    private IMConfig imConfig;
 
     private NioEventLoopGroup mainGroup;
     private NioEventLoopGroup subGroup;
     private ServerBootstrap bootstrap;
 
-    public ImWebSocketServer(ImBootstrapConfig.TcpConfig config) {
-        this.config = config;
+    public ImWebSocketServer(IMConfig imConfig) {
+        this.imConfig = imConfig;
         // 创建主从线程组
         mainGroup = new NioEventLoopGroup();
         subGroup = new NioEventLoopGroup();
@@ -70,15 +71,15 @@ public class ImWebSocketServer {
                         pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
                         pipeline.addLast(new WebSocketMessageDecoderHandler());
                         pipeline.addLast(new WebSocketMessageEncoderHandler());
-                        pipeline.addLast(new NettyServerHandler(config.getBrokerId(), config.getLogicUrl()));
+                        pipeline.addLast(new NettyServerHandler(imConfig.getBrokerId(), imConfig.getLogicUrl()));
                     }
                 });
     }
 
     public void start() {
         // 启动服务端
-        this.bootstrap.bind(config.getWebSocketPort());
-//        logger.info("web start success");
+        this.bootstrap.bind(imConfig.getWebSocketPort());
+       log.info("web start success");
     }
 
 }

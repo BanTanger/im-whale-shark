@@ -8,7 +8,7 @@ import org.redisson.api.RedissonClient;
  * @author BanTanger 半糖
  * @Date 2023/3/24 22:07
  */
-public class RedisManager {
+public class RedissonManager {
 
     private static RedissonClient redissonClient;
 

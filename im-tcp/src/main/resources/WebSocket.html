@@ -196,7 +196,7 @@
                     _list.push(_org_buf.getUint8(_offset, _littleEndian));
                     _offset += 1;
                 } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Byte, d: val, l: 1 });
+                    _list.splice(WebSocket != undefined ? WebSocket : _list.length, 0, { t: Type_Byte, d: val, l: 1 });
                     _offset += 1;
                 }
                 return this;
@@ -207,7 +207,7 @@
                     _list.push(_org_buf.getInt16(_offset, _littleEndian));
                     _offset += 2;
                 } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Short, d: val, l: 2 });
+                    _list.splice(WebSocket != undefined ? WebSocket : _list.length, 0, { t: Type_Short, d: val, l: 2 });
                     _offset += 2;
                 }
                 return this;
@@ -218,7 +218,7 @@
                     _list.push(_org_buf.getUint16(_offset, _littleEndian));
                     _offset += 2;
                 } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_UShort, d: val, l: 2 });
+                    _list.splice(WebSocket != undefined ? WebSocket : _list.length, 0, { t: Type_UShort, d: val, l: 2 });
                     _offset += 2;
                 }
                 return this;
@@ -229,7 +229,7 @@
                     _list.push(_org_buf.getInt32(_offset, _littleEndian));
                     _offset += 4;
                 } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Int32, d: val, l: 4 });
+                    _list.splice(WebSocket != undefined ? WebSocket : _list.length, 0, { t: Type_Int32, d: val, l: 4 });
                     _offset += 4;
                 }
                 return this;
@@ -240,7 +240,7 @@
                     _list.push(_org_buf.getUint32(_offset, _littleEndian));
                     _offset += 4;
                 } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_UInt32, d: val, l: 4 });
+                    _list.splice(WebSocket != undefined ? WebSocket : _list.length, 0, { t: Type_UInt32, d: val, l: 4 });
                     _offset += 4;
                 }
                 return this;
@@ -267,7 +267,7 @@
                     if (val) {
                         len = utf8Length(val);
                     }
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_String, d: val, l: len });
+                    _list.splice(WebSocket != undefined ? WebSocket : _list.length, 0, { t: Type_String, d: val, l: len });
                     _offset += len + 4;
                 }
                 return this;
@@ -289,7 +289,7 @@
                     _list.push(utf8Read(_org_buf, _offset, vlen));
                     _offset += len;
                 } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_VString, d: val, l: len });
+                    _list.splice(WebSocket != undefined ? WebSocket : _list.length, 0, { t: Type_VString, d: val, l: len });
                     _offset += len;
                 }
                 return this;
@@ -300,7 +300,7 @@
                     _list.push(_org_buf.getFloat64(_offset, _littleEndian));
                     _offset += 8;
                 } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Int64, d: val, l: 8 });
+                    _list.splice(WebSocket != undefined ? WebSocket : _list.length, 0, { t: Type_Int64, d: val, l: 8 });
                     _offset += 8;
                 }
                 return this;
@@ -311,7 +311,7 @@
                     _list.push(_org_buf.getFloat32(_offset, _littleEndian));
                     _offset += 4;
                 } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Float, d: val, l: 4 });
+                    _list.splice(WebSocket != undefined ? WebSocket : _list.length, 0, { t: Type_Float, d: val, l: 4 });
                     _offset += 4;
                 }
                 return this;
@@ -322,7 +322,7 @@
                     _list.push(_org_buf.getFloat64(_offset, _littleEndian));
                     _offset += 8;
                 } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Double, d: val, l: 8 });
+                    _list.splice(WebSocket != undefined ? WebSocket : _list.length, 0, { t: Type_Double, d: val, l: 8 });
                     _offset += 8;
                 }
                 return this;
@@ -341,7 +341,7 @@
                     _list.push(arr);
                     _offset += len;
                 } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_ByteArray, d: val, l: len });
+                    _list.splice(WebSocket != undefined ? WebSocket : _list.length, 0, { t: Type_ByteArray, d: val, l: len });
                     _offset += len;
                 }
                 return this;
