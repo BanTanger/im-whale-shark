@@ -12,9 +12,6 @@ public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
-        if (args.length > 0) {
-            Starter.start(args[0]);
-        }
     }
 
 }

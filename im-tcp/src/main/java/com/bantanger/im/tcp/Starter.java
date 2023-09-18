@@ -31,7 +31,7 @@ public class Starter {
         }
     }
 
-    static void start(String path) {
+    public static void start(String path) {
         try {
             Yaml yaml = new Yaml();
             FileInputStream is = new FileInputStream(path);

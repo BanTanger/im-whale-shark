@@ -135,6 +135,7 @@ services:
       context: ./docker/build/tcp
     restart: always
     ports:
+      - "19000:19000" # springboot 启动端口
       - "19001:19001" # tcp 端口
       - "19002:19002" # ws 端口
       - "5005:5005"
