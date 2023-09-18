@@ -3,7 +3,6 @@ package com.bantanger.im.tcp.server;
 import com.bantanger.im.codec.WebSocketMessageDecoderHandler;
 import com.bantanger.im.codec.WebSocketMessageEncoderHandler;
 import com.bantanger.im.codec.config.ImBootstrapConfig;
-import com.bantanger.im.service.config.IMConfig;
 import com.bantanger.im.tcp.handler.NettyServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -17,8 +16,6 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * WebSocket 网络通讯, HTTP 包装的协议，双向通信，降低延时
@@ -30,14 +27,14 @@ import org.slf4j.LoggerFactory;
 @Slf4j
 public class ImWebSocketServer {
 
-    private IMConfig imConfig;
+    private ImBootstrapConfig.TcpConfig config;
 
     private NioEventLoopGroup mainGroup;
     private NioEventLoopGroup subGroup;
     private ServerBootstrap bootstrap;
 
-    public ImWebSocketServer(IMConfig imConfig) {
-        this.imConfig = imConfig;
+    public ImWebSocketServer(ImBootstrapConfig.TcpConfig config) {
+        this.config = config;
         // 创建主从线程组
         mainGroup = new NioEventLoopGroup();
         subGroup = new NioEventLoopGroup();
@@ -71,14 +68,14 @@ public class ImWebSocketServer {
                         pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
                         pipeline.addLast(new WebSocketMessageDecoderHandler());
                         pipeline.addLast(new WebSocketMessageEncoderHandler());
-                        pipeline.addLast(new NettyServerHandler(imConfig.getBrokerId(), imConfig.getLogicUrl()));
+                        pipeline.addLast(new NettyServerHandler(config.getBrokerId(), config.getLogicUrl()));
                     }
                 });
     }
 
     public void start() {
         // 启动服务端
-        this.bootstrap.bind(imConfig.getWebSocketPort());
+        this.bootstrap.bind(config.getWebSocketPort());
        log.info("web start success");
     }
 

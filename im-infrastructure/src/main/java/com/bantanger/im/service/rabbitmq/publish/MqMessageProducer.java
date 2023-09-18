@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 @Slf4j
 public class MqMessageProducer {
 
-    public void sendMessage(Message message, Integer command) {
+    public static void sendMessage(Message message, Integer command) {
         Channel channel = null;
         String num = command.toString();
         String substring = num.substring(0, 1);

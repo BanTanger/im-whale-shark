@@ -68,3 +68,6 @@ for index in "${!jar_files[@]}"; do
     mv "$target_file" "$target_file_without_version"
     echo "复制 ${jar_files[$index]} 到 $target_file_without_version 完成"
 done
+
+cp "im-tcp/src/main/resources/application.yml" "docker/build/tcp/application.yml"
+echo "复制 im-tcp/src/main/resources/application.yml 到 docker/build/tcp/application.yml"
