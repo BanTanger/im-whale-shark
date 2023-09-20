@@ -54,14 +54,14 @@ echo ">>>>>>>>>>>>>>>>>"
 jar_files=(
     "im-domain/target/im-domain-1.0-SNAPSHOT.jar"
     "im-message-store/target/im-message-store-1.0-SNAPSHOT.jar"
-    "im-tcp/target/im-tcp-1.0-SNAPSHOT-jar-with-dependencies.jar"
+    "im-tcp/target/im-tcp-1.0-SNAPSHOT.jar"
 )
 
 for index in "${!jar_files[@]}"; do
     target_file="${target_directories[$index]}/jar/$(basename "${jar_files[$index]}")"
     target_file_without_version="${target_directories[$index]}/jar/$(basename "${jar_files[$index]}" "-1.0-SNAPSHOT.jar").jar"
     if [[ "${jar_files[$index]}" == *"jar-with-dependencies.jar" ]]; then
-        target_file_without_version="${target_directories[$index]}/jar/$(basename "${jar_files[$index]}" "-1.0-SNAPSHOT-jar-with-dependencies.jar").jar"
+        target_file_without_version="${target_directories[$index]}/jar/$(basename "${jar_files[$index]}" "-1.0-SNAPSHOT.jar").jar"
     fi
     echo "开始复制 ${jar_files[$index]} .."
     cp "${jar_files[$index]}" "$target_file"
@@ -69,5 +69,5 @@ for index in "${!jar_files[@]}"; do
     echo "复制 ${jar_files[$index]} 到 $target_file_without_version 完成"
 done
 
-cp "im-tcp/src/main/resources/application.yml" "docker/build/tcp/application.yml"
-echo "复制 im-tcp/src/main/resources/application.yml 到 docker/build/tcp/application.yml"
+cp "im-tcp/src/main/resources/application-docker.yml" "docker/build/tcp/application.yml"
+echo "复制 im-tcp/src/main/resources/application-docker.yml 到 docker/build/tcp/application.yml"

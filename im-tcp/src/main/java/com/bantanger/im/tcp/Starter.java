@@ -1,6 +1,5 @@
 package com.bantanger.im.tcp;
 
-import ch.qos.logback.classic.util.ContextInitializer;
 import com.bantanger.im.codec.config.ImBootstrapConfig;
 import com.bantanger.im.service.rabbitmq.MqFactory;
 import com.bantanger.im.service.rabbitmq.listener.MqMessageListener;
@@ -48,7 +47,7 @@ public class Starter {
             LoginStatusFactoryConfig.init();
             // MQ 工厂初始化
             MqFactory.init(config.getIm().getRabbitmq());
-            // MqFactory.createExchange();
+            MqFactory.createExchange();
             // MQ 监听器初始化
             MqMessageListener.init(String.valueOf(config.getIm().getBrokerId()));
             // 每个服务器都注册 Zk

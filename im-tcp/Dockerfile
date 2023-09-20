@@ -15,4 +15,4 @@ COPY jar/im-tcp.jar /opt/application/im-tcp.jar
 COPY config-docker.yml /opt/application/config.yml
 COPY application.yml /opt/application/application.yml
 
-ENTRYPOINT ["java", "-jar", "/opt/application/im-tcp.jar", "--spring.config.location=/opt/application/application.yml", "/opt/application/config.yml"]
+ENTRYPOINT ["java", "-jar", "/opt/application/im-tcp.jar", "--spring.config.location=/opt/application/application.yml", "--customOption=/opt/application/config.yml"]
