@@ -468,6 +468,13 @@
         if (window.WebSocket) {
             //参数就是与服务器连接的地址
             socket = new WebSocket("ws://localhost:19002/ws");
+
+            // 设置WebSocket的origin请求头
+            socket.onbeforecopy = function (event) {
+                event.preventDefault();
+                socket.setRequestHeader("Origin", "localhost:19000");
+            };
+
             //客户端收到服务器消息的时候就会执行这个回调方法
             socket.onmessage = function (event) {
                 var ta = document.getElementById("responseText");
