@@ -3,6 +3,7 @@ package com.bantanger.im.domain.group.dao.mapper;
 import com.bantanger.im.domain.group.dao.ImGroupMemberEntity;
 import com.bantanger.im.domain.group.model.req.GroupMemberDto;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
@@ -22,7 +23,7 @@ public interface ImGroupMemberMapper extends BaseMapper<ImGroupMemberEntity> {
      * @param memberId
      * @return
      */
-    List<String> getJoinedGroupId(Integer appId, String memberId);
+    List<String> getJoinedGroupId(@Param("appId") Integer appId, @Param("memberId") String memberId);
 
     /**
      * 拉取群组所有成员(基本)信息
@@ -30,7 +31,7 @@ public interface ImGroupMemberMapper extends BaseMapper<ImGroupMemberEntity> {
      * @param groupId
      * @return
      */
-    List<GroupMemberDto> getGroupMember(Integer appId, String groupId);
+    List<GroupMemberDto> getGroupMember(@Param("appId") Integer appId, @Param("groupId") String groupId);
 
     /**
      * 拉取群组所有成员 id
@@ -38,7 +39,7 @@ public interface ImGroupMemberMapper extends BaseMapper<ImGroupMemberEntity> {
      * @param groupId
      * @return
      */
-    List<String> getGroupMemberId(Integer appId, String groupId);
+    List<String> getGroupMemberId(@Param("appId") Integer appId, @Param("groupId") String groupId);
 
     /**
      * 拉取群组管理员(基本)信息
@@ -46,7 +47,7 @@ public interface ImGroupMemberMapper extends BaseMapper<ImGroupMemberEntity> {
      * @param appId
      * @return
      */
-    List<GroupMemberDto> getGroupManager(String groupId, Integer appId);
+    List<GroupMemberDto> getGroupManager(@Param("appId") Integer appId, @Param("groupId") String groupId);
 
     /**
      * 增量拉取用户加入群组的 Id
@@ -55,5 +56,5 @@ public interface ImGroupMemberMapper extends BaseMapper<ImGroupMemberEntity> {
      * @param role
      * @return
      */
-    List<String> syncJoinedGroupId(Integer appId, String memberId, int role);
+    List<String> syncJoinedGroupId(@Param("appId") Integer appId, @Param("memberId") String memberId, @Param("role") Integer role);
 }

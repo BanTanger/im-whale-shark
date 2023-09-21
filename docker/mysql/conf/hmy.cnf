@@ -1,0 +1,13 @@
+[mysqld]
+skip-name-resolve
+character_set_server=utf8
+datadir=/var/lib/mysql
+server-id=1000
+[mysql]
+default-character-set = utf8
+[mysql.server]
+default-character-set = utf8
+[mysqld_safe]
+default-character-set = utf8
+[client]
+default-character-set = utf8

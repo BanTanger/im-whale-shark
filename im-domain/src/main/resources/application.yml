@@ -1,5 +1,18 @@
 server:
   port: 18000
+  tomcat:
+    basedir: ./
+    accesslog:
+      buffered: false
+      directory: logs
+      enabled: true
+      file-date-format: .yyyy-MM-dd
+      pattern: '%h %l %u %t "%r" %s"%{Referer}i" "%{User-Agent}i" %D %{x-request-id}r %{user-id}r %{resource-id}r'
+      prefix: access_log
+      rename-on-rotate: true
+      request-attributes-enabled: false
+      rotate: true
+      suffix: .log
 
 spring:
   profiles:
@@ -8,10 +21,12 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: whalesharkim
     url: jdbc:mysql://127.0.0.1:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
+#    url: jdbc:mysql://47.97.204.83:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
     username: root
   # redis
   redis:
     host: 127.0.0.1
+#    host: 47.97.204.83
     port: 6379
     jedis:
       pool:
@@ -23,6 +38,7 @@ spring:
   # rabbitmq
   rabbitmq:
     host: localhost
+#    host: 47.97.204.83
     port: 5672
     addresses: localhost
     username: admin
@@ -34,6 +50,7 @@ spring:
 appconfig:
   privateKey: bantanger
   zkAddr: 127.0.0.1:2181 # zk 连接地址
+#  zkAddr: 47.97.204.83:2181 # zk 连接地址
   zkConnectTimeOut: 5000 # zk 超时时间
   imRouteModel: 3 # 路由策略 1.轮询 2.随机 3.一致性hash
   consistentHashModel: 1 # 一致性哈希底层调用数据结构 1.TreeMap 2.自定义 Map 3.待扩展
@@ -61,7 +78,12 @@ appconfig:
 
 # logger 配置
 logging:
-  config: logback-spring.xml
+  level:
+    root: info
+    com:
+      bantanger:
+        im:
+          domain: debug
 
 mybatis-plus:
   configuration:
@@ -72,9 +94,9 @@ mybatis-plus:
       update-strategy: NOT_EMPTY
   type-aliases-package: com.bantanger.im.domain
 
-mybatis:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#mybatis:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 # 配置全局 httpClient 设置
 httpclient:
