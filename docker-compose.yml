@@ -11,6 +11,7 @@ services:
     privileged: true
     volumes:
       - ./docker/mysql/conf:/etc/mysql/conf.d
+      - ./docker/mysql/conf/hmy.cnf:/etc/mysql/conf.d/hmy.cnf
       - ./docker/mysql/logs:/logs
       - ./docker/mysql/data:/var/lib/mysql
       - ./docker/mysql/db:/docker-entrypoint-initdb.d/
@@ -90,7 +91,7 @@ services:
 
   # IM Domain 容器
   im-domain:
-    container_name: im_domain
+    container_name: im-domain
     build:
       context: ./docker/build/domain
     restart: always

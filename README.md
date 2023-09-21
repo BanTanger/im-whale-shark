@@ -62,30 +62,41 @@ im-system-whale-shark
 
 可参考自行下载: [服务器下载 Git、Docker、Docker-Compose](docker/docker.md)
 
+#### 粗粒度部署方式:
+
 1. 克隆本项目
 
 ```bash
 git clone https://github.com/BanTanger/im-whale-shark.git
 ```
-2. 项目打包
+
+2. 根目录下运行 build 脚本
 
 ```bash
-mvn clean package
+sh build.sh
+```
+- 会将各个模块打包，执行 docker-compose，届时通过终端观察 im-whaleshark 日志
+
+#### 细粒度部署方式:
+
+1. 克隆本项目
+
+```bash
+git clone https://github.com/BanTanger/im-whale-shark.git
 ```
 
-此过程可能有点长，请耐心等待
-
-3. 为脚本执行赋予权限并执行
+2. 为脚本执行赋予权限并执行
 
 ```bash
 chmod +x *.sh
 ```
 ```bash
-./copy.sh
+sh clean.sh
+sh copy.sh
 ```
 - 将各个模块的 jar 包和 Dockerfile 移动到 docker/build 包下
 
-4. 部署项目
+3. 部署项目
 
 ```bash
 sh deploy.sh base
@@ -96,7 +107,7 @@ sh deploy.sh serives
 ```
 - 将后端的三个模块部署到 docker
 
-5. 开启防火墙
+4. 开启防火墙
 ```bash
 ./open_port.sh
 ```
@@ -152,9 +163,11 @@ docker run -d -p 5672:5672 -p 15672:15672 --name rabbitmq
 
 ### websocket 测试
 `whale-shark/im-tcp/src/main/resources/WebSocket.html`
-暂时较为简陋, 本地测试, 需开启后端三个服务
+暂时较为简陋, 本地测试需开启后端三个服务并打开 WebSocket 页面
 
-主要浏览方式通过 F12 查看服务端发送的 `json` 格式是否正确
+Docker 部署测试请访问 `localhost:19000`
+
+浏览方式通过 F12 查看服务端发送的 `json` 格式是否正确
 
 ![](assert/design/websocket窗口功能讲解.png)
 

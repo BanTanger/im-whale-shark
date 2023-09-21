@@ -5,36 +5,35 @@ import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.pack.group.AddGroupMemberPack;
 import com.bantanger.im.codec.pack.group.GroupMemberSpeakPack;
 import com.bantanger.im.codec.pack.group.UpdateGroupMemberPack;
+import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.GroupEventCommand;
+import com.bantanger.im.common.enums.group.GroupErrorCode;
+import com.bantanger.im.common.enums.group.GroupMemberRoleEnum;
+import com.bantanger.im.common.enums.group.GroupStatusEnum;
+import com.bantanger.im.common.enums.group.GroupTypeEnum;
+import com.bantanger.im.common.exception.ApplicationException;
 import com.bantanger.im.common.model.ClientInfo;
+import com.bantanger.im.domain.group.GroupMessageProducer;
+import com.bantanger.im.domain.group.dao.ImGroupEntity;
+import com.bantanger.im.domain.group.dao.ImGroupMemberEntity;
+import com.bantanger.im.domain.group.dao.mapper.ImGroupMemberMapper;
 import com.bantanger.im.domain.group.model.req.*;
 import com.bantanger.im.domain.group.model.req.callback.AddMemberAfterCallback;
 import com.bantanger.im.domain.group.model.resp.AddMemberResp;
+import com.bantanger.im.domain.group.model.resp.GetRoleInGroupResp;
 import com.bantanger.im.domain.group.service.ImGroupMemberService;
 import com.bantanger.im.domain.group.service.ImGroupService;
-import com.bantanger.im.domain.group.GroupMessageProducer;
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
+import com.bantanger.im.domain.user.service.ImUserService;
 import com.bantanger.im.service.callback.CallbackService;
 import com.bantanger.im.service.config.AppConfig;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.bantanger.im.common.ResponseVO;
-import com.bantanger.im.common.enums.group.GroupErrorCode;
-import com.bantanger.im.common.enums.group.GroupMemberRoleEnum;
-import com.bantanger.im.common.enums.group.GroupStatusEnum;
-import com.bantanger.im.common.enums.group.GroupTypeEnum;
-import com.bantanger.im.common.exception.ApplicationException;
-import com.bantanger.im.domain.group.dao.ImGroupEntity;
-import com.bantanger.im.domain.group.dao.ImGroupMemberEntity;
-import com.bantanger.im.domain.group.dao.mapper.ImGroupMemberMapper;
-import com.bantanger.im.domain.group.model.resp.GetRoleInGroupResp;
-import com.bantanger.im.domain.user.service.ImUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -421,7 +420,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Override
     public List<GroupMemberDto> getGroupManager(String groupId, Integer appId) {
-        return imGroupMemberMapper.getGroupManager(groupId, appId);
+        return imGroupMemberMapper.getGroupManager(appId, groupId);
     }
 
     @Override
