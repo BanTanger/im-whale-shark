@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -54,7 +55,9 @@ public class GroupMessageService {
     @Resource
     RedisSequence redisSequence;
 
-    /** 线程池优化单聊消息处理逻辑 */
+    /**
+     * 线程池优化单聊消息处理逻辑
+     */
     private final ThreadPoolExecutor threadPoolExecutor;
 
     {
@@ -79,7 +82,7 @@ public class GroupMessageService {
                 messageCacheByMessageId.equals(MessageErrorCode.MESSAGE_CACHE_EXPIRE.getError())) {
             // 说明缓存过期，服务端向客户端发送 ack 要求客户端重新生成 messageId
             // 不做处理。直到客户端计时器超时
-            return ;
+            return;
         }
         GroupChatMessageContent messageCache = JSON.parseObject(messageCacheByMessageId, GroupChatMessageContent.class);
         if (messageCache != null) {
@@ -87,7 +90,7 @@ public class GroupMessageService {
                 // 线程池执行消息同步，发送，回应等任务流程
                 doThreadPoolTask(messageCache);
             });
-            return ;
+            return;
         }
         // 定义群聊消息的 Sequence, 客户端根据 seq 进行排序
         // key: appId + Seq + (from + toId) / groupId
@@ -96,30 +99,34 @@ public class GroupMessageService {
                 + messageContent.getGroupId());
         messageContent.setMessageSequence(seq);
 
-        threadPoolExecutor.execute(() -> {
-            // 1. 消息持久化落库
+        // 1. 消息持久化落库（不等待执行结果）
+        CompletableFuture.runAsync(() -> {
             messageStoreServiceImpl.storeGroupMessage(messageContent);
+        }, threadPoolExecutor);
 
-            // 查询群组所有成员进行消息分发
-            List<String> groupMemberIds = imGroupMemberServiceImpl
-                    .getGroupMemberId(messageContent.getGroupId(), messageContent.getAppId());
-
+        CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
+            // 2. 查询群组所有成员进行消息分发
+            List<String> groupMemberIds = imGroupMemberServiceImpl.getGroupMemberId(messageContent.getGroupId(), messageContent.getAppId());
             messageContent.setMemberIds(groupMemberIds);
+            return messageContent;
+        }, threadPoolExecutor).thenApplyAsync(messageContentWithMembers -> {
+            // 3. 在异步持久化之后执行离线消息存储
+            OfflineMessageContent offlineMessage = getOfflineMessage(messageContentWithMembers);
+            offlineMessage.setToId(messageContentWithMembers.getGroupId());
+            messageStoreServiceImpl.storeGroupOfflineMessage(offlineMessage, messageContentWithMembers.getMemberIds());
+            return messageContentWithMembers;
+        }, threadPoolExecutor).thenAcceptAsync(finalMessageContent -> {
+            // 4. 线程池执行消息同步，发送，回应等任务流程
+            doThreadPoolTask(finalMessageContent);
 
-            // 2.在异步持久化之后执行离线消息存储
-            OfflineMessageContent offlineMessage = getOfflineMessage(messageContent);
-            offlineMessage.setToId(messageContent.getGroupId());
-            messageStoreServiceImpl.storeGroupOfflineMessage(offlineMessage, groupMemberIds);
+            // 5. 消息缓存
+            messageStoreServiceImpl.setMessageCacheByMessageId(finalMessageContent.getAppId(), finalMessageContent.getMessageId(), finalMessageContent);
 
-            // 线程池执行消息同步，发送，回应等任务流程
-            doThreadPoolTask(messageContent);
+            log.info("消息 ID [{}] 处理完成", finalMessageContent.getMessageId());
+        }, threadPoolExecutor);
 
-            // 消息缓存
-            messageStoreServiceImpl.setMessageCacheByMessageId(
-                    messageContent.getAppId(), messageContent.getMessageId(), messageContent);
-
-            log.info("消息 ID [{}] 处理完成", messageContent.getMessageId());
-        });
+        // 等待所有任务完成
+        future.join();
     }
 
     private void doThreadPoolTask(GroupChatMessageContent messageContent) {
@@ -173,6 +180,7 @@ public class GroupMessageService {
      * 前置校验
      * 1. 这个用户是否被禁言 是否被禁用
      * 2. 发送方是否在群组内
+     *
      * @param fromId
      * @param groupId
      * @param appId
@@ -184,6 +192,7 @@ public class GroupMessageService {
 
     /**
      * ACK 应答报文包装和发送
+     *
      * @param messageContent
      * @param responseVO
      */
@@ -201,6 +210,7 @@ public class GroupMessageService {
 
     /**
      * 消息同步【发送方除本端所有端消息同步】
+     *
      * @param messageContent
      */
     protected void syncToSender(MessageContent messageContent) {
@@ -211,6 +221,7 @@ public class GroupMessageService {
 
     /**
      * [群聊] 消息发送【接收端所有[在线]端都需要接收消息】
+     *
      * @param messageContent
      * @return
      */

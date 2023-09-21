@@ -6,6 +6,7 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
+echo "--------------------------------"
 echo "::: Welcome to IM-WhaleShark :::"
 
 # 定义要开启的端口列表

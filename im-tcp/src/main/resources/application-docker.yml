@@ -1,0 +1,49 @@
+server:
+  port: 19000
+  tomcat:
+    basedir: ./
+    accesslog:
+      buffered: false
+      directory: logs
+      enabled: true
+      file-date-format: .yyyy-MM-dd
+      pattern: '%h %l %u %t "%r" %s"%{Referer}i" "%{User-Agent}i" %D %{x-request-id}r %{user-id}r %{resource-id}r'
+      prefix: access_log
+      rename-on-rotate: true
+      request-attributes-enabled: false
+      rotate: true
+      suffix: .log
+
+spring:
+  profiles:
+    active: dev
+  # redis
+  redis:
+    host: im-redis
+    port: 6379
+    jedis:
+      pool:
+        max-active: 100
+        max-idle: 100
+        max-wait: 1000
+        min-idle: 10
+    password: whalesharkim
+  # rabbitmq
+  rabbitmq:
+    host: im-rabbitmq
+    port: 5672
+    addresses: im-rabbitmq
+    username: admin
+    password: admin
+
+  application:
+    name: im-tcp
+
+# logger 配置
+logging:
+  level:
+    root: info
+    com:
+      bantanger:
+        im:
+          tcp: debug

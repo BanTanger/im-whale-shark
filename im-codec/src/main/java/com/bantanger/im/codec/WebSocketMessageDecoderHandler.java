@@ -19,13 +19,18 @@ import java.util.List;
 @Slf4j
 public class WebSocketMessageDecoderHandler extends MessageToMessageDecoder<BinaryWebSocketFrame> {
     @Override
-    protected void decode(ChannelHandlerContext ctx, BinaryWebSocketFrame msg, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, BinaryWebSocketFrame msg, List<Object> out) {
 
         ByteBuf content = msg.content();
         if (content.readableBytes() < 28) {
             return;
         }
-        Message message = ByteBufToMessageUtils.transition(content);
+        Message message = null;
+        try {
+            message = ByteBufToMessageUtils.transition(content);
+        } catch (Exception e) {
+            log.error("", e);
+        }
         if (message == null) {
             return;
         }
