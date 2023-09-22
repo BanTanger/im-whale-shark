@@ -8,6 +8,5 @@ RUN echo 'Asia/Shanghai' >/etc/timezone
 
 COPY ./jar/im-message-store.jar /opt/application/im-message-store.jar
 COPY application-docker.yml /opt/application/application.yml
-COPY logback-spring.xml /opt/application/logback-spring.xml
 
-ENTRYPOINT ["java", "-jar" ,"/opt/application/im-message-store.jar", "--spring.config.location=/opt/application/application.yml", "--logging.config=/opt/application/logback-spring.xml"]
+ENTRYPOINT ["java", "-jar" ,"/opt/application/im-message-store.jar", "--spring.config.location=/opt/application/application.yml"]

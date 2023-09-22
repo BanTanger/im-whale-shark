@@ -55,7 +55,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             = new GenericObjectPool<>(new CommandExecutionFactory());
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Message msg) {
         Integer command = parseCommand(msg);
         CommandFactory commandFactory = CommandFactory.getInstance();
         CommandStrategy commandStrategy = commandFactory.getCommandStrategy(command);
@@ -79,13 +79,17 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
         }
     }
 
-    private CommandExecution getCommandExecution(ChannelHandlerContext ctx, Message msg) throws Exception {
-        CommandExecution commandExecution;
-        commandExecution = commandExecutionRequestPool.borrowObject();
-        commandExecution.setCtx(ctx);
-        commandExecution.setBrokeId(brokerId);
-        commandExecution.setMsg(msg);
-        commandExecution.setFeignMessageService(feignMessageService);
+    private CommandExecution getCommandExecution(ChannelHandlerContext ctx, Message msg) {
+        CommandExecution commandExecution = null;
+        try {
+            commandExecution = commandExecutionRequestPool.borrowObject();
+            commandExecution.setCtx(ctx);
+            commandExecution.setBrokeId(brokerId);
+            commandExecution.setMsg(msg);
+            commandExecution.setFeignMessageService(feignMessageService);
+        } catch (Exception e) {
+            log.error("对象池并不存在所需对象，错误原因:", e);
+        }
         return commandExecution;
     }
 
@@ -109,19 +113,19 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         UserChannelRepository.add(ctx.channel());
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) {
         UserChannelRepository.forceOffLine(ctx.channel());
         ctx.close();
 //        logger.info("剩余通道个数：{}", UserChannelRepository.CHANNEL_GROUP.size());
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
         UserChannelRepository.remove(ctx.channel());
     }

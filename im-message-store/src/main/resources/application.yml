@@ -1,5 +1,18 @@
 server:
-  port: 8001
+  port: 18001
+  tomcat:
+    basedir: ./
+    accesslog:
+      buffered: false
+      directory: logs
+      enabled: true
+      file-date-format: .yyyy-MM-dd
+      pattern: '%h %l %u %t "%r" %s"%{Referer}i" "%{User-Agent}i" %D %{x-request-id}r %{user-id}r %{resource-id}r'
+      prefix: access_log
+      rename-on-rotate: true
+      request-attributes-enabled: false
+      rotate: true
+      suffix: .log
 
 spring:
   profiles:
@@ -8,10 +21,12 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: whalesharkim
     url: jdbc:mysql://127.0.0.1:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
+#    url: jdbc:mysql://47.97.204.83:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
     username: root
 
   redis:
     host: 127.0.0.1
+#    host: 47.97.204.83
     port: 6379
     jedis:
       pool:
@@ -22,6 +37,7 @@ spring:
     password:
   rabbitmq:
     host: localhost
+#    host: 47.97.204.83
     port: 5672
     addresses: localhost
     username: admin
@@ -45,8 +61,13 @@ spring:
         checkout-timeout: 0
 
 # logger 配置
-#logging:
-#  config: classpath:logback-spring.xml
+logging:
+  level:
+    root: info
+    com:
+      bantanger:
+        im:
+          message: debug
 
 mybatis-plus:
   configuration:

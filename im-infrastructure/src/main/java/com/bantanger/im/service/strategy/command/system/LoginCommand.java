@@ -10,7 +10,7 @@ import com.bantanger.im.common.enums.device.ConnectState;
 import com.bantanger.im.common.model.UserClientDto;
 import com.bantanger.im.common.model.UserSession;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
-import com.bantanger.im.service.redis.RedisManager;
+import com.bantanger.im.service.redis.RedissonManager;
 import com.bantanger.im.service.strategy.command.model.CommandExecution;
 import com.bantanger.im.service.utils.UserChannelRepository;
 import io.netty.channel.ChannelHandlerContext;
@@ -65,7 +65,7 @@ public class LoginCommand extends BaseCommandStrategy {
         }
 
         // 存储到 Redis
-        RedissonClient redissonClient = RedisManager.getRedissonClient();
+        RedissonClient redissonClient = RedissonManager.getRedissonClient();
         RMap<String, String> map = redissonClient.getMap(
                 msg.getMessageHeader().getAppId() +
                         Constants.RedisConstants.UserSessionConstants +

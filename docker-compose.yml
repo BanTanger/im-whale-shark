@@ -11,22 +11,13 @@ services:
     privileged: true
     volumes:
       - ./docker/mysql/conf:/etc/mysql/conf.d
-      - ./docker/mysql/logs:/logs
+      - ./docker/mysql/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/mysql/logs:/var/log/mysql
       - ./docker/mysql/data:/var/lib/mysql
       - ./docker/mysql/db:/docker-entrypoint-initdb.d/
-    command: [
-      'mysqld',
-      '--innodb-buffer-pool-size=80M',
-      '--character-set-server=utf8mb4',
-      '--collation-server=utf8mb4_unicode_ci',
-      '--default-time-zone=+8:00',
-      '--lower-case-table-names=1'
-    ]
+
     environment:
       MYSQL_ROOT_PASSWORD: 'whalesharkim'
-#      MYSQL_DATABASE: 'im_core'
-#      MYSQL_USER: 'root'
-#      MYSQL_PASSWORD: 'whalesharkim'
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -90,7 +81,7 @@ services:
 
   # IM Domain 容器
   im-domain:
-    container_name: im_domain
+    container_name: im-domain
     build:
       context: ./docker/build/domain
     restart: always
@@ -135,9 +126,9 @@ services:
       context: ./docker/build/tcp
     restart: always
     ports:
+      - "19000:19000" # springboot 启动端口
       - "19001:19001" # tcp 端口
-      - "19003:19003" # ws 端口
-      - "5005:5005"
+      - "19002:19002" # ws 端口
     depends_on:
       - im-redis
       - im-rabbitmq
@@ -151,5 +142,5 @@ services:
 
 networks:
   im-network:
-    driver: host
+    driver: bridge
 

@@ -16,8 +16,6 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * WebSocket 网络通讯, HTTP 包装的协议，双向通信，降低延时
@@ -78,7 +76,7 @@ public class ImWebSocketServer {
     public void start() {
         // 启动服务端
         this.bootstrap.bind(config.getWebSocketPort());
-//        logger.info("web start success");
+       log.info("web start success");
     }
 
 }

@@ -8,6 +8,9 @@ import com.bantanger.im.common.enums.command.CommandType;
 import com.bantanger.im.service.rabbitmq.MqFactory;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * @author BanTanger 半糖

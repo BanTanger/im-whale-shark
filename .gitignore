@@ -25,3 +25,6 @@
 /logs/
 /docker/build/
 /docker/mysql/logs/
+/im-tcp/logs/
+/im-domain/logs/
+/im-message-store/logs/
