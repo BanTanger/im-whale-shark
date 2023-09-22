@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<!-- saved from url=(0113)file:///D:/360MoveData/Users/l'g't/Documents/WeChat%20Files/wxid_21hxssiejnz322/FileStorage/File/2023-04/web.html -->
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>WebSocket客户端</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .bigbox {
+            width: 50%;
+            margin: 0 auto;
+        }
+
+        .login {
+            width: 40%;
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+        .login input {
+            display: block;
+            width: 80px;
+            height: 30px;
+            margin: 15px auto;
+        }
+
+        .inputdata {
+            width: 40%;
+            display: inline-block;
+            vertical-align: top;
+            margin: 0 auto;
+        }
+
+        .inputdata input {
+            display: block;
+            width: 80px;
+            height: 30px;
+            margin: 10px auto;
+        }
+
+        .inputdata textarea {
+            display: block;
+            margin: 10px auto;
+            width: 245px;
+            height: 130px;
+            resize: none;
+        }
+
+        .output textarea {
+            resize: none;
+            width: 100%;
+            height: 100px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+<script type="text/javascript">
+
+
+    ByteBuffer = function (arrayBuf, offset) {
+
+        var Type_Byte = 1;
+        var Type_Short = 2;
+        var Type_UShort = 3;
+        var Type_Int32 = 4;
+        var Type_UInt32 = 5;
+        var Type_String = 6;//变长字符串，前两个字节表示长度
+        var Type_VString = 7;//定长字符串
+        var Type_Int64 = 8;
+        var Type_Float = 9;
+        var Type_Double = 10;
+        var Type_ByteArray = 11;
+
+        var _org_buf = arrayBuf ? (arrayBuf.constructor == DataView ? arrayBuf : (arrayBuf.constructor == Uint8Array ? new DataView(arrayBuf.buffer, offset) : new DataView(arrayBuf, offset))) : new DataView(new Uint8Array([]).buffer);
+        var _offset = offset || 0;
+        var _list = [];
+        var _littleEndian = false;
+
+        //指定字节序 为BigEndian
+        this.bigEndian = function () {
+            _littleEndian = false;
+            return this;
+        };
+
+        //指定字节序 为LittleEndian
+        this.littleEndian = function () {
+            _littleEndian = true;
+            return this;
+        };
+
+        if (!ArrayBuffer.prototype.slice) {
+            ArrayBuffer.prototype.slice = function (start, end) {
+                var that = new Uint8Array(this);
+                if (end == undefined) end = that.length;
+                var result = new ArrayBuffer(end - start);
+                var resultArray = new Uint8Array(result);
+                for (var i = 0; i < resultArray.length; i++)
+                    resultArray[i] = that[i + start];
+                return result;
+            }
+        }
+
+        function utf8Write(view, offset, str) {
+            var c = 0;
+            for (var i = 0, l = str.length; i < l; i++) {
+                c = str.charCodeAt(i);
+                if (c < 0x80) {
+                    view.setUint8(offset++, c);
+                } else if (c < 0x800) {
+                    view.setUint8(offset++, 0xc0 | (c >> 6));
+                    view.setUint8(offset++, 0x80 | (c & 0x3f));
+                } else if (c < 0xd800 || c >= 0xe000) {
+                    view.setUint8(offset++, 0xe0 | (c >> 12));
+                    view.setUint8(offset++, 0x80 | (c >> 6) & 0x3f);
+                    view.setUint8(offset++, 0x80 | (c & 0x3f));
+                } else {
+                    i++;
+                    c = 0x10000 + (((c & 0x3ff) << 10) | (str.charCodeAt(i) & 0x3ff));
+                    view.setUint8(offset++, 0xf0 | (c >> 18));
+                    view.setUint8(offset++, 0x80 | (c >> 12) & 0x3f);
+                    view.setUint8(offset++, 0x80 | (c >> 6) & 0x3f);
+                    view.setUint8(offset++, 0x80 | (c & 0x3f));
+                }
+            }
+        }
+
+        function utf8Read(view, offset, length) {
+            var string = '', chr = 0;
+            for (var i = offset, end = offset + length; i < end; i++) {
+                var byte = view.getUint8(i);
+                if ((byte & 0x80) === 0x00) {
+                    string += String.fromCharCode(byte);
+                    continue;
+                }
+                if ((byte & 0xe0) === 0xc0) {
+                    string += String.fromCharCode(
+                        ((byte & 0x0f) << 6) |
+                        (view.getUint8(++i) & 0x3f)
+                    );
+                    continue;
+                }
+                if ((byte & 0xf0) === 0xe0) {
+                    string += String.fromCharCode(
+                        ((byte & 0x0f) << 12) |
+                        ((view.getUint8(++i) & 0x3f) << 6) |
+                        ((view.getUint8(++i) & 0x3f) << 0)
+                    );
+                    continue;
+                }
+                if ((byte & 0xf8) === 0xf0) {
+                    chr = ((byte & 0x07) << 18) |
+                        ((view.getUint8(++i) & 0x3f) << 12) |
+                        ((view.getUint8(++i) & 0x3f) << 6) |
+                        ((view.getUint8(++i) & 0x3f) << 0);
+                    if (chr >= 0x010000) { // surrogate pair
+                        chr -= 0x010000;
+                        string += String.fromCharCode((chr >>> 10) + 0xD800, (chr & 0x3FF) + 0xDC00);
+                    } else {
+                        string += String.fromCharCode(chr);
+                    }
+                    continue;
+                }
+                throw new Error('Invalid byte ' + byte.toString(16));
+            }
+            return string;
+        }
+
+        function utf8Length(str) {
+            var c = 0, length = 0;
+            for (var i = 0, l = str.length; i < l; i++) {
+                c = str.charCodeAt(i);
+                if (c < 0x80) {
+                    length += 1;
+                } else if (c < 0x800) {
+                    length += 2;
+                } else if (c < 0xd800 || c >= 0xe000) {
+                    length += 3;
+                } else {
+                    i++;
+                    length += 4;
+                }
+            }
+            return length;
+        }
+
+        this.byte = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getUint8(_offset, _littleEndian));
+                _offset += 1;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Byte, d: val, l: 1 });
+                _offset += 1;
+            }
+            return this;
+        };
+
+        this.short = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getInt16(_offset, _littleEndian));
+                _offset += 2;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Short, d: val, l: 2 });
+                _offset += 2;
+            }
+            return this;
+        };
+
+        this.ushort = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getUint16(_offset, _littleEndian));
+                _offset += 2;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_UShort, d: val, l: 2 });
+                _offset += 2;
+            }
+            return this;
+        };
+
+        this.int32 = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getInt32(_offset, _littleEndian));
+                _offset += 4;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Int32, d: val, l: 4 });
+                _offset += 4;
+            }
+            return this;
+        };
+
+        this.uint32 = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getUint32(_offset, _littleEndian));
+                _offset += 4;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_UInt32, d: val, l: 4 });
+                _offset += 4;
+            }
+            return this;
+        };
+
+        /**
+         * 新加的方法，获取bytebuffer的长度
+         */
+        this.blength = function () {
+            return _offset;
+        };
+
+        /**
+         * 变长字符串 前4个字节表示字符串长度
+         **/
+        this.string = function (val, index) {
+            if (arguments.length == 0) {
+                var len = _org_buf.getInt32(_offset, _littleEndian);
+                _offset += 4;
+                _list.push(utf8Read(_org_buf, _offset, len));
+                _offset += len;
+            } else {
+                var len = 0;
+                if (val) {
+                    len = utf8Length(val);
+                }
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_String, d: val, l: len });
+                _offset += len + 4;
+            }
+            return this;
+        };
+
+        /**
+         * 定长字符串 val为null时，读取定长字符串（需指定长度len）
+         **/
+        this.vstring = function (val, len, index) {
+            if (!len) {
+                throw new Error('vstring must got len argument');
+                return this;
+            }
+            if (val == undefined || val == null) {
+                var vlen = 0;//实际长度
+                for (var i = _offset; i < _offset + len; i++) {
+                    if (_org_buf.getUint8(i) > 0) vlen++;
+                }
+                _list.push(utf8Read(_org_buf, _offset, vlen));
+                _offset += len;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_VString, d: val, l: len });
+                _offset += len;
+            }
+            return this;
+        };
+
+        this.int64 = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getFloat64(_offset, _littleEndian));
+                _offset += 8;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Int64, d: val, l: 8 });
+                _offset += 8;
+            }
+            return this;
+        };
+
+        this.float = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getFloat32(_offset, _littleEndian));
+                _offset += 4;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Float, d: val, l: 4 });
+                _offset += 4;
+            }
+            return this;
+        };
+
+        this.double = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getFloat64(_offset, _littleEndian));
+                _offset += 8;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Double, d: val, l: 8 });
+                _offset += 8;
+            }
+            return this;
+        };
+
+        /**
+         * 写入或读取一段字节数组
+         **/
+        this.byteArray = function (val, len, index) {
+            if (!len) {
+                throw new Error('byteArray must got len argument');
+                return this;
+            }
+            if (val == undefined || val == null) {
+                var arr = new Uint8Array(_org_buf.buffer.slice(_offset, _offset + len));
+                _list.push(arr);
+                _offset += len;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_ByteArray, d: val, l: len });
+                _offset += len;
+            }
+            return this;
+        };
+
+        /**
+         * 解包成数据数组
+         **/
+        this.unpack = function () {
+            return _list;
+        };
+
+        /**
+         * 打包成二进制,在前面加上4个字节表示包长
+         **/
+        this.packWithHead = function () {
+            return this.pack(true);
+        };
+
+        /**
+         * 打包成二进制
+         * @param ifHead 是否在前面加上4个字节表示包长
+         **/
+        this.pack = function (ifHead) {
+            _org_buf = new DataView(new ArrayBuffer((ifHead) ? _offset + 4 : _offset));
+            var offset = 0;
+            if (ifHead) {
+                _org_buf.setUint32(offset, _offset, _littleEndian);
+                offset += 4;
+            }
+            for (var i = 0; i < _list.length; i++) {
+                switch (_list[i].t) {
+                    case Type_Byte:
+                        _org_buf.setInt8(offset, _list[i].d);
+                        offset += _list[i].l;
+                        break;
+                    case Type_Short:
+                        _org_buf.setInt16(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_UShort:
+                        _org_buf.setUint16(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_Int32:
+                        _org_buf.setInt32(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_UInt32:
+                        _org_buf.setUint32(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_String:
+                        //前4个字节表示字符串长度
+                        _org_buf.setUint32(offset, _list[i].l, _littleEndian);
+                        offset += 4;
+                        utf8Write(_org_buf, offset, _list[i].d);
+                        offset += _list[i].l;
+                        break;
+                    case Type_VString:
+                        utf8Write(_org_buf, offset, _list[i].d);
+                        var vlen = utf8Length(_list[i].d);//字符串实际长度
+                        //补齐\0
+                        for (var j = offset + vlen; j < offset + _list[i].l; j++) {
+                            _org_buf.setUint8(j, 0);
+                        }
+                        offset += _list[i].l;
+                        break;
+                    case Type_Int64:
+                        _org_buf.setFloat64(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_Float:
+                        _org_buf.setFloat32(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_Double:
+                        _org_buf.setFloat64(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_ByteArray:
+                        var indx = 0;
+                        for (var j = offset; j < offset + _list[i].l; j++) {
+                            if (indx < _list[i].d.length) {
+                                _org_buf.setUint8(j, _list[i].d[indx]);
+                            } else {//不够的话，后面补齐0x00
+                                _org_buf.setUint8(j, 0);
+                            }
+                            indx++
+                        }
+                        offset += _list[i].l;
+                        break;
+                }
+            }
+            return _org_buf.buffer;
+        };
+
+        /**
+         * 未读数据长度
+         **/
+        this.getAvailable = function () {
+            if (!_org_buf) return _offset;
+            return _org_buf.buffer.byteLength - _offset;
+        };
+    }
+
+    function uuid() {
+        var s = [];
+        var hexDigits = "0123456789abcdef";
+        for (var i = 0; i < 36; i++) {
+            s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+        }
+        s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+        s[8] = s[13] = s[18] = s[23] = "-";
+
+        var uuid = s.join("");
+        return uuid;
+    }
+    var socket;
+
+    function viewsocket() {
+        //如果浏览器支持WebSocket
+        if (window.WebSocket) {
+            //参数就是与服务器连接的地址
+            socket = new WebSocket("ws://localhost:19002/ws");
+
+            // 设置WebSocket的origin请求头
+            socket.onbeforecopy = function (event) {
+                event.preventDefault();
+                socket.setRequestHeader("Origin", "localhost:19000");
+            };
+
+            //客户端收到服务器消息的时候就会执行这个回调方法
+            socket.onmessage = function (event) {
+                var ta = document.getElementById("responseText");
+                var userId = document.getElementById("userId").value;
+
+                var bytebuf = new ByteBuffer(event.data);
+                let byteBuffer = bytebuf.int32().int32().unpack();
+
+                let command = byteBuffer[0];
+                let bodyLen = byteBuffer[1];
+                let unpack = bytebuf.vstring(null, bodyLen).unpack();
+                let msgBody = unpack[2];
+                var version = 1;
+
+                var clientType = document.getElementById("clientType").value;
+                clientType = parseInt(clientType);
+                var messageType = 0x0;
+                var appId = document.getElementById("appId").value;
+                appId = parseInt(appId)
+
+                var imei = document.getElementById("imei").value;
+                var imeiLen = getLen(imei);
+
+                console.log("收到服务端发来的消息: " + msgBody);
+
+                if (command == 1103) {
+                    var d = JSON.parse(msgBody)
+                    var data = d.data;
+                    let userId = document.getElementById('userId').value;
+                    if (data.fromId == userId) {
+                        ta.value = ta.value + "\n" + "自己：" + data.messageBody;
+                    } else if (data.fromId != userId) {
+                        ta.value = ta.value + "\n" + data.fromId + "：" + data.messageBody;
+                    }
+
+                    // data.fromId = data.toId;
+                    // data.conversationId = "0_" + data.toId + "_" + data.fromId;
+                    // data.conversationType = 0;
+
+                    if (userId != data.fromId) {
+                        var rAck = {
+                            "fromId": userId,
+                            "toId": data.fromId,
+                            "messageKey": data.messageKey,
+                            "messageId": data.messageId,
+                            "messageSequence": data.messageSequence,
+                        }
+
+                        let messageReciver = new ByteBuffer();
+                        var jsonData = JSON.stringify(rAck);
+                        let bodyLen = jsonData.length;
+                        messageReciver.int32(1107)
+                            .int32(version).int32(clientType)
+                            .int32(messageType).int32(appId)
+                            .int32(imeiLen).int32(bodyLen).vstring(imei, imeiLen)
+                            .vstring(jsonData, bodyLen);
+                        socket.send(messageReciver.pack());
+                    }
+
+                    if (clientType == 1) {
+                        let messageReader = new ByteBuffer();
+                        var toId = data.fromId;
+                        if (data.fromId == userId) {
+                            toId = data.toId;
+                        }
+                        var readedData = {
+                            "fromId": userId,
+                            "toId": toId,
+                            "conversationType": 0,
+                            "messageSequence": data.messageSequence,
+                        }
+                        var readData = JSON.stringify(readedData);
+                        let readBodyLen = readData.length;
+                        messageReader.int32(1106)
+                            .int32(version).int32(clientType)
+                            .int32(messageType).int32(appId)
+                            .int32(imeiLen).int32(readBodyLen).vstring(imei, imeiLen)
+                            .vstring(readData, readBodyLen);
+                        socket.send(messageReader.pack());
+                    }
+
+                } else if (command == 2104) {
+                    var d = JSON.parse(msgBody)
+                    var data = d.data;
+                    let userId = document.getElementById('userId').value;
+
+                    if (clientType == 1) {
+                        let messageReader = new ByteBuffer();
+                        var toId = data.fromId;
+                        if (data.fromId == userId) {
+                            toId = data.toId;
+                        }
+                        var readedData = {
+                            "fromId": userId,
+                            "toId": data.fromId,
+                            "groupId": data.groupId,
+                            "conversationType": 1,
+                            "messageSequence": data.messageSequence,
+                        }
+                        var readData = JSON.stringify(readedData);
+                        let readBodyLen = readData.length;
+                        messageReader.int32(2106)
+                            .int32(version).int32(clientType)
+                            .int32(messageType).int32(appId)
+                            .int32(imeiLen).int32(readBodyLen).vstring(imei, imeiLen)
+                            .vstring(readData, readBodyLen);
+                        socket.send(messageReader.pack());
+                    }
+                } else if (command == 9999) {
+                    var msg = eval("(" + msgBody + ")");
+                    console.log(msg)
+                    console.log(userId)
+
+                    if (msg["userId"] == "system") {
+                        ta.value = ta.value + "\n 系统：" + msg.data;
+                    } else if (msg["userId"] == userId) {
+                        let msgInfo = msg.data;
+                        msgInfo = eval("(" + msgInfo + ")");
+                        ta.value = ta.value + "\n" + "自己：" + msgInfo.msgBody;
+                    } else {
+                        let msgInfo = msg.data;
+                        msgInfo = eval("(" + msgInfo + ")");
+                        ta.value = ta.value + "\n" + msg.toId + "：" + msgInfo.msgBody;
+                    }
+                }
+            }
+
+            //连接建立的回调函数
+            socket.onopen = function (event) {
+                socket.binaryType = "arraybuffer";
+                var ta = document.getElementById("responseText");
+                ta.value = "连接开启";
+            }
+
+            //连接断掉的回调函数
+            socket.onclose = function (event) {
+                var ta = document.getElementById("responseText");
+                ta.value = ta.value + "\n" + "连接关闭";
+            }
+        } else {
+            alert("浏览器不支持WebSocket！");
+        }
+
+    }
+    viewsocket();
+    //登录
+    function login(userId, toUser, clientType, imei, appId) {
+        if (!window.WebSocket) {
+            return;
+        }
+        console.log(userId + " " + toUser);
+        //当websocket状态打开
+        if (socket.readyState == WebSocket.OPEN) {
+
+            var command = 9000;
+            var version = 1;
+            if (clientType == null) {
+                clientType = 1;
+            }
+            clientType = parseInt(clientType);
+
+            var messageType = 0x0;
+
+            if (imei == null) {
+                imei = "web";
+            }
+
+            if (appId == null) {
+                appId = '10000'
+            }
+            appId = parseInt(appId);
+
+            var userId = userId;
+
+            var data = {
+                "userId": userId,
+                "appId": 10000,
+                "clientType": clientType,
+                "imei": imei,
+                "customStatus": null,
+                "customClientName": ""
+            };
+            var jsonData = JSON.stringify(data);
+            console.log(jsonData);
+
+            var bodyLen = jsonData.length;
+            var imeiLen = getLen(imei);
+            let loginMsg = new ByteBuffer();
+            loginMsg.int32(command).int32(version)
+                .int32(clientType).int32(messageType)
+                .int32(appId).int32(imeiLen)
+                .int32(bodyLen).vstring(imei, imeiLen)
+                .vstring(jsonData, bodyLen);
+            socket.send(loginMsg.pack());
+        } else {
+            alert("连接没有开启");
+        }
+    }
+
+    // *               私有协议规则，
+    // *               4位表示Command表示消息的开始，
+    // *               4位表示version
+    // *               4位表示clientType
+    // *               4位表示messageType
+    // *               4位表示appId(待定)
+    // *               4位表示数据长度
+    // *               后续将解码方式加到数据头根据不同的解码方式解码，如pb，json，现在用json字符串
+    //发消息
+    function sendMsg(userId, toId, command, msg, clientType, imei, appId) {
+        if (!window.WebSocket) {
+            return;
+        }
+        console.log(msg)
+        //当websocket状态打开
+        if (socket.readyState == WebSocket.OPEN) {
+            // debugger;
+            //var command = 1103;
+
+
+            // var command = 9000;
+            var version = 1;
+            if (clientType == null) {
+                clientType = 1;
+            }
+
+            clientType = parseInt(clientType);
+
+            var messageType = 0x0;
+
+            var userId = userId;
+
+            if (command == null || command == '') {
+                command = 1103;
+            }
+
+            if (imei == null) {
+                imei = "web"
+            }
+            if (appId == null) {
+                appId = '10000'
+            }
+            appId = parseInt(appId);
+            var data = {
+                "userId": userId,
+                "groupId": toId,
+                "appId": appId,
+                "clientType": 1,
+                "imei": imei,
+                "command": command
+            }
+
+            var messageId = uuid();
+            if (msg === 'lld') {
+                messageId = msg;
+            }
+            var messageData = {};
+            if (command == 1103) {
+                messageData = {
+                    "messageId": messageId,
+                    "fromId": userId,
+                    "toId": toId,
+                    "appId": appId,
+                    "clientType": clientType,
+                    "imei": imei,
+                    "messageBody": msg
+                }
+            } else if (command == 2104) {
+                messageData = {
+                    "messageId": messageId,
+                    "fromId": userId,
+                    "groupId": toId,
+                    "appId": appId,
+                    "clientType": clientType,
+                    "imei": imei,
+                    "messageBody": msg
+                }
+            } else {
+                messageData = JSON.parse(msg)
+            }
+            // data.data = messageData;
+
+            var jsonData = JSON.stringify(messageData);
+            console.log(jsonData)
+            var bodyLen = getLen(jsonData);
+            var imeiLen = getLen(imei);
+            let sendMsg = new ByteBuffer();
+            sendMsg.int32(command).int32(version)
+                .int32(clientType).int32(messageType)
+                .int32(appId).int32(imeiLen)
+                .int32(bodyLen).vstring(imei, imeiLen)
+                .vstring(jsonData, bodyLen);
+            console.log(sendMsg.pack());
+            socket.send(sendMsg.pack());
+        } else {
+            alert("连接没有开启");
+        }
+    }
+
+    function getLen(str) {
+        var len = 0;
+        for (var i = 0; i < str.length; i++) {
+            var c = str.charCodeAt(i);
+            //单字节加1
+            if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
+                len++;
+            } else {
+                len += 3;
+            }
+        }
+        return len;
+    }
+
+</script>
+<div class="bigbox">
+    <form onsubmit="return false">
+
+        <div class="login">
+            <input type="text" placeholder="输入登录id" id="userId" name="userId" style="width: 100px;height: 20px">
+            <input type="text" placeholder=" appId" id="appId" name="appId" style="width: 100px;height: 20px">
+            <input type="text" placeholder=" clientType" id="clientType" name="clientType"
+                   style="width: 100px;height: 20px">
+            <input type="text" placeholder="imei" id="imei" name="imei" style="width: 100px;height: 20px">
+            <input type="button" value="login" onclick="login(this.form.userId.value,this.form.toUser.value,this.form.clientType.value
+                ,this.form.imei.value,this.form.appId.value);">
+
+        </div>
+        <div class="inputdata">
+            <input type="text" placeholder="输入command" name="command" style="width: 200px;height: 20px">
+            <input type="text" placeholder="你要发消息给谁" name="toUser" style="width: 200px;height: 20px">
+            <textarea placeholder="输入要发送的内容" name="message"></textarea>
+
+            <input type="button" value="发送数据" onclick="sendMsg(this.form.userId.value,this.form.toUser.value,this.form.command.value,this.form.message.value
+                    ,this.form.clientType.value,this.form.imei.value,this.form.appId.value);">
+        </div>
+
+        <div class="output">
+            <h3>服务器输出：</h3>
+
+            <textarea id="responseText"></textarea>
+
+            <input type="button" onclick="javascript:document.querySelector('#responseText').value='' "
+                   value="清空数据">
+        </div>
+    </form>
+    <button class="reconnect" onclick="viewsocket()">重新连接</button>
+</div>
+
+
+</body>
+
+</html>
