@@ -8,8 +8,11 @@
 这两个子模块都对接了第三方登录的功能
 
 体验步骤:
-1. 运行项目
-2. 点击命令行里出现的蓝链 进行权限校验
+1. 环境搭建, 执行 ./assert/sql/register_login_demo.sql 文件
+2. 申请 github oauth apps, 修改配置, 运行项目
+3. 点击命令行里出现的蓝链, 进行权限校验
+
+![img_1.png](../../../im-design-demo/im-register-login-demo/login-design-adapter-demo/assert/img_1.png)
 
 ## Github Oauth 第三方登录实现
 参考这篇文章：
