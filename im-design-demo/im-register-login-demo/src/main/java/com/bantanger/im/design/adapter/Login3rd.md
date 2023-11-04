@@ -36,7 +36,8 @@ spring:
 
 ![img.png](../../../../../../resources/static/img.png)
 
-权限访问: https://github.com/login/oauth/authorize?client_id=cf00a9382ce8110c2a70&redirect_uri=http://localhost:21001/github&state=GITHUB
+权限访问: 
+https://github.com/login/oauth/authorize?client_id=cf00a9382ce8110c2a70&redirect_uri=http://localhost:21001/github&state=GITHUB
 
 可能会出现超时的情况
 ![img.png](img.png)

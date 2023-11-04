@@ -11,15 +11,30 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.http.HttpMethod;
 
-import java.util.Objects;
-
 /**
  * @author BanTanger 半糖
  * @Date 2023/11/4 12:03
  */
 @Slf4j
 public class HttpClientUtils {
-    public static JSONObject execute(String url, HttpMethod httpMethod) {
+    public static String execute(String url, String accessToken) {
+        HttpRequestBase http = null;
+        try {
+            HttpClient client = HttpClients.createDefault();
+            http = new HttpGet(url);
+            http.addHeader("Authorization", "token " + accessToken);
+
+            HttpEntity entity = client.execute(http).getEntity();
+            return EntityUtils.toString(entity);
+        } catch (Exception e) {
+            log.error("请求失败，url 为: {}, 错误信息为 {}", url, e.getMessage());
+            throw new RuntimeException("请求失败！" + e.getMessage());
+        } finally {
+            http.releaseConnection();
+        }
+    }
+
+    public static String execute2(String url, HttpMethod httpMethod) {
         HttpRequestBase http = null;
         try {
             HttpClient client = HttpClients.createDefault();
@@ -30,7 +45,8 @@ public class HttpClientUtils {
             }
             HttpEntity entity = client.execute(http).getEntity();
             String accessToken = EntityUtils.toString(entity);
-            return JSONObject.parseObject(accessToken);
+            accessToken = accessToken.substring(0, accessToken.indexOf("&"));
+            return accessToken;
         } catch (Exception e) {
             log.error("请求失败，url 为: {}, 错误信息为 {}", url, e.getMessage());
             throw new RuntimeException("请求失败！" + e.getMessage());

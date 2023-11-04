@@ -45,14 +45,13 @@ public class Login3rdAdapter extends UserService implements Login3rdTarget {
         }
         // 请求 Github 平台获取 Token，并携带 code
         String tokenUrl = githubTokenUrl.concat(code);
-        JSONObject tokenResponse = HttpClientUtils.execute(tokenUrl, HttpMethod.GET);
+        String tokenResponse = HttpClientUtils.execute2(tokenUrl, HttpMethod.GET);
         // 请求用户信息，携带 token
-        String token = String.valueOf(tokenResponse.get("access_token"));
-        String userUrl = githubUserUrl.concat(token);
-        JSONObject userInfoResponse = HttpClientUtils.execute(userUrl, HttpMethod.GET);
+        String token = tokenResponse.substring(tokenResponse.indexOf("=") + 1);
+        String userInfoResponse = HttpClientUtils.execute(githubUserUrl, token);
 
         // 获取用户信息，username 加上 GITHUB@ 前缀，密码与 username 一致，这里就不加密了
-        String username = githubUserPrefix.concat(String.valueOf(userInfoResponse.get("name")));
+        String username = githubUserPrefix.concat(userInfoResponse);
         String password = username;
 
         return autoRegister3rdAndLogin(username, password);

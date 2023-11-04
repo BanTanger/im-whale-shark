@@ -26,7 +26,7 @@ public class UserService {
             return "Login Fail";
         }
         log.info("用户 {} 登录成功", username);
-        return "Login Success";
+        return "Login Success, username: " + username;
     }
 
     public String register(UserEntity userEntity) {
@@ -40,7 +40,7 @@ public class UserService {
             log.error("创建用户失败");
         }
         log.info("用户 {} 创建成功", userEntity.getUserName());
-        return "Register Success";
+        return "Register Success, username: " + userEntity.getUserName();
     }
 
     public boolean checkUserExists(String username) {
