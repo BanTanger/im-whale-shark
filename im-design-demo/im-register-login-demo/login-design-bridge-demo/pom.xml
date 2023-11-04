@@ -2,24 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
     <parent>
-        <artifactId>im-whale-shark</artifactId>
+        <artifactId>im-register-login-demo</artifactId>
         <groupId>com.bantanger</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-    <description>im-design-demo</description>
+    <artifactId>login-design-bridge-demo</artifactId>
+
     <properties>
-        <java.version>1.8</java.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
     </properties>
-
-    <artifactId>im-design-demo</artifactId>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>im-register-login-demo</module>
-    </modules>
 
 </project>
