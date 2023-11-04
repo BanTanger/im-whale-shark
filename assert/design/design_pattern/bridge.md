@@ -4,7 +4,7 @@
 
 UML 图如下
 
-![img.png](img.png)
+![img.png](../../../im-design-demo/im-register-login-demo/login-design-bridge-demo/assert/img.png)
 
 桥接一共有四个角色
 

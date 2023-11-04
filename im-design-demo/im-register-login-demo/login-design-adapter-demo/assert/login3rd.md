@@ -1,4 +1,20 @@
-# 第三方登录的实现
+# 第三方登录的实现以及使用说明
+
+## 使用说明
+
++ im-design-demo/im-register-login-demo/login-design-adapter-demo
++ im-design-demo/im-register-login-demo/login-design-bridge-demo
+
+这两个子模块都对接了第三方登录的功能
+
+体验步骤:
+1. 环境搭建, 执行 ./assert/sql/register_login_demo.sql 文件
+2. 申请 github oauth apps, 修改配置, 运行项目
+3. 点击命令行里出现的蓝链, 进行权限校验
+
+![img_1.png](img_1.png)
+
+## Github Oauth 第三方登录实现
 
 参考这篇文章：
 
