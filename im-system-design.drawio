@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-11-11T12:33:37.554Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" etag="z3tlzNaUEEY2gNIWx3jJ" version="22.1.0" type="github" pages="11">
+<mxfile host="app.diagrams.net" modified="2023-11-11T12:52:00.491Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" etag="NvU6UCc70pJYQfHfYL85" version="22.1.0" type="github" pages="11">
   <diagram name="路由层作用" id="KgJZ5N0K1NzEe5FZhcLB">
     <mxGraphModel dx="1050" dy="534" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -2266,12 +2266,12 @@
         <mxCell id="uIszEUv3CIU4-OxU6Vrs-1" value="&lt;font face=&quot;Comic Sans MS&quot; style=&quot;font-size: 20px;&quot;&gt;&lt;b&gt;Netty 集群&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
           <mxGeometry x="310" width="130" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="uIszEUv3CIU4-OxU6Vrs-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="uIszEUv3CIU4-OxU6Vrs-2" target="uIszEUv3CIU4-OxU6Vrs-4">
+        <mxCell id="uIszEUv3CIU4-OxU6Vrs-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;shape=link;" edge="1" parent="1" source="uIszEUv3CIU4-OxU6Vrs-2" target="uIszEUv3CIU4-OxU6Vrs-4">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="uIszEUv3CIU4-OxU6Vrs-20" value="消息转发到 目标 Netty" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="uIszEUv3CIU4-OxU6Vrs-19">
           <mxGeometry x="-0.427" relative="1" as="geometry">
-            <mxPoint x="32" y="-7" as="offset" />
+            <mxPoint x="32" y="-20" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="uIszEUv3CIU4-OxU6Vrs-2" value="Netty1" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
@@ -2282,6 +2282,9 @@
         </mxCell>
         <mxCell id="uIszEUv3CIU4-OxU6Vrs-4" value="Netty2" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="315" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6oDvSolWSTE6KVFkA9WS-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="uIszEUv3CIU4-OxU6Vrs-5" target="uIszEUv3CIU4-OxU6Vrs-25">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="uIszEUv3CIU4-OxU6Vrs-5" value="Netty" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="200" y="260" width="120" height="60" as="geometry" />
@@ -2307,12 +2310,20 @@
         <mxCell id="uIszEUv3CIU4-OxU6Vrs-11" value="Client2" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-100" y="130" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="uIszEUv3CIU4-OxU6Vrs-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="uIszEUv3CIU4-OxU6Vrs-13" target="uIszEUv3CIU4-OxU6Vrs-4">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="uIszEUv3CIU4-OxU6Vrs-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;shape=link;width=6.551724137931036;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="15" y="258.0344827586207" as="sourcePoint" />
+            <mxPoint x="310" y="188.00000000000023" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="162" y="258" />
+              <mxPoint x="162" y="208" />
+              <mxPoint x="310" y="208" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="uIszEUv3CIU4-OxU6Vrs-17" value="channel" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="uIszEUv3CIU4-OxU6Vrs-16">
           <mxGeometry x="-0.0022" y="1" relative="1" as="geometry">
-            <mxPoint as="offset" />
+            <mxPoint x="-1" y="7" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="uIszEUv3CIU4-OxU6Vrs-13" value="Client3" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
@@ -2334,7 +2345,37 @@
           <mxGeometry x="-80" y="-2" width="140" height="30" as="geometry" />
         </mxCell>
         <mxCell id="uIszEUv3CIU4-OxU6Vrs-25" value="在线 Netty 服务 --&amp;gt; Netty" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="333" y="260" width="160" height="30" as="geometry" />
+          <mxGeometry x="380" y="250" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2856io0wj88EAE8jjThp-1" value="mq" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="250" y="145" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2856io0wj88EAE8jjThp-2" value="Server" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="80" y="168" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2856io0wj88EAE8jjThp-3" value="Client" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="135" y="160" width="50" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2856io0wj88EAE8jjThp-4" value="Server" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="440" y="158" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6oDvSolWSTE6KVFkA9WS-1" value="IP Port" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="190" y="150" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6oDvSolWSTE6KVFkA9WS-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6oDvSolWSTE6KVFkA9WS-3" target="uIszEUv3CIU4-OxU6Vrs-25">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="325" />
+              <mxPoint x="400" y="300" />
+              <mxPoint x="460" y="300" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6oDvSolWSTE6KVFkA9WS-3" value="Zk" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="510" y="310" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6oDvSolWSTE6KVFkA9WS-5" value="查询服务，redis 路由表，&lt;br&gt;用户上线，uid：netty id" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="80" y="-7" width="160" height="40" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
