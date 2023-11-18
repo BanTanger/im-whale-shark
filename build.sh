@@ -15,6 +15,7 @@ export LANGUAGE=en_US.UTF-8
 mvn -U clean install -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
 
 # 为脚本赋予权限
+cd script
 chmod +x *.sh
 # 清空 build 包
 ./clean.sh
