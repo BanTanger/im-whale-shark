@@ -143,7 +143,7 @@ public class Constants {
         /** 群聊消息有序 */
         public static final String GroupMessageSeq = ":groupMessageSeq:";
         /** 会话消息有序 */
-        public static final String ConversationSeq = "conversationSeq";
+        public static final String ConversationSeq = ":conversationSeq";
 
         // 用于消息数据同步 Key
         /** 好友数量记录 */

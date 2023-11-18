@@ -13,10 +13,15 @@ import com.bantanger.im.common.model.message.content.OfflineMessageContent;
 import com.bantanger.im.domain.message.model.req.SendMessageReq;
 import com.bantanger.im.domain.message.model.resp.SendMessageResp;
 import com.bantanger.im.domain.message.seq.RedisSequence;
+import com.bantanger.im.domain.message.service.check.CheckSendMessage;
 import com.bantanger.im.domain.message.service.check.CheckSendMessageImpl;
+import com.bantanger.im.domain.message.service.store.MessageStoreService;
 import com.bantanger.im.domain.message.service.store.MessageStoreServiceImpl;
 import com.bantanger.im.service.sendmsg.MessageProducer;
 import com.bantanger.im.service.support.ids.ConversationIdGenerate;
+import com.bantanger.im.service.utils.ThreadPoolUtil;
+import jodd.util.ThreadUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -35,43 +40,32 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class P2PMessageService {
 
-    @Resource
-    CheckSendMessageImpl checkSendMessageServiceImpl;
-
-    @Resource
-    MessageProducer messageProducer;
-
-    @Resource
-    MessageStoreServiceImpl messageStoreServiceImpl;
-
-    @Resource
-    RedisSequence redisSequence;
+    private static final String MODULE_NAME = "P2P";
+    private final RedisSequence redisSequence;
+    private final MessageProducer messageProducer;
+    private final CheckSendMessage checkSendMessageServiceImpl;
+    private final MessageStoreService messageStoreServiceImpl;
 
     /**
      * 线程池优化单聊消息处理逻辑
      */
-    private final ThreadPoolExecutor threadPoolExecutor;
+    private static final ThreadPoolExecutor THREAD_POOL_EXECUTOR;
 
-    {
-        final AtomicInteger num = new AtomicInteger(0);
-        threadPoolExecutor = new ThreadPoolExecutor(8, 8, 60, TimeUnit.SECONDS,
-                // 任务队列存储超过核心线程数的任务
-                new LinkedBlockingDeque<>(1000), r -> {
-            Thread thread = new Thread(r);
-            thread.setDaemon(true);
-            thread.setName("[P2P] message-process-thread-" + num.getAndIncrement());
-            return thread;
-        });
+    static {
+        THREAD_POOL_EXECUTOR = ThreadPoolUtil.getIoTargetThreadPool(MODULE_NAME);
     }
 
     public void processor(MessageContent messageContent) {
         // 日志打印
-        log.info("消息 ID [{}] 开始处理", messageContent.getMessageId());
+        log.info("[{}] 消息 ID [{}] 开始处理",
+                MODULE_NAME, messageContent.getMessageId());
 
         // 设置临时缓存，避免消息无限制重发，当缓存失效. 不做处理
-        String messageCacheByMessageId = messageStoreServiceImpl.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId());
+        String messageCacheByMessageId = messageStoreServiceImpl
+                .getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId());
         if (messageCacheByMessageId != null &&
                 messageCacheByMessageId.equals(MessageErrorCode.MESSAGE_CACHE_EXPIRE.getError())) {
             // 说明缓存过期，服务端向客户端发送 ack 要求客户端重新生成 messageId
@@ -79,17 +73,21 @@ public class P2PMessageService {
             // 客户端 本地，重新生成 messageId
             return ;
         }
-        MessageContent messageCache = JSON.parseObject(messageCacheByMessageId, MessageContent.class);
+        MessageContent messageCache =
+                JSON.parseObject(messageCacheByMessageId, MessageContent.class);
         if (messageCache != null){
-            threadPoolExecutor.execute(() -> {
+            THREAD_POOL_EXECUTOR.execute(() -> {
                 // 线程池执行消息同步，发送，回应等任务流程
                 doThreadPoolTask(messageCache);
             });
             return ;
         }
 
-        // TODO 外提 Seq 存储，因为 seq 生成策略可以是 redis，也可以是一个新的服务专门处理。
-        //  为了保证安全性需要对第三方接口进行异常捕获，因此不要将这段逻辑脏污线程池的逻辑，保证线程池的流式纯粹
+        /* 外提 Seq 存储逻辑
+         * 因为 seq 生成策略可以是 redis，也可以是一个新的服务专门处理。
+         * 为了保证安全性需要对第三方接口进行异常捕获，
+         * 因此不要将这段逻辑脏污线程池的逻辑，保证线程池的流式纯粹
+         */
         // 定义单聊消息的 Sequence, 客户端根据 seq 进行排序
         // key: appId + Seq + (from + toId) / groupId
         long seq = redisSequence.doGetSeq(messageContent.getAppId()
@@ -98,7 +96,7 @@ public class P2PMessageService {
                 messageContent.getFromId(), messageContent.getToId()));
         messageContent.setMessageSequence(seq);
 
-        threadPoolExecutor.execute(() -> {
+        THREAD_POOL_EXECUTOR.execute(() -> {
             // 1. 消息持久化落库(MQ 异步) id 防重处理，通过唯一键，做一个防重处理
             messageStoreServiceImpl.storeP2PMessage(messageContent);
             // 2. 在异步持久化之后执行离线消息存储
@@ -110,7 +108,8 @@ public class P2PMessageService {
             messageStoreServiceImpl.setMessageCacheByMessageId(
                     messageContent.getAppId(), messageContent.getMessageId(), messageContent);
 
-            log.info("消息 ID [{}] 处理完成", messageContent.getMessageId());
+            log.info("[{}] 消息 ID [{}] 处理完成",
+                    MODULE_NAME, messageContent.getMessageId());
         });
     }
 
@@ -197,10 +196,12 @@ public class P2PMessageService {
      * @param responseVO
      */
     public void ack(MessageContent messageContent, ResponseVO responseVO) {
-        log.info("[P2P] msg ack, msgId = {}, checkResult = {}", messageContent.getMessageId(), responseVO.getCode());
+        log.info("[{}}] msg ack, msgId = {}, checkResult = {}",
+                MODULE_NAME, messageContent.getMessageId(), responseVO.getCode());
 
         // ack 包塞入消息 id，告知客户端端 该条消息已被成功接收
-        ChatMessageAck chatMessageAck = new ChatMessageAck(messageContent.getMessageId(), messageContent.getMessageSequence());
+        ChatMessageAck chatMessageAck = new ChatMessageAck(
+                messageContent.getMessageId(), messageContent.getMessageSequence());
         responseVO.setData(chatMessageAck);
         // 发送消息，回传给发送方端
         messageProducer.sendToUserOneClient(messageContent.getFromId(),
@@ -234,7 +235,7 @@ public class P2PMessageService {
      * @param messageContent
      */
     public void syncToSender(MessageContent messageContent) {
-        log.debug("[P2P] 发送方消息同步");
+        log.debug("[{}}] 发送方消息同步", MODULE_NAME);
         messageProducer.sendToUserExceptClient(
                 messageContent.getFromId(),
                 MessageCommand.MSG_P2P,

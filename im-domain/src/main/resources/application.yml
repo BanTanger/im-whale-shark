@@ -1,3 +1,9 @@
+DATABASE: im_core
+USERNAME: root
+PASSWORD: whalesharkim
+#PASSWORD: 123456
+IP: 127.0.0.1:13306
+
 server:
   port: 18000
   tomcat:
@@ -18,11 +24,11 @@ spring:
   profiles:
     active: dev
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.jdbc.Driver
     password: whalesharkim
-    url: jdbc:mysql://127.0.0.1:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
-#    url: jdbc:mysql://47.97.204.83:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${IP}/${DATABASE}?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
     username: root
+
   # redis
   redis:
     host: 127.0.0.1
