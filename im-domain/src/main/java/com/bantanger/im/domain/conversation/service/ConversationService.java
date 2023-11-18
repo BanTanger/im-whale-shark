@@ -33,5 +33,10 @@ public interface ConversationService {
      */
     ResponseVO updateConversation(UpdateConversationReq req);
 
+    /**
+     * 同步客户端本地 Seq 与服务端最大 Seq
+     * @param req 数据结构为{客户端最大 Seq，服务端一次响应的最大次数}
+     * @return
+     */
     ResponseVO syncConversationSet(SyncReq req);
 }

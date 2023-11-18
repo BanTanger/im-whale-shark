@@ -156,6 +156,10 @@ docker run -d -p 5672:5672 -p 15672:15672 --name rabbitmq
 + im-domain 包下的 Application 程序 `com.bantanger.im.domain.Application`。它用于构建业务逻辑服务, 如用户、好友、群组的创建, 更改, 删除, 与数据库、缓存进行逻辑交互。端口号为 `8000`
 + im-message-store 包下的 Application 程序 `com.bantanger.im.message.Application`。它用于实现 MQ 异步消息落库存储服务。端口号为 `8001`
 
+注意 tcp Application 方式启动需要配置 parameter args 
+
+![img.png](assert/design/photo/tcp模块Application方式启动需要配置paramargs.png)
+
 ### py 脚本测试
 `whale-shark/im-domain/src/test/python/` 包下所有测试文件都可运行
 
