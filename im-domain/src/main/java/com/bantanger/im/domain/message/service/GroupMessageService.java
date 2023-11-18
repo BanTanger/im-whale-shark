@@ -16,6 +16,8 @@ import com.bantanger.im.domain.message.seq.RedisSequence;
 import com.bantanger.im.domain.message.service.check.CheckSendMessage;
 import com.bantanger.im.domain.message.service.store.MessageStoreService;
 import com.bantanger.im.service.sendmsg.MessageProducer;
+import com.bantanger.im.service.utils.ThreadPoolUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -38,55 +40,42 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class GroupMessageService {
 
-    @Resource
-    CheckSendMessage checkSendMessageImpl;
-
-    @Resource
-    MessageProducer messageProducer;
-
-    @Resource
-    ImGroupMemberService imGroupMemberServiceImpl;
-
-    @Resource
-    MessageStoreService messageStoreServiceImpl;
-
-    @Resource
-    RedisSequence redisSequence;
+    private static final String MODULE_NAME = "GROUP";
+    private final RedisSequence redisSequence;
+    private final MessageProducer messageProducer;
+    private final CheckSendMessage checkSendMessageImpl;
+    private final ImGroupMemberService imGroupMemberServiceImpl;
+    private final MessageStoreService messageStoreServiceImpl;
 
     /**
-     * 线程池优化单聊消息处理逻辑
+     * 线程池优化群聊消息处理逻辑
      */
-    private final ThreadPoolExecutor threadPoolExecutor;
+    private static final ThreadPoolExecutor THREAD_POOL_EXECUTOR;
 
-    {
-        final AtomicInteger num = new AtomicInteger(0);
-        threadPoolExecutor = new ThreadPoolExecutor(8, 8, 60, TimeUnit.SECONDS,
-                // 任务队列存储超过核心线程数的任务
-                new LinkedBlockingDeque<>(1000), r -> {
-            Thread thread = new Thread(r);
-            thread.setDaemon(true);
-            thread.setName("[GROUP] message-process-thread-" + num.getAndIncrement());
-            return thread;
-        });
+    static {
+        THREAD_POOL_EXECUTOR = ThreadPoolUtil.getIoTargetThreadPool(MODULE_NAME);
     }
 
     public void processor(GroupChatMessageContent messageContent) {
         // 日志打印
-        log.info("消息 ID [{}] 开始处理", messageContent.getMessageId());
+        log.info("[{}] 消息 ID [{}] 开始处理", MODULE_NAME, messageContent.getMessageId());
 
         // 设置临时缓存，避免消息无限制重发，当缓存失效，直接重新构建新消息进行处理
-        String messageCacheByMessageId = messageStoreServiceImpl.getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId());
+        String messageCacheByMessageId = messageStoreServiceImpl
+                .getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId());
         if (messageCacheByMessageId != null &&
                 messageCacheByMessageId.equals(MessageErrorCode.MESSAGE_CACHE_EXPIRE.getError())) {
             // 说明缓存过期，服务端向客户端发送 ack 要求客户端重新生成 messageId
             // 不做处理。直到客户端计时器超时
             return;
         }
-        GroupChatMessageContent messageCache = JSON.parseObject(messageCacheByMessageId, GroupChatMessageContent.class);
+        GroupChatMessageContent messageCache =
+                JSON.parseObject(messageCacheByMessageId, GroupChatMessageContent.class);
         if (messageCache != null) {
-            threadPoolExecutor.execute(() -> {
+            THREAD_POOL_EXECUTOR.execute(() -> {
                 // 线程池执行消息同步，发送，回应等任务流程
                 doThreadPoolTask(messageCache);
             });
@@ -102,28 +91,32 @@ public class GroupMessageService {
         // 1. 消息持久化落库（不等待执行结果）
         CompletableFuture.runAsync(() -> {
             messageStoreServiceImpl.storeGroupMessage(messageContent);
-        }, threadPoolExecutor);
+        }, THREAD_POOL_EXECUTOR);
 
         CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
             // 2. 查询群组所有成员进行消息分发
-            List<String> groupMemberIds = imGroupMemberServiceImpl.getGroupMemberId(messageContent.getGroupId(), messageContent.getAppId());
+            List<String> groupMemberIds = imGroupMemberServiceImpl
+                    .getGroupMemberId(messageContent.getGroupId(), messageContent.getAppId());
             messageContent.setMemberIds(groupMemberIds);
+
             return messageContent;
-        }, threadPoolExecutor).thenApplyAsync(messageContentWithMembers -> {
+        }, THREAD_POOL_EXECUTOR).thenApplyAsync(messageContentWithMembers -> {
             // 3. 在异步持久化之后执行离线消息存储
             OfflineMessageContent offlineMessage = getOfflineMessage(messageContentWithMembers);
             offlineMessage.setToId(messageContentWithMembers.getGroupId());
-            messageStoreServiceImpl.storeGroupOfflineMessage(offlineMessage, messageContentWithMembers.getMemberIds());
+            messageStoreServiceImpl.storeGroupOfflineMessage(
+                    offlineMessage, messageContentWithMembers.getMemberIds());
+
             return messageContentWithMembers;
-        }, threadPoolExecutor).thenAcceptAsync(finalMessageContent -> {
+        }, THREAD_POOL_EXECUTOR).thenAcceptAsync(finalMessageContent -> {
             // 4. 线程池执行消息同步，发送，回应等任务流程
             doThreadPoolTask(finalMessageContent);
-
             // 5. 消息缓存
             messageStoreServiceImpl.setMessageCacheByMessageId(finalMessageContent.getAppId(), finalMessageContent.getMessageId(), finalMessageContent);
 
-            log.info("消息 ID [{}] 处理完成", finalMessageContent.getMessageId());
-        }, threadPoolExecutor);
+            log.info("[{}] 消息 ID [{}] 处理完成",
+                    MODULE_NAME, finalMessageContent.getMessageId());
+        }, THREAD_POOL_EXECUTOR);
 
         // 等待所有任务完成
         future.join();
@@ -197,7 +190,8 @@ public class GroupMessageService {
      * @param responseVO
      */
     protected void ack(MessageContent messageContent, ResponseVO responseVO) {
-        log.info("[GROUP] msg ack, msgId = {}, checkResult = {}", messageContent.getMessageId(), responseVO.getCode());
+        log.info("[{}] msg ack, msgId = {}, checkResult = {}",
+                MODULE_NAME, messageContent.getMessageId(), responseVO.getCode());
 
         // ack 包塞入消息 id，告知客户端端 该条消息已被成功接收
         ChatMessageAck chatMessageAck = new ChatMessageAck(messageContent.getMessageId());
@@ -214,7 +208,7 @@ public class GroupMessageService {
      * @param messageContent
      */
     protected void syncToSender(MessageContent messageContent) {
-        log.info("[GROUP] 发送方消息同步");
+        log.info("[{}}] 发送方消息同步", MODULE_NAME);
         messageProducer.sendToUserExceptClient(messageContent.getFromId(),
                 GroupEventCommand.MSG_GROUP, messageContent, messageContent);
     }

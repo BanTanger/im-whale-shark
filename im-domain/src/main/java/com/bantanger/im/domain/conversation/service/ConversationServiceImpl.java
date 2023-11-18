@@ -21,6 +21,7 @@ import com.bantanger.im.service.sendmsg.MessageProducer;
 import com.bantanger.im.service.utils.UserSequenceRepository;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -31,22 +32,14 @@ import java.util.List;
  * @Date 2023/4/8 14:22
  */
 @Service
+@RequiredArgsConstructor
 public class ConversationServiceImpl implements ConversationService {
 
-    @Resource
-    ImConversationSetMapper imConversationSetMapper;
-
-    @Resource
-    MessageProducer messageProducer;
-
-    @Resource
-    RedisSequence redisSequence;
-
-    @Resource
-    AppConfig appConfig;
-
-    @Resource
-    UserSequenceRepository userSequenceRepository;
+    private final AppConfig appConfig;
+    private final RedisSequence redisSequence;
+    private final MessageProducer messageProducer;
+    private final UserSequenceRepository userSequenceRepository;
+    private final ImConversationSetMapper imConversationSetMapper;
 
     public String convertConversationId(Integer type, String fromId, String toId) {
         return type + "_" + fromId + "_" + toId;
@@ -68,11 +61,19 @@ public class ConversationServiceImpl implements ConversationService {
         query.eq("app_id", messageReadContent.getAppId());
         query.eq("conversation_id", conversationId);
         ImConversationSetEntity imConversationSetEntity = imConversationSetMapper.selectOne(query);
+
+        /* key：appid + Seq
+         * 这是因为 conversation seq 是为了对所有会话进行排序的，
+         * 即客户端看到的消息从高到低是按照会话里的最新消息进行排序（置顶另外讨论）最新会话在最前
+         * 而 p2p，group 的 seq 是为了对一个会话里的消息进行排序
+         */
+        long seq = redisSequence.doGetSeq(
+                messageReadContent.getAppId() + Constants.SeqConstants.ConversationSeq);
+
         if (imConversationSetEntity == null) {
             // 如果查询记录为空，代表不存在该会话，需要新建
             imConversationSetEntity = new ImConversationSetEntity();
-            long seq = redisSequence.doGetSeq(
-                    messageReadContent.getAppId() + ":" + Constants.SeqConstants.ConversationSeq);
+
             imConversationSetEntity.setConversationId(conversationId);
             imConversationSetEntity.setSequence(seq);
             imConversationSetEntity.setConversationType(messageReadContent.getConversationType());
@@ -86,8 +87,6 @@ public class ConversationServiceImpl implements ConversationService {
             userSequenceRepository.writeUserSeq(messageReadContent.getAppId(),
                     messageReadContent.getFromId(), Constants.SeqConstants.ConversationSeq, seq);
         } else {
-            long seq = redisSequence.doGetSeq(
-                    messageReadContent.getAppId() + ":" + Constants.SeqConstants.ConversationSeq);
             imConversationSetEntity.setSequence(seq);
             imConversationSetEntity.setReadSequence(messageReadContent.getMessageSequence());
             imConversationSetMapper.readMark(imConversationSetEntity);
@@ -120,7 +119,7 @@ public class ConversationServiceImpl implements ConversationService {
         query.eq("app_id", req.getAppId());
         ImConversationSetEntity imConversationSetEntity = imConversationSetMapper.selectOne(query);
         if (imConversationSetEntity != null) {
-            long seq = redisSequence.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.ConversationSeq);
+            long seq = redisSequence.doGetSeq(req.getAppId() + Constants.SeqConstants.ConversationSeq);
             if (req.getIsMute() != null) {
                 // 更新禁言状态
                 imConversationSetEntity.setIsMute(req.getIsMute());
