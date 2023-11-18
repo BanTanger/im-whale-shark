@@ -88,6 +88,7 @@ git clone https://github.com/BanTanger/im-whale-shark.git
 2. 为脚本执行赋予权限并执行
 
 ```bash
+cd script
 chmod +x *.sh
 ```
 ```bash
