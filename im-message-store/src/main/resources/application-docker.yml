@@ -20,7 +20,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: whalesharkim
-    url: jdbc:mysql://im-mysql:3306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://im-mysql:13306/im_core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8&allowPublicKeyRetrieval=true
     username: root
 
   redis:
