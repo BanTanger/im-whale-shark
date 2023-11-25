@@ -5,7 +5,7 @@
 
 IM-WhaleShark（鲸鲨）是基于 Netty 实现的高性能分布式 IM 即时通讯系统
 
-[介绍](#介绍) | [技术栈](#技术栈) | [模块职责](#模块职责) | [功能实现](#亮点) | [架构设计](#架构设计) | [快速开始](#快速开始) | [状态码简述](#状态码定义) | [与我联系](#联系)
+[介绍](#介绍) | [快速开始](#快速开始) | [技术栈](#技术栈) | [模块职责](#模块职责) | [功能实现](#亮点) | [架构设计](#架构设计) | [状态码简述](#状态码定义) | [与我联系](#联系)
 
 </div>
 
@@ -426,3 +426,7 @@ IM 服务采用 SDK 方式集成到前端代码。一个大致的流程演示如
 欢迎与我联系交流，我拉你进交流群，微信二维码为（注明来意喔~）：
 
 ![与我联系.png](assert/design/photo/与我联系.png)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=BanTanger/im-whale-shark&type=Date)](https://star-history.com/#BanTanger/im-whale-shark&Date)
