@@ -4,9 +4,9 @@ echo "--------------------------------"
 echo "::: Welcome to IM-WhaleShark :::"
 # 创建目标目录
 target_directories=(
-    "docker/build/domain"
-    "docker/build/message-store"
-    "docker/build/tcp"
+    "./../docker/build/domain"
+    "./../docker/build/message-store"
+    "./../docker/build/tcp"
 )
 
 for dir in "${target_directories[@]}"; do
@@ -18,9 +18,9 @@ done
 echo ">>>>>>>>>>>>>>>>>"
 
 docker_files=(
-    "im-domain/Dockerfile"
-    "im-message-store/Dockerfile"
-    "im-tcp/Dockerfile"
+    "./../im-domain/Dockerfile"
+    "./../im-message-store/Dockerfile"
+    "./../im-tcp/Dockerfile"
 )
 
 # 复制 Dockerfile
@@ -34,9 +34,9 @@ done
 echo ">>>>>>>>>>>>>>>>>"
 
 config_files=(
-    "im-domain/src/main/resources/application-docker.yml"
-    "im-message-store/src/main/resources/application-docker.yml"
-    "im-tcp/src/main/resources/config-docker.yml"
+    "./../im-domain/src/main/resources/application-docker.yml"
+    "./../im-message-store/src/main/resources/application-docker.yml"
+    "./../im-tcp/src/main/resources/config-docker.yml"
 )
 
 # 复制配置文件
@@ -52,9 +52,9 @@ echo ">>>>>>>>>>>>>>>>>"
 
 # 复制 jar 文件并更改文件名
 jar_files=(
-    "im-domain/target/im-domain-1.0-SNAPSHOT.jar"
-    "im-message-store/target/im-message-store-1.0-SNAPSHOT.jar"
-    "im-tcp/target/im-tcp-1.0-SNAPSHOT.jar"
+    "./../im-domain/target/im-domain-1.0-SNAPSHOT.jar"
+    "./../im-message-store/target/im-message-store-1.0-SNAPSHOT.jar"
+    "./../im-tcp/target/im-tcp-1.0-SNAPSHOT.jar"
 )
 
 for index in "${!jar_files[@]}"; do
@@ -69,5 +69,5 @@ for index in "${!jar_files[@]}"; do
     echo "复制 ${jar_files[$index]} 到 $target_file_without_version 完成"
 done
 
-cp "im-tcp/src/main/resources/application-docker.yml" "docker/build/tcp/application.yml"
-echo "复制 im-tcp/src/main/resources/application-docker.yml 到 docker/build/tcp/application.yml"
+cp "./../im-tcp/src/main/resources/application-docker.yml" "./../docker/build/tcp/application.yml"
+echo "复制 ./../im-tcp/src/main/resources/application-docker.yml 到 ./../docker/build/tcp/application.yml"
