@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+import static com.bantanger.im.codec.utils.ByteBufToMessageUtils.PACKET_CODEC_LENGTH;
+
 /**
  * WebSocket 解码器
  *
@@ -22,7 +24,8 @@ public class WebSocketMessageDecoderHandler extends MessageToMessageDecoder<Bina
     protected void decode(ChannelHandlerContext ctx, BinaryWebSocketFrame msg, List<Object> out) {
 
         ByteBuf content = msg.content();
-        if (content.readableBytes() < 28) {
+        if (content.readableBytes() < PACKET_CODEC_LENGTH) {
+            ctx.channel().close();
             return;
         }
         Message message = null;

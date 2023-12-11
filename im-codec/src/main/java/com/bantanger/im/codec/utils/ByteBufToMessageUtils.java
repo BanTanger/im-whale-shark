@@ -22,6 +22,8 @@ import io.netty.buffer.ByteBuf;
  */
 public class ByteBufToMessageUtils {
 
+    public static final Integer PACKET_CODEC_LENGTH = 28;
+
     public static Message transition(ByteBuf in){
 
         /** 获取command*/

@@ -10,6 +10,8 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.util.List;
 
+import static com.bantanger.im.codec.utils.ByteBufToMessageUtils.PACKET_CODEC_LENGTH;
+
 /**
  * Socket 消息解码类
  *
@@ -22,7 +24,8 @@ public class MessageDecoderHandler extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx,
                           ByteBuf in, List<Object> out) throws Exception {
         // 解析私有协议
-        if (in.readableBytes() < 28) {
+        if (in.readableBytes() < PACKET_CODEC_LENGTH) {
+            ctx.channel().close();
             return;
         }
         // 解析请求头
