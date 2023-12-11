@@ -1,5 +1,5 @@
 server:
-  port: 19000
+  port: 9000
   tomcat:
     basedir: ./
     accesslog:
