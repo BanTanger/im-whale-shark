@@ -5,7 +5,6 @@ import com.bantanger.im.common.enums.route.UrlRouteModelEnum;
 import com.bantanger.im.service.route.RouteHandler;
 import com.bantanger.im.service.route.algroithm.hash.AbstractConsistentHash;
 import com.bantanger.im.service.support.ids.SnowflakeIdWorker;
-import org.I0Itec.zkclient.ZkClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,11 +20,6 @@ public class BeanConfig {
 
     @Resource
     private AppConfig appConfig;
-
-    @Bean
-    public ZkClient buildZkClient() {
-        return new ZkClient(appConfig.getZkAddr(), appConfig.getZkConnectTimeOut());
-    }
 
     @Bean
     public RouteHandler routeHandler() throws Exception {

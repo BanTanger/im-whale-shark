@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,7 +54,7 @@ public class ImUserController {
         ResponseVO login = imUserService.login(req);
         if (login.isOk()) {
             // 从 Zk 获取 im 地址，返回给 sdk
-            List<String> allNode = new ArrayList<>();
+            List<String> allNode;
             if (ClientType.WEB.getCode().equals(req.getClientType())) {
                 allNode = zkManager.getAllWebNode();
             } else {

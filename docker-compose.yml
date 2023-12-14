@@ -31,7 +31,7 @@ services:
   # ZooKeeper 容器
   im-zookeeper:
     container_name: im-zookeeper
-    image: wurstmeister/zookeeper:latest
+    image: zookeeper:3.4.13
     restart: always
     privileged: true
     environment:

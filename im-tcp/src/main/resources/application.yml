@@ -20,7 +20,6 @@ spring:
   # redis
   redis:
     host: 127.0.0.1
-#    host: 47.97.204.83
     port: 6379
     jedis:
       pool:
@@ -32,7 +31,6 @@ spring:
   # rabbitmq
   rabbitmq:
     host: localhost
-#    host: 47.97.204.83
     port: 5672
     addresses: localhost
     username: admin

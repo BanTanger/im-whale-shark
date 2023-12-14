@@ -155,14 +155,16 @@ public class ImBootstrapConfig {
 
     @Data
     public static class ZkConfig {
-        /**
-         * zk 连接地址
-         */
+        /** zk 连接地址 */
         private String zkAddr;
-        /**
-         * zk 连接超时时间
-         */
+        /** zk 连接超时时间 */
         private Integer zkConnectTimeOut;
+        /** zk 会话超时时间 */
+        private Integer zkSessionTimeOut;
+        /** 重试等待时间 */
+        private Integer retryTimeMs;
+        /** 最大重试次数 */
+        private Integer maxRetries;
     }
 
 }

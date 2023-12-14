@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.Data;
 
 /**
+ * 命令上下文模型
  * @author BanTanger 半糖
  * @Date 2023/4/6 10:28
  */

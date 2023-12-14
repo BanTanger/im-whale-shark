@@ -6,11 +6,11 @@ import com.bantanger.im.service.rabbitmq.listener.MqMessageListener;
 import com.bantanger.im.service.redis.RedissonManager;
 import com.bantanger.im.service.strategy.command.CommandFactoryConfig;
 import com.bantanger.im.service.strategy.login.factory.LoginStatusFactoryConfig;
+import com.bantanger.im.service.zookeeper.CuratorZkClient;
 import com.bantanger.im.service.zookeeper.ZkManager;
 import com.bantanger.im.service.zookeeper.ZkRegistry;
 import com.bantanger.im.tcp.server.ImServer;
 import com.bantanger.im.tcp.server.ImWebSocketServer;
-import org.I0Itec.zkclient.ZkClient;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
@@ -67,9 +67,9 @@ public class Starter {
      */
     public static void registerZk(ImBootstrapConfig config) throws UnknownHostException {
         String hostAddress = InetAddress.getLocalHost().getHostAddress();
-        ZkClient zkClient = new ZkClient(config.getIm().getZkConfig().getZkAddr(),
-                config.getIm().getZkConfig().getZkConnectTimeOut());
-        ZkManager zkManager = new ZkManager(zkClient);
+        CuratorZkClient curatorZkClient = new CuratorZkClient(config.getIm().getZkConfig());
+        ZkManager zkManager = new ZkManager();
+        zkManager.setZkClient(curatorZkClient);
         ZkRegistry zkRegistry = new ZkRegistry(zkManager, hostAddress, config.getIm());
         Thread thread = new Thread(zkRegistry);
         thread.start();
