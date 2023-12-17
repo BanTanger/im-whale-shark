@@ -15,7 +15,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author: BanTanger 半糖
  * @create: 2023-09-18 15:31
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+        "com.bantanger.im.tcp",
+        // 这里是因为 feign 是在 tcp 层做的，需要被 tcp 层的 springboot 扫描管理
+        "com.bantanger.im.service.**.extensionpost.impl"
+})
 public class Application {
 
     public static void main(String[] args) {
