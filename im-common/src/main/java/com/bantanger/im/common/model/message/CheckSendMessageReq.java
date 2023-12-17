@@ -1,5 +1,6 @@
 package com.bantanger.im.common.model.message;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -8,6 +9,7 @@ import lombok.Data;
  * @Date 2023/4/5 19:06
  */
 @Data
+@Builder
 public class CheckSendMessageReq {
 
     private String fromId;
