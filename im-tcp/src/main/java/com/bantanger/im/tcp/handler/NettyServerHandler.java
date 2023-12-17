@@ -1,7 +1,11 @@
 package com.bantanger.im.tcp.handler;
 
 import com.bantanger.im.codec.proto.Message;
+import com.bantanger.im.common.enums.command.GroupEventCommand;
+import com.bantanger.im.common.enums.command.MessageCommand;
+import com.bantanger.im.common.enums.command.SystemCommand;
 import com.bantanger.im.service.rabbitmq.publish.MqMessageProducer;
+import com.bantanger.im.service.strategy.command.CommandFactoryConfig;
 import com.bantanger.im.service.strategy.command.CommandStrategy;
 import com.bantanger.im.service.strategy.command.factory.CommandFactory;
 import com.bantanger.im.service.strategy.command.model.CommandExecution;
@@ -18,6 +22,10 @@ import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author BanTanger 半糖
@@ -46,11 +54,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
     private final GenericObjectPool<CommandExecution> commandExecutionRequestPool
             = new GenericObjectPool<>(new CommandExecutionFactory());
 
-    /**
-     * 命令解析执行器
-     * @param ctx
-     * @param msg
-     */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) {
         Integer command = parseCommand(msg);
@@ -66,7 +69,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
                 // 执行策略
                 commandStrategy.systemStrategy(commandExecution);
             } else {
-                MqMessageProducer.sendMessage(msg);
+                MqMessageProducer.sendMessage(msg, command);
             }
         } finally {
             // 将对象归还给对象池
