@@ -208,7 +208,7 @@ public class GroupMessageService {
      * @param messageContent
      */
     protected void syncToSender(MessageContent messageContent) {
-        log.info("[{}}] 发送方消息同步", MODULE_NAME);
+        log.info("[{}] 发送方消息同步", MODULE_NAME);
         messageProducer.sendToUserExceptClient(messageContent.getFromId(),
                 GroupEventCommand.MSG_GROUP, messageContent, messageContent);
     }

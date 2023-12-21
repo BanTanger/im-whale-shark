@@ -235,7 +235,7 @@ public class P2PMessageService {
      * @param messageContent
      */
     public void syncToSender(MessageContent messageContent) {
-        log.debug("[{}}] 发送方消息同步", MODULE_NAME);
+        log.debug("[{}] 发送方消息同步", MODULE_NAME);
         messageProducer.sendToUserExceptClient(
                 messageContent.getFromId(),
                 MessageCommand.MSG_P2P,
