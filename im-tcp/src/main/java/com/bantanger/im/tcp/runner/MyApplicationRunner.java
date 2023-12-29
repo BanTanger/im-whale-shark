@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 
 /**
- * @author: chensongmin
+ * @author: BanTanger 半糖
  * @create: 2023-09-18 22:12
  */
 @Component

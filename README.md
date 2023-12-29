@@ -414,6 +414,33 @@ ACK 丢失现象解决策略: 由于我们 ack 中含有 msgId, 可以在客户�
 | 群聊消息已读通知给同步端                                     | 2053（0x805） |
 | 群聊消息已读回执，给原消息发送方                             | 2054（0x806） |
 
+## 开发规范
+
+打开地址 [im-whale-shark](https://github.com/BanTanger/im-whale-shark) 
+
+Fork 代码到自己的仓库
+
+熟悉工程模型和代码，并调试运行理解整个框架的设计实现。
+
+```text
+# 主要type
+feat:     增加新功能
+fix:      修复bug
+
+# 特殊type
+docs:     只改动了文档相关的内容
+style:    不影响代码含义的改动，例如去掉空格、改变缩进、增删分号
+build:    构造工具的或者外部依赖的改动，例如webpack，npm
+refactor: 代码重构时使用
+revert:   执行git revert打印的message
+
+# 暂不使用type
+test:     添加测试或者修改现有测试
+perf:     提高性能的改动
+ci:       与CI（持续集成服务）有关的改动
+chore:    不修改src或者test的其余修改，例如构建过程或辅助工具的变动
+```
+
 ## 前后端对接
 IM 服务采用 SDK 方式集成到前端代码。一个大致的流程演示如下:
 
