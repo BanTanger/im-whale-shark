@@ -15,11 +15,11 @@ CREATE TABLE app_user
 CREATE TABLE im_conversation_set
 (
     conversation_id   VARCHAR(255) NOT NULL,
-    conversation_type INT(10)      NULL COMMENT '0 单聊 1群聊 2机器人 3公众号',
-    from_id           VARCHAR(50)  NULL,
-    to_id             VARCHAR(50)  NULL,
-    is_mute           INT(10)      NULL COMMENT '是否免打扰 1免打扰',
-    is_top            INT(10)      NULL COMMENT '是否置顶 1置顶',
+    conversation_type INT(10)      NOT NULL DEFAULT 0 COMMENT '0 单聊 1群聊 2机器人 3公众号',
+    from_id           VARCHAR(50)  NOT NULL,
+    to_id             VARCHAR(50)  NOT NULL,
+    is_mute           INT(10)      NOT NULL DEFAULT 0 COMMENT '是否免打扰 1免打扰',
+    is_top            INT(10)      NOT NULL DEFAULT 0 COMMENT '是否置顶 1置顶',
     sequence          BIGINT       NULL COMMENT 'sequence',
     read_sequence     BIGINT       NULL,
     app_id            INT(10)      NOT NULL,

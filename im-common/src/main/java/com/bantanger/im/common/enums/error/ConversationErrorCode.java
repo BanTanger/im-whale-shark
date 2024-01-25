@@ -10,6 +10,7 @@ import com.bantanger.im.common.exception.ApplicationExceptionEnum;
 public enum ConversationErrorCode implements ApplicationExceptionEnum {
 
     CONVERSATION_UPDATE_PARAM_ERROR(50000,"会话参数修改错误"),
+    CONVERSATION_CREATE_FAIL(50001, "会话创建失败"),
 
     ;
 

@@ -14,6 +14,8 @@ import com.bantanger.im.common.enums.group.GroupStatusEnum;
 import com.bantanger.im.common.enums.group.GroupTypeEnum;
 import com.bantanger.im.common.exception.ApplicationException;
 import com.bantanger.im.common.model.ClientInfo;
+import com.bantanger.im.domain.conversation.model.CreateConversationReq;
+import com.bantanger.im.domain.conversation.service.ConversationService;
 import com.bantanger.im.domain.group.GroupMessageProducer;
 import com.bantanger.im.domain.group.dao.ImGroupEntity;
 import com.bantanger.im.domain.group.dao.ImGroupMemberEntity;
@@ -28,10 +30,12 @@ import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.domain.user.service.ImUserService;
 import com.bantanger.im.service.callback.CallbackService;
 import com.bantanger.im.service.config.AppConfig;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -40,34 +44,25 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.*;
 
+import static com.bantanger.im.common.enums.conversation.ConversationTypeEnum.GROUP;
+
 /**
  * @author BanTanger 半糖
  * @Date 2023/3/25 15:16
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
+    private final AppConfig appConfig;
+    private final ImGroupMemberMapper imGroupMemberMapper;
+    private final ImGroupService groupService;
+    private final ImUserService imUserService;
+    private final ConversationService conversationServiceImpl;
+    private final CallbackService callbackService;
     @Resource
-    ImGroupMemberMapper imGroupMemberMapper;
-
-    @Resource
-    ImGroupService groupService;
-
-    @Resource
-    ImGroupMemberService groupMemberService;
-
-    @Resource
-    ImUserService imUserService;
-
-    @Resource
-    CallbackService callbackService;
-
-    @Resource
-    AppConfig appConfig;
-
-    @Resource
-    GroupMessageProducer groupMessageProducer;
+    private GroupMessageProducer groupMessageProducer;
 
     @Override
     public ResponseVO importGroupMember(ImportGroupMemberReq req) {
@@ -82,7 +77,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         for (GroupMemberDto memberId : req.getMembers()) {
             ResponseVO responseVO = null;
             try {
-                responseVO = groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), memberId);
+                responseVO = addGroupMember(req.getGroupId(), req.getAppId(), memberId);
             } catch (Exception e) {
                 e.printStackTrace();
                 responseVO = ResponseVO.errorResponse();
@@ -118,56 +113,39 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
         // 查询是否有群主
         if (dto.getRole() != null && GroupMemberRoleEnum.OWNER.getCode() == dto.getRole()) {
-            QueryWrapper<ImGroupMemberEntity> queryOwner = new QueryWrapper<>();
-            queryOwner.eq("group_id", groupId);
-            queryOwner.eq("app_id", appId);
-            queryOwner.eq("role", GroupMemberRoleEnum.OWNER.getCode());
-            Integer ownerNum = imGroupMemberMapper.selectCount(queryOwner);
+            Integer ownerNum = imGroupMemberMapper.selectCount(new LambdaQueryWrapper<ImGroupMemberEntity>()
+                    .eq(ImGroupMemberEntity::getGroupId, groupId)
+                    .eq(ImGroupMemberEntity::getAppId, appId)
+                    .eq(ImGroupMemberEntity::getRole, GroupMemberRoleEnum.OWNER.getCode()));
             if (ownerNum > 0) {
                 return ResponseVO.errorResponse(GroupErrorCode.GROUP_IS_HAVE_OWNER);
             }
         }
 
-        QueryWrapper<ImGroupMemberEntity> query = new QueryWrapper<>();
-        query.eq("group_id", groupId);
-        query.eq("app_id", appId);
-        query.eq("member_id", dto.getMemberId());
-        ImGroupMemberEntity memberDto = imGroupMemberMapper.selectOne(query);
+        LambdaQueryWrapper<ImGroupMemberEntity> queryWrapper = new LambdaQueryWrapper<ImGroupMemberEntity>()
+                .eq(ImGroupMemberEntity::getGroupId, groupId)
+                .eq(ImGroupMemberEntity::getAppId, appId)
+                .eq(ImGroupMemberEntity::getMemberId, dto.getMemberId());
+        ImGroupMemberEntity memberDto = imGroupMemberMapper.selectOne(queryWrapper);
 
-        long now = System.currentTimeMillis();
+
         if (memberDto == null) {
             //初次加群
-            memberDto = new ImGroupMemberEntity();
-
-            memberDto.setMemberId(dto.getMemberId());
-            memberDto.setRole(dto.getRole());
-            memberDto.setSpeakDate(dto.getSpeakDate());
-            memberDto.setAlias(dto.getAlias());
-            memberDto.setJoinTime(dto.getJoinTime());
-            memberDto.setJoinType(dto.getJoinType());
-            memberDto.setGroupId(groupId);
-            memberDto.setAppId(appId);
-            memberDto.setJoinTime(now);
+            memberDto = buildGroupMemberJoinModel(groupId, appId, dto);
             int insert = imGroupMemberMapper.insert(memberDto);
             if (insert == 1) {
+                // 创建会话
+                doCreateGroupConversation(dto.getMemberId(), groupId, appId);
                 return ResponseVO.successResponse();
             }
             return ResponseVO.errorResponse(GroupErrorCode.USER_JOIN_GROUP_ERROR);
         } else if (GroupMemberRoleEnum.LEAVE.getCode().equals(memberDto.getRole())) {
             //重新进群
-            memberDto = new ImGroupMemberEntity();
-
-            memberDto.setMemberId(dto.getMemberId());
-            memberDto.setRole(dto.getRole());
-            memberDto.setSpeakDate(dto.getSpeakDate());
-            memberDto.setAlias(dto.getAlias());
-            memberDto.setJoinTime(dto.getJoinTime());
-            memberDto.setJoinType(dto.getJoinType());
-            memberDto.setGroupId(groupId);
-            memberDto.setAppId(appId);
-            memberDto.setJoinTime(now);
-            int update = imGroupMemberMapper.update(memberDto, query);
+            memberDto = buildGroupMemberJoinModel(groupId, appId, dto);
+            int update = imGroupMemberMapper.update(memberDto, queryWrapper);
             if (update == 1) {
+                // 退群用户 conversation 不会删除，因此这里不用创建
+//                doCreateGroupConversation(dto.getMemberId(), groupId, appId);
                 return ResponseVO.successResponse();
             }
             return ResponseVO.errorResponse(GroupErrorCode.USER_JOIN_GROUP_ERROR);
@@ -175,6 +153,20 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
         return ResponseVO.errorResponse(GroupErrorCode.USER_IS_JOINED_GROUP);
 
+    }
+
+    private static ImGroupMemberEntity buildGroupMemberJoinModel(String groupId, Integer appId, GroupMemberDto dto) {
+        ImGroupMemberEntity memberDto = new ImGroupMemberEntity();
+        memberDto.setMemberId(dto.getMemberId());
+        memberDto.setRole(dto.getRole());
+        memberDto.setSpeakDate(dto.getSpeakDate());
+        memberDto.setAlias(dto.getAlias());
+        memberDto.setJoinTime(dto.getJoinTime());
+        memberDto.setJoinType(dto.getJoinType());
+        memberDto.setGroupId(groupId);
+        memberDto.setAppId(appId);
+        memberDto.setJoinTime(System.currentTimeMillis());
+        return memberDto;
     }
 
     @Override
@@ -245,11 +237,10 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Override
     public ResponseVO addMember(AddGroupMemberReq req) {
-
-        List<AddMemberResp> resp = new ArrayList<>();
-
         boolean isAdmin = false;
-        ResponseVO<ImGroupEntity> groupResp = groupService.getGroup(req.getGroupId(), req.getAppId());
+        Integer appId = req.getAppId();
+
+        ResponseVO<ImGroupEntity> groupResp = groupService.getGroup(req.getGroupId(), appId);
         if (!groupResp.isOk()) {
             return groupResp;
         }
@@ -257,7 +248,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         List<GroupMemberDto> memberDtos = req.getMembers();
         // 事件之前回调
         if (appConfig.isAddGroupMemberBeforeCallback()) {
-            ResponseVO responseVO = callbackService.beforeCallback(req.getAppId(),
+            ResponseVO responseVO = callbackService.beforeCallback(appId,
                     Constants.CallbackCommand.GroupMemberAddBefore
                     , JSONObject.toJSONString(req));
             if (!responseVO.isOk()) {
@@ -270,41 +261,47 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                         GroupMemberDto.class);
             } catch (Exception e) {
                 e.printStackTrace();
-                log.error("GroupMemberAddBefore 回调失败：{}", req.getAppId());
+                log.error("GroupMemberAddBefore 回调失败：{}", appId);
             }
         }
 
-        ImGroupEntity group = groupResp.getData();
+        ImGroupEntity groupBody = groupResp.getData();
 
         /**
          * 私有群（private）	类似普通微信群，创建后仅支持已在群内的好友邀请加群，且无需被邀请方同意或群主审批
          * 公开群（Public）	类似 QQ 群，创建后群主可以指定群管理员，需要群主或管理员审批通过才能入群
          * 群类型 1私有群（类似微信） 2公开群(类似qq）
          */
-        if (!isAdmin && GroupTypeEnum.PUBLIC.getCode() == group.getGroupType()) {
+        if (!isAdmin && GroupTypeEnum.PUBLIC.getCode() == groupBody.getGroupType()) {
             throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_APPMANAGER_ROLE);
         }
 
         List<String> successId = new ArrayList<>();
-        for (GroupMemberDto memberId : memberDtos) {
+        List<AddMemberResp> resp = new ArrayList<>();
+        for (GroupMemberDto memberDto : memberDtos) {
             ResponseVO responseVO = null;
             try {
-                responseVO = groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), memberId);
+                responseVO = addGroupMember(req.getGroupId(), appId, memberDto);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
                 responseVO = ResponseVO.errorResponse();
             }
             AddMemberResp addMemberResp = new AddMemberResp();
-            addMemberResp.setMemberId(memberId.getMemberId());
+            String memberId = memberDto.getMemberId();
+            addMemberResp.setMemberId(memberId);
             if (responseVO.isOk()) {
-                successId.add(memberId.getMemberId());
-                addMemberResp.setResult(0);
+                // 记录成功加入群聊的用户信息
+                successId.add(memberId);
+                addMemberResp.setResult(AddMemberResp.AddGroupResultEnum.SUCCESS.getCode());
+
+                // 为成功加入群聊的用户创建会话
+                doCreateGroupConversation(memberId, groupBody.getGroupId(), appId);
             } else if (responseVO.getCode() == GroupErrorCode.USER_IS_JOINED_GROUP.getCode()) {
-                addMemberResp.setResult(2);
-                addMemberResp.setResultMessage(responseVO.getMsg());
+                addMemberResp.setResult(AddMemberResp.AddGroupResultEnum.REPEAT_JOIN.getCode());
+                addMemberResp.setResultMessage(AddMemberResp.AddGroupResultEnum.REPEAT_JOIN.getMessage());
             } else {
-                addMemberResp.setResult(1);
-                addMemberResp.setResultMessage(responseVO.getMsg());
+                addMemberResp.setResult(AddMemberResp.AddGroupResultEnum.FAIL.getCode());
+                addMemberResp.setResultMessage(AddMemberResp.AddGroupResultEnum.FAIL.getMessage());
             }
             resp.add(addMemberResp);
         }
@@ -314,21 +311,30 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         addGroupMemberPack.setGroupId(req.getGroupId());
         addGroupMemberPack.setMembers(successId);
         groupMessageProducer.producer(req.getOperater(), GroupEventCommand.ADDED_MEMBER, addGroupMemberPack
-                , new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
+                , new ClientInfo(appId, req.getClientType(), req.getImei()));
 
         // 事件处理回调
         if (appConfig.isAddGroupMemberAfterCallback()) {
             AddMemberAfterCallback dto = new AddMemberAfterCallback();
             dto.setGroupId(req.getGroupId());
-            dto.setGroupType(group.getGroupType());
+            dto.setGroupType(groupBody.getGroupType());
             dto.setMemberId(resp);
             dto.setOperater(req.getOperater());
-            callbackService.afterCallback(req.getAppId()
+            callbackService.afterCallback(appId
                     , Constants.CallbackCommand.GroupMemberAddAfter,
                     JSONObject.toJSONString(dto));
         }
 
         return ResponseVO.successResponse(resp);
+    }
+
+    private void doCreateGroupConversation(String memberId, String groupId, Integer appId) {
+        CreateConversationReq createConversationReq = new CreateConversationReq();
+        createConversationReq.setConversationType(GROUP.getCode());
+        createConversationReq.setFromId(memberId);
+        createConversationReq.setToId(groupId);
+        createConversationReq.setAppId(appId);
+        conversationServiceImpl.createConversation(createConversationReq);
     }
 
     @Override
@@ -386,7 +392,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 }
             }
         }
-        ResponseVO responseVO = groupMemberService.removeGroupMember(req.getGroupId(), req.getAppId(), req.getMemberId());
+        ResponseVO responseVO = removeGroupMember(req.getGroupId(), req.getAppId(), req.getMemberId());
 
 
         if (responseVO.isOk()) {

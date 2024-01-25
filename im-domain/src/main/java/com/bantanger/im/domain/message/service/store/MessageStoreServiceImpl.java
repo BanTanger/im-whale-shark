@@ -11,9 +11,11 @@ import com.bantanger.im.common.model.message.store.DoStoreP2PMessageDto;
 import com.bantanger.im.common.model.message.content.GroupChatMessageContent;
 import com.bantanger.im.common.model.message.content.MessageBody;
 import com.bantanger.im.common.model.message.content.MessageContent;
+import com.bantanger.im.domain.conversation.service.ConversationService;
 import com.bantanger.im.domain.conversation.service.ConversationServiceImpl;
 import com.bantanger.im.service.config.AppConfig;
 import com.bantanger.im.service.support.ids.SnowflakeIdWorker;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -31,19 +33,12 @@ import java.util.concurrent.TimeUnit;
  * @Date 2023/4/5 13:50
  */
 @Service
+@RequiredArgsConstructor
 public class MessageStoreServiceImpl implements MessageStoreService {
 
-    @Resource
-    RabbitTemplate rabbitTemplate;
-
-    @Resource
-    StringRedisTemplate stringRedisTemplate;
-
-    @Resource
-    ConversationServiceImpl conversationServiceImpl;
-
-    @Resource
-    AppConfig appConfig;
+    private final RabbitTemplate rabbitTemplate;
+    private final AppConfig appConfig;
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Override
     public void storeP2PMessage(MessageContent messageContent) {
@@ -138,7 +133,7 @@ public class MessageStoreServiceImpl implements MessageStoreService {
         }
 
         offlineMessage.setConversationType(conversationType.getCode());
-        offlineMessage.setConversationId(conversationServiceImpl.convertConversationId(
+        offlineMessage.setConversationId(ConversationService.convertConversationId(
                 conversationType.getCode(), fromId, toId
         ));
         // 插入数据，messageKey 作为分值
