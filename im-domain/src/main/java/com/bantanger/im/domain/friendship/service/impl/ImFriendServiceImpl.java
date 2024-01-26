@@ -258,7 +258,7 @@ public class ImFriendServiceImpl implements ImFriendService {
         }
 
         // Friend 表插入 B 记录
-        LambdaQueryWrapper<ImFriendShipEntity> bQueryWrapper = getFriendShipQueryWrapper(appId, fromId, toId);
+        LambdaQueryWrapper<ImFriendShipEntity> bQueryWrapper = getFriendShipQueryWrapper(appId, toId, fromId);
         ImFriendShipEntity toItem = imFriendShipMapper.selectOne(bQueryWrapper);
         if (toItem == null) {
             toItem = buildFriendShipEntity(appId, toId, fromId, dto);
