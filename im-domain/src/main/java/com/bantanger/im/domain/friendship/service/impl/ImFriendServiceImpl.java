@@ -141,15 +141,15 @@ public class ImFriendServiceImpl implements ImFriendService {
             return this.doAddFriend(req, req.getFromId(), req.getToItem(), req.getAppId());
         } else {
             // 被加用户设置好友申请认证，走申请逻辑(im_friendship_request)
-            QueryWrapper<ImFriendShipEntity> query = new QueryWrapper<>();
-            query.eq("app_id", req.getAppId());
-            query.eq("from_id", req.getFromId());
-            query.eq("to_id", req.getToItem().getToId());
-            ImFriendShipEntity fromItem = imFriendShipMapper.selectOne(query);
-            if (fromItem == null || fromItem.getStatus()
-                    != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode()) {
+            ImFriendShipEntity fromItem = imFriendShipMapper.selectOne(
+                    new LambdaQueryWrapper<ImFriendShipEntity>()
+                            .eq(ImFriendShipEntity::getAppId, req.getAppId())
+                            .eq(ImFriendShipEntity::getFromId, req.getFromId())
+                            .eq(ImFriendShipEntity::getToId, req.getToItem().getToId()));
+            if (fromItem == null || FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode().equals(fromItem.getStatus())) {
                 //插入一条好友申请的数据
-                ResponseVO responseVO = imFriendShipRequestServiceImpl.addFienshipRequest(req.getFromId(), req.getToItem(), req.getAppId());
+                ResponseVO responseVO = imFriendShipRequestServiceImpl
+                        .addFriendshipRequest(req.getFromId(), req.getToItem(), req.getAppId());
                 if (!responseVO.isOk()) {
                     return responseVO;
                 }
@@ -157,7 +157,7 @@ public class ImFriendServiceImpl implements ImFriendService {
                 return ResponseVO.errorResponse(FriendShipErrorCode.TO_IS_YOUR_FRIEND);
             }
         }
-        return ResponseVO.successResponse(data);
+        return ResponseVO.successResponse();
     }
 
     @Override

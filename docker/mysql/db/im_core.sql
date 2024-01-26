@@ -32,9 +32,9 @@ CREATE TABLE im_friendship
     from_id         VARCHAR(50)   NOT NULL COMMENT 'from_id',
     to_id           VARCHAR(50)   NOT NULL COMMENT 'to_id',
     remark          VARCHAR(50)   NULL COMMENT '备注',
-    status          INT(10)       NULL COMMENT '状态 1正常 2删除',
-    black           INT(10)       NULL COMMENT '1正常 2拉黑',
-    create_time     BIGINT        NULL,
+    status          INT(10)       NOT NULL DEFAULT 1 COMMENT '状态 1.正常 2.删除',
+    black           INT(10)       NOT NULL DEFAULT 1 COMMENT '1.正常 2.拉黑',
+    create_time     BIGINT        NOT NULL DEFAULT current_timestamp,
     friend_sequence BIGINT        NULL,
     black_sequence  BIGINT        NULL,
     add_source      VARCHAR(20)   NULL COMMENT '来源',
@@ -51,25 +51,25 @@ INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black
 
 CREATE TABLE im_friendship_group
 (
-    app_id      int(20)     null comment 'app_id',
-    from_id     varchar(50) null comment 'from_id',
-    group_id    int(50) auto_increment
-        primary key,
-    group_name  varchar(50) null,
-    sequence    bigint      null,
-    create_time bigint      null,
-    update_time bigint      null,
-    del_flag    int(10)     null,
-    constraint `UNIQUE`
-        unique (app_id, from_id, group_name)
-);
+    app_id      int(20)     NOT NULL COMMENT 'app_id',
+    from_id     varchar(50) NOT NULL comment 'from_id',
+    group_id    int(50) AUTO_INCREMENT
+        PRIMARY KEY,
+    group_name  varchar(50) NOT NULL DEFAULT '默认分组' comment '好友分组组名',
+    sequence    bigint      NOT NULL DEFAULT 0,
+    create_time bigint      NOT NULL DEFAULT current_timestamp,
+    update_time bigint      NOT NULL DEFAULT current_timestamp,
+    del_flag    int(10)     NOT NULL DEFAULT 0,
+    CONSTRAINT `UNIQUE`
+        UNIQUE (app_id, from_id, group_name)
+) COMMENT '好友分组表';
 
 CREATE TABLE im_friendship_group_member
 (
     group_id BIGINT      NOT NULL
         PRIMARY KEY,
     to_id    VARCHAR(50) NULL
-);
+) COMMENT '好友分组成员表';
 
 CREATE TABLE im_friendship_request
 (
