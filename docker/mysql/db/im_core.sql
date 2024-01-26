@@ -15,16 +15,23 @@ CREATE TABLE app_user
 CREATE TABLE im_conversation_set
 (
     conversation_id   VARCHAR(255) NOT NULL,
-    conversation_type INT(10)      NULL COMMENT '0 单聊 1群聊 2机器人 3公众号',
-    from_id           VARCHAR(50)  NULL,
-    to_id             VARCHAR(50)  NULL,
-    is_mute           INT(10)      NULL COMMENT '是否免打扰 1免打扰',
-    is_top            INT(10)      NULL COMMENT '是否置顶 1置顶',
-    sequence          BIGINT       NULL COMMENT 'sequence',
-    read_sequence     BIGINT       NULL,
+    conversation_type INT(10)      NOT NULL DEFAULT 0 COMMENT '0 单聊 1群聊 2机器人 3公众号',
+    from_id           VARCHAR(50)  NOT NULL,
+    to_id             VARCHAR(50)  NOT NULL,
+    is_mute           INT(10)      NOT NULL DEFAULT 0 COMMENT '是否免打扰 1免打扰',
+    is_top            INT(10)      NOT NULL DEFAULT 0 COMMENT '是否置顶 1置顶',
+    sequence          BIGINT       NOT NULL DEFAULT 0 COMMENT 'sequence',
+    read_sequence     BIGINT       NOT NULL DEFAULT 0 COMMENT '已读最大消息id',
     app_id            INT(10)      NOT NULL,
     PRIMARY KEY (app_id, conversation_id)
 );
+
+INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('0_10001_10002', 0, '10001', '10002', 0, 0, 0, 0, 10001);
+INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('0_bantanger_10001', 0, 'bantanger', '10001', 0, 0, 0, 0, 10001);
+INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('0_bantanger_10002', 0, 'bantanger', '10002', 0, 0, 0, 0, 10001);
+INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('1_10001_27a35ff2f9be4cc9a8d3db1ad3322804', 0, '10001', '27a35ff2f9be4cc9a8d3db1ad3322804', 0, 0, 0, 0, 10001);
+INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('1_bantanger_27a35ff2f9be4cc9a8d3db1ad3322804', 0, 'bantanger', '27a35ff2f9be4cc9a8d3db1ad3322804', 0, 0, 0, 0, 10001);
+INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('1_10002_27a35ff2f9be4cc9a8d3db1ad3322804', 0, '10002', '27a35ff2f9be4cc9a8d3db1ad3322804', 0, 0, 0, 0, 10001);
 
 CREATE TABLE im_friendship
 (
@@ -32,44 +39,44 @@ CREATE TABLE im_friendship
     from_id         VARCHAR(50)   NOT NULL COMMENT 'from_id',
     to_id           VARCHAR(50)   NOT NULL COMMENT 'to_id',
     remark          VARCHAR(50)   NULL COMMENT '备注',
-    status          INT(10)       NULL COMMENT '状态 1正常 2删除',
-    black           INT(10)       NULL COMMENT '1正常 2拉黑',
+    status          INT(10)       NOT NULL DEFAULT 1 COMMENT '状态 1.正常 2.删除',
+    black           INT(10)       NOT NULL DEFAULT 1 COMMENT '1.正常 2.拉黑',
     create_time     BIGINT        NULL,
-    friend_sequence BIGINT        NULL,
-    black_sequence  BIGINT        NULL,
+    friend_sequence BIGINT        NOT NULL DEFAULT 1 COMMENT '好友申请序列id，保证按时间顺序排列',
+    black_sequence  BIGINT        NOT NULL DEFAULT 0 COMMENT '好友拉黑序列id，保证按时间顺序排列',
     add_source      VARCHAR(20)   NULL COMMENT '来源',
     extra           VARCHAR(1000) NULL COMMENT '来源',
     PRIMARY KEY (app_id, from_id, to_id)
 );
 
-INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black, create_time, friend_sequence, black_sequence, add_source, extra) VALUES (10001, '10001', '10002', 'minim tempor', 1, 1, 1680608016816, null, null, 'cillum', 'dolore fugiat');
-INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black, create_time, friend_sequence, black_sequence, add_source, extra) VALUES (10001, '10001', 'bantanger', 'minim tempor', 1, 1, 1680608016850, null, null, 'cillum', 'dolore fugiat');
-INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black, create_time, friend_sequence, black_sequence, add_source, extra) VALUES (10001, '10002', '10001', 'minim tempor', 1, 1, 1680608016850, null, null, 'cillum', 'dolore fugiat');
-INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black, create_time, friend_sequence, black_sequence, add_source, extra) VALUES (10001, '10002', 'bantanger', 'minim tempor', 1, 1, 1681024983443, 1, null, 'cillum', 'dolore fugiat');
-INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black, create_time, friend_sequence, black_sequence, add_source, extra) VALUES (10001, 'bantanger', '10001', 'minim tempor', 1, 1, 1680608016850, null, null, 'cillum', 'dolore fugiat');
-INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black, create_time, friend_sequence, black_sequence, add_source, extra) VALUES (10001, 'bantanger', '10002', 'minim tempor', 1, 1, 1681024987165, 1, null, 'cillum', 'dolore fugiat');
+INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black, create_time, friend_sequence, black_sequence, add_source, extra) VALUES (10001, '10001', '10002', 'minim tempor', 1, 1, 1680608016816, 1, 0, '二维码', '二维码扫描添加');
+INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black, create_time, friend_sequence, black_sequence, add_source, extra) VALUES (10001, '10002', '10001', 'minim tempor', 1, 1, 1680608016850, 1, 0, '二维码', '二维码扫描添加');
+INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black, create_time, friend_sequence, black_sequence, add_source, extra) VALUES (10001, '10001', 'bantanger', 'minim tempor', 1, 1, 1680608016850, 1, 0, '通讯录', '我是 xxx，一起认识一下吧');
+INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black, create_time, friend_sequence, black_sequence, add_source, extra) VALUES (10001, 'bantanger', '10001', 'minim tempor', 1, 1, 1680608016850, 1, 0, '通讯录', '我是 xxx，一起认识一下吧');
+INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black, create_time, friend_sequence, black_sequence, add_source, extra) VALUES (10001, '10002', 'bantanger', 'minim tempor', 1, 1, 1681024983443, 1, 0, 'ID搜索', '你好呀');
+INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black, create_time, friend_sequence, black_sequence, add_source, extra) VALUES (10001, 'bantanger', '10002', 'minim tempor', 1, 1, 1681024987165, 1, 0, 'ID搜索', '你好呀');
 
 CREATE TABLE im_friendship_group
 (
-    app_id      int(20)     null comment 'app_id',
-    from_id     varchar(50) null comment 'from_id',
-    group_id    int(50) auto_increment
-        primary key,
-    group_name  varchar(50) null,
-    sequence    bigint      null,
-    create_time bigint      null,
-    update_time bigint      null,
-    del_flag    int(10)     null,
-    constraint `UNIQUE`
-        unique (app_id, from_id, group_name)
-);
+    app_id      INT(20)     NOT NULL COMMENT 'app_id',
+    from_id     VARCHAR(50) NOT NULL comment 'from_id',
+    group_id    INT(50) AUTO_INCREMENT
+        PRIMARY KEY,
+    group_name  VARCHAR(50) NOT NULL DEFAULT '默认分组' comment '好友分组组名',
+    sequence    BIGINT      NOT NULL DEFAULT 0,
+    create_time BIGINT      NULL,
+    update_time BIGINT      NULL,
+    del_flag    INT(10)     NOT NULL DEFAULT 0,
+    CONSTRAINT `UNIQUE`
+        UNIQUE (app_id, from_id, group_name)
+) COMMENT '好友分组表';
 
 CREATE TABLE im_friendship_group_member
 (
     group_id BIGINT      NOT NULL
         PRIMARY KEY,
     to_id    VARCHAR(50) NULL
-);
+) COMMENT '好友分组成员表';
 
 CREATE TABLE im_friendship_request
 (
@@ -94,15 +101,11 @@ CREATE TABLE im_group
 (
     app_id           INT(20)       NOT NULL COMMENT 'app_id',
     group_id         VARCHAR(50)   NOT NULL COMMENT 'group_id',
-    owner_id         VARCHAR(50)   NOT NULL COMMENT '群主
-',
+    owner_id         VARCHAR(50)   NOT NULL COMMENT '群主',
     group_type       INT(10)       NULL COMMENT '群类型 1私有群（类似微信） 2公开群(类似QQ）',
     group_name       VARCHAR(100)  NULL,
     mute             INT(10)       NULL COMMENT '是否全员禁言，0 不禁言；1 全员禁言',
-    apply_join_type  INT(10)       NULL COMMENT '//    申请加群选项包括如下几种：
-//    0 表示禁止任何人申请加入
-//    1 表示需要群主或管理员审批
-//    2 表示允许无需审批自由加入群组',
+    apply_join_type  INT(10)       NULL COMMENT '0.禁止任何人申请加入, 1.表示需要群主或管理员审批, 2.表示允许无需审批自由加入群组',
     photo            VARCHAR(300)  NULL,
     max_member_count INT(20)       NULL,
     introduction     VARCHAR(100)  NULL COMMENT '群简介',
@@ -110,8 +113,8 @@ CREATE TABLE im_group
     status           INT(5)        NULL COMMENT '群状态 0正常 1解散',
     sequence         BIGINT        NULL,
     create_time      BIGINT        NULL,
-    extra            VARCHAR(1000) NULL COMMENT '来源',
     update_time      BIGINT        NULL,
+    extra            VARCHAR(1000) NULL COMMENT '来源',
     PRIMARY KEY (APP_ID, GROUP_ID)
 );
 
@@ -136,8 +139,6 @@ CREATE TABLE im_group_member
     extra           VARCHAR(1000) NULL
 );
 
-INSERT INTO im_core.im_group_member (group_member_id, group_id, app_id, member_id, role, speak_date, mute, alias, join_time, leave_time, join_type, extra) VALUES (1, '9122c352bbcb411f9a6cb365961dced3', 10001, '10002', 1, 20180210, null, 'consectetur quis nisi labore', 1679400643055, null, null, null);
-INSERT INTO im_core.im_group_member (group_member_id, group_id, app_id, member_id, role, speak_date, mute, alias, join_time, leave_time, join_type, extra) VALUES (2, '9122c352bbcb411f9a6cb365961dced3', 10001, '10003', 1, 20170202, null, 'ipsum nisi magna est laboris', 1679400643080, null, null, null);
 INSERT INTO im_core.im_group_member (group_member_id, group_id, app_id, member_id, role, speak_date, mute, alias, join_time, leave_time, join_type, extra) VALUES (3, '27a35ff2f9be4cc9a8d3db1ad3322804', 10001, '10001', 1, null, null, null, 1679400643080, null, null, null);
 INSERT INTO im_core.im_group_member (group_member_id, group_id, app_id, member_id, role, speak_date, mute, alias, join_time, leave_time, join_type, extra) VALUES (4, '27a35ff2f9be4cc9a8d3db1ad3322804', 10001, '10002', 0, null, null, null, 1679400643080, null, null, null);
 INSERT INTO im_core.im_group_member (group_member_id, group_id, app_id, member_id, role, speak_date, mute, alias, join_time, leave_time, join_type, extra) VALUES (5, '27a35ff2f9be4cc9a8d3db1ad3322804', 10001, 'bantanger', 2, 20200411, null, 'sit reprehenderit', 1681471124554, null, 'id', null);

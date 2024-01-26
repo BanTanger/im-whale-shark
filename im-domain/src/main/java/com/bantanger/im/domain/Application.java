@@ -9,13 +9,13 @@ import org.springframework.context.annotation.FilterType;
 @SpringBootApplication(scanBasePackages = {"com.bantanger.im.service", "com.bantanger.im.domain"})
 @MapperScan("com.bantanger.im.domain.*.dao.mapper")
 @ComponentScan(
-        basePackages = "com.bantanger.im",
-        excludeFilters = {
-                @ComponentScan.Filter(
-                        type = FilterType.REGEX,
-                        pattern = "com\\.bantanger\\.im\\.service\\..*\\.extensionpost\\.impl\\..*"
-                )
-        }
+    basePackages = "com.bantanger.im",
+    excludeFilters = {
+        @ComponentScan.Filter(
+                type = FilterType.REGEX,
+                pattern = "com\\.bantanger\\.im\\.service\\..*\\.extensionpost\\.impl\\..*"
+        )
+    }
 )
 public class Application {
 

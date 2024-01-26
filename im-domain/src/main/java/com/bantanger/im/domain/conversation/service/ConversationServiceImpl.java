@@ -13,6 +13,7 @@ import com.bantanger.im.common.model.SyncResp;
 import com.bantanger.im.common.model.message.read.MessageReadContent;
 import com.bantanger.im.domain.conversation.dao.ImConversationSetEntity;
 import com.bantanger.im.domain.conversation.dao.mapper.ImConversationSetMapper;
+import com.bantanger.im.domain.conversation.model.CreateConversationReq;
 import com.bantanger.im.domain.conversation.model.DeleteConversationReq;
 import com.bantanger.im.domain.conversation.model.UpdateConversationReq;
 import com.bantanger.im.domain.message.seq.RedisSequence;
@@ -24,7 +25,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -41,26 +42,34 @@ public class ConversationServiceImpl implements ConversationService {
     private final UserSequenceRepository userSequenceRepository;
     private final ImConversationSetMapper imConversationSetMapper;
 
-    public String convertConversationId(Integer type, String fromId, String toId) {
-        return type + "_" + fromId + "_" + toId;
+    @Override
+    public ResponseVO createConversation(@Valid CreateConversationReq req) {
+        Integer conversationType = req.getConversationType();
+        String conversationId = ConversationService.convertConversationId(
+                conversationType, req.getFromId(), req.getToId());
+
+        // 创建双方会话
+        ImConversationSetEntity imConversationSetEntity = new ImConversationSetEntity();
+        imConversationSetEntity.setAppId(req.getAppId());
+        imConversationSetEntity.setFromId(req.getFromId());
+        imConversationSetEntity.setToId(req.getToId());
+        imConversationSetEntity.setConversationId(conversationId);
+        imConversationSetEntity.setConversationType(conversationType);
+        int insert = imConversationSetMapper.insert(imConversationSetEntity);
+        if (insert != 1) {
+            return ResponseVO.errorResponse(ConversationErrorCode.CONVERSATION_CREATE_FAIL);
+        }
+        return ResponseVO.successResponse();
     }
 
     @Override
     public void messageMarkRead(MessageReadContent messageReadContent) {
         // 抽离 toId, 有不同情况
-        // 会话类型为单聊，toId 赋值为目标用户
-        String toId = messageReadContent.getToId();
-        if (ConversationTypeEnum.GROUP.getCode().equals(messageReadContent.getConversationType())) {
-            // 会话类型为群聊，toId 赋值为 groupId
-            toId = messageReadContent.getGroupId();
-        }
+        String toId = getToIdOrGroupId(messageReadContent);
+
         // conversationId: 1_fromId_toId
-        String conversationId = convertConversationId(
+        String conversationId = ConversationService.convertConversationId(
                 messageReadContent.getConversationType(), messageReadContent.getFromId(), toId);
-        QueryWrapper<ImConversationSetEntity> query = new QueryWrapper<>();
-        query.eq("app_id", messageReadContent.getAppId());
-        query.eq("conversation_id", conversationId);
-        ImConversationSetEntity imConversationSetEntity = imConversationSetMapper.selectOne(query);
 
         /* key：appid + Seq
          * 这是因为 conversation seq 是为了对所有会话进行排序的，
@@ -70,34 +79,15 @@ public class ConversationServiceImpl implements ConversationService {
         long seq = redisSequence.doGetSeq(
                 messageReadContent.getAppId() + Constants.SeqConstants.ConversationSeq);
 
-        if (imConversationSetEntity == null) {
-            // 如果查询记录为空，代表不存在该会话，需要新建
-            imConversationSetEntity = new ImConversationSetEntity();
+        imConversationSetMapper.readMark(buildReadMarkModel(messageReadContent, conversationId, seq));
 
-            imConversationSetEntity.setConversationId(conversationId);
-            imConversationSetEntity.setSequence(seq);
-            imConversationSetEntity.setConversationType(messageReadContent.getConversationType());
-            imConversationSetEntity.setFromId(messageReadContent.getFromId());
-            imConversationSetEntity.setToId(toId);
-            imConversationSetEntity.setAppId(messageReadContent.getAppId());
-            imConversationSetEntity.setReadSequence(messageReadContent.getMessageSequence());
-
-            imConversationSetMapper.insert(imConversationSetEntity);
-
-            userSequenceRepository.writeUserSeq(messageReadContent.getAppId(),
-                    messageReadContent.getFromId(), Constants.SeqConstants.ConversationSeq, seq);
-        } else {
-            imConversationSetEntity.setSequence(seq);
-            imConversationSetEntity.setReadSequence(messageReadContent.getMessageSequence());
-            imConversationSetMapper.readMark(imConversationSetEntity);
-
-            userSequenceRepository.writeUserSeq(messageReadContent.getAppId(),
-                    messageReadContent.getFromId(), Constants.SeqConstants.ConversationSeq, seq);
-        }
+        userSequenceRepository.writeUserSeq(messageReadContent.getAppId(),
+                messageReadContent.getFromId(), Constants.SeqConstants.ConversationSeq, seq);
     }
 
+
     @Override
-    public ResponseVO deleteConversation(DeleteConversationReq req) {
+    public ResponseVO deleteConversation(@Valid DeleteConversationReq req) {
         if (appConfig.getDeleteConversationSyncMode() == 1) {
             DeleteConversationPack pack = new DeleteConversationPack();
             pack.setConversationId(req.getConversationId());
@@ -110,7 +100,7 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
-    public ResponseVO updateConversation(UpdateConversationReq req) {
+    public ResponseVO updateConversation(@Valid UpdateConversationReq req) {
         if (req.getIsTop() == null && req.getIsMute() == null) {
             return ResponseVO.errorResponse(ConversationErrorCode.CONVERSATION_UPDATE_PARAM_ERROR);
         }
@@ -132,7 +122,7 @@ public class ConversationServiceImpl implements ConversationService {
             imConversationSetMapper.update(imConversationSetEntity, query);
 
             userSequenceRepository.writeUserSeq(req.getAppId(),
-                    req.getFromId(), Constants.SeqConstants.ConversationSeq, seq);
+            req.getFromId(), Constants.SeqConstants.ConversationSeq, seq);
 
             UpdateConversationPack pack = new UpdateConversationPack();
             pack.setConversationId(req.getConversationId());
@@ -141,13 +131,12 @@ public class ConversationServiceImpl implements ConversationService {
             pack.setSequence(seq);
             pack.setConversationType(imConversationSetEntity.getConversationType());
             messageProducer.sendToUserExceptClient(req.getFromId(),
-                    ConversationEventCommand.CONVERSATION_UPDATE,
-                    pack, new ClientInfo(req.getAppId(), req.getClientType(),
-                            req.getImei()));
+            ConversationEventCommand.CONVERSATION_UPDATE,
+            pack, new ClientInfo(req.getAppId(), req.getClientType(),
+            req.getImei()));
         }
         return ResponseVO.successResponse();
     }
-
     @Override
     public ResponseVO syncConversationSet(SyncReq req) {
         if (req.getMaxLimit() > appConfig.getConversationMaxCount()) {
@@ -177,5 +166,24 @@ public class ConversationServiceImpl implements ConversationService {
         }
         resp.setCompleted(true);
         return ResponseVO.successResponse(resp);
+    }
+
+    private static ImConversationSetEntity buildReadMarkModel(MessageReadContent messageReadContent, String conversationId, long seq) {
+        ImConversationSetEntity imConversationSetEntity = new ImConversationSetEntity();
+        imConversationSetEntity.setAppId(messageReadContent.getAppId());
+        imConversationSetEntity.setConversationId(conversationId);
+        imConversationSetEntity.setSequence(seq);
+        imConversationSetEntity.setReadSequence(messageReadContent.getMessageSequence());
+        return imConversationSetEntity;
+    }
+
+    private static String getToIdOrGroupId(MessageReadContent messageReadContent) {
+        // 会话类型为单聊，toId 赋值为目标用户
+        String toId = messageReadContent.getToId();
+        if (ConversationTypeEnum.GROUP.getCode().equals(messageReadContent.getConversationType())) {
+            // 会话类型为群聊，toId 赋值为 groupId
+            toId = messageReadContent.getGroupId();
+        }
+        return toId;
     }
 }
