@@ -157,10 +157,10 @@ CREATE TABLE im_group_message_history
 CREATE TABLE im_message_body
 (
     app_id       INT(10)       NOT NULL,
-    message_key  BIGINT(50)    NOT NULL
+    message_key  BIGINT(50)    NOT NULL COMMENT 'messageBodyId'
         PRIMARY KEY,
     message_body VARCHAR(5000) NULL,
-    security_key VARCHAR(100)  NULL,
+    security_key VARCHAR(100)  NULL COMMENT '加密密钥',
     message_time BIGINT        NULL,
     create_time  BIGINT        NULL,
     extra        VARCHAR(1000) NULL,
