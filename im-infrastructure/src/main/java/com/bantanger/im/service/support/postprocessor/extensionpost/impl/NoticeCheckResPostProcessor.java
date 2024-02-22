@@ -41,7 +41,8 @@ public class NoticeCheckResPostProcessor implements CheckLegalMsgPostProcessor {
 
         if (responseVO.isOk()) {
             // 如果成功就投递到 MQ
-            MqMessageProducer.sendMessage(feignDataBO.getMsg());
+            MqMessageProducer.sendMessage(feignDataBO.getMsg(),
+                    feignDataBO.getMsg().getMessageHeader().getCommand());
         } else {
             // 如果失败就发送 ACK 失败响应报文
             ChatMessageAck chatMessageAck = new ChatMessageAck(msgPack.getString(MSG_ID));

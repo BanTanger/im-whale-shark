@@ -14,6 +14,8 @@ import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
 import com.bantanger.im.service.strategy.command.model.CommandExecution;
 import io.netty.channel.ChannelHandlerContext;
 
+import static com.bantanger.im.common.constant.Constants.MsgPackConstants.*;
+
 /**
  * TCP 层校验消息发送方合法性
  * @author BanTanger 半糖
@@ -31,8 +33,8 @@ public class P2PMsgCommand extends BaseCommandStrategy {
         req.setAppId(msg.getMessageHeader().getAppId());
         req.setCommand(msg.getMessageHeader().getCommand());
         JSONObject jsonObject = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()));
-        String fromId = jsonObject.getString("fromId");
-        String toId = jsonObject.getString("toId");
+        String fromId = jsonObject.getString(FROM_ID);
+        String toId = jsonObject.getString(TO_ID);
         req.setFromId(fromId);
         req.setToId(toId);
 
@@ -43,7 +45,7 @@ public class P2PMsgCommand extends BaseCommandStrategy {
             MqMessageProducer.sendMessage(msg, req.getCommand());
         } else {
             // 3. 如果失败就发送 ACK 失败响应报文
-            ChatMessageAck chatMessageAck = new ChatMessageAck(jsonObject.getString("messageId"));
+            ChatMessageAck chatMessageAck = new ChatMessageAck(jsonObject.getString(MSG_ID));
             responseVO.setData(chatMessageAck);
             MessagePack<ResponseVO> ack = new MessagePack<>();
             ack.setData(responseVO);

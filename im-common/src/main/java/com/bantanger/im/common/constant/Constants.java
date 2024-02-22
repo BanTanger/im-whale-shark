@@ -137,6 +137,7 @@ public class Constants {
     }
 
     public static class SeqConstants {
+
         // 保证消息有序性 Key
         /** 单聊消息有序 */
         public static final String MessageSeq = ":messageSeq:";
@@ -154,6 +155,18 @@ public class Constants {
         public static final String FriendShipGroupSeq = "friendShipGroupSeq";
         /** 群聊数量记录 */
         public static final String GroupSeq = "groupSeq";
+
+    }
+
+    public static class MsgPackConstants {
+
+        public static final String FROM_ID = "fromId";
+
+        public static final String TO_ID = "toId";
+
+        public static final String GROUP_ID = "groupId";
+
+        public static final String MSG_ID = "messageId";
 
     }
 
