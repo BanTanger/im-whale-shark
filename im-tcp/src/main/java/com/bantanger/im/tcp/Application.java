@@ -2,6 +2,7 @@ package com.bantanger.im.tcp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * =================================== IM-WhaleShark ========================================
@@ -24,6 +25,9 @@ public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
+        GenericApplicationContext context = new GenericApplicationContext();
+        // 允许Bean覆盖，后面的BeanDefinition能覆盖前面的
+        context.setAllowBeanDefinitionOverriding(true) ;
     }
 
 }

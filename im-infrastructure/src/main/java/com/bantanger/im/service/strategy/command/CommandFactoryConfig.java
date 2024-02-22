@@ -8,7 +8,6 @@ import com.bantanger.im.service.strategy.command.system.LoginCommand;
 import com.bantanger.im.service.strategy.command.system.LogoutCommand;
 import com.bantanger.im.service.strategy.command.system.PingCommand;
 
-import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,7 +27,6 @@ public class CommandFactoryConfig {
     private static final PingCommand PING_COMMAND = new PingCommand();
     private static final CheckLegalMsgCommand CHECK_LEGAL_MSG_COMMAND = new CheckLegalMsgCommand();
 
-    @PostConstruct
     public static void init() {
         // 系统命令策略
         commandStrategyMap.put(SystemCommand.LOGIN.getCommand(), LOGIN_COMMAND);
