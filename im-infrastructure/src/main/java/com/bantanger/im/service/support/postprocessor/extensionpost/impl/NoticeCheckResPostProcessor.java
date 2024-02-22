@@ -1,4 +1,4 @@
-package com.bantanger.im.service.strategy.command.message.extensionpost.impl;
+package com.bantanger.im.service.support.postprocessor.extensionpost.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -7,8 +7,8 @@ import com.bantanger.im.codec.proto.MessagePack;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.command.MessageCommand;
 import com.bantanger.im.service.rabbitmq.publish.MqMessageProducer;
-import com.bantanger.im.service.strategy.command.message.extensionpost.CheckLegalMsgPostProcessor;
-import com.bantanger.im.service.strategy.command.message.extensionpost.FeignDataBO;
+import com.bantanger.im.service.support.postprocessor.extensionpost.CheckLegalMsgPostProcessor;
+import com.bantanger.im.service.support.postprocessor.extensionpost.FeignDataBO;
 import com.bantanger.im.service.utils.BeanPostProcessorUtil;
 import com.bantanger.im.service.support.postprocessor.PostContext;
 import org.springframework.context.annotation.Configuration;
@@ -18,10 +18,12 @@ import javax.annotation.PostConstruct;
 import static com.bantanger.im.common.constant.Constants.MsgPackConstants.MSG_ID;
 
 /**
+ * 【已废弃】
  * 校验消息是否合法的后继通知扩展点
  * @author BanTanger 半糖
  * @Date 2023/12/17 0:15
  */
+@Deprecated
 @Configuration
 public class NoticeCheckResPostProcessor implements CheckLegalMsgPostProcessor {
 
