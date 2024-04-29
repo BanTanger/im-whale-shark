@@ -164,7 +164,7 @@ public class Constants {
 
         public static final String TO_ID = "toId";
 
-        public static final String GROUP_ID = "toId";
+        public static final String GROUP_ID = "groupId";
 
         public static final String MSG_ID = "messageId";
 

@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 # Be sure your script exits whenever encounter errors
+
+echo "--------------------------------"
+echo "::: Welcome to IM-WhaleShark :::"
+
 set -e
 # Be sure your charset is correct. eg: zh_CN.UTF-8
 export LC_ALL=en_US.UTF-8

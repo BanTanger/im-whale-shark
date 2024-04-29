@@ -2,30 +2,30 @@ package com.bantanger.im.domain.friendship.service.impl;
 
 import com.bantanger.im.codec.pack.friendship.ApproverFriendRequestPack;
 import com.bantanger.im.codec.pack.friendship.ReadAllFriendRequestPack;
+import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.FriendshipEventCommand;
+import com.bantanger.im.common.enums.friend.ApproverFriendRequestStatusEnum;
 import com.bantanger.im.common.enums.friend.FriendShipErrorCode;
+import com.bantanger.im.common.exception.ApplicationException;
 import com.bantanger.im.domain.friendship.dao.ImFriendShipRequestEntity;
 import com.bantanger.im.domain.friendship.dao.mapper.ImFriendShipRequestMapper;
-import com.bantanger.im.domain.friendship.service.ImFriendService;
-import com.bantanger.im.domain.message.seq.RedisSequence;
-import com.bantanger.im.service.sendmsg.MessageProducer;
-import com.bantanger.im.service.utils.UserSequenceRepository;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.bantanger.im.common.ResponseVO;
-import com.bantanger.im.common.enums.friend.ApproverFriendRequestStatusEnum;
-import com.bantanger.im.common.exception.ApplicationException;
 import com.bantanger.im.domain.friendship.model.req.ApprovalFriendRequestReq;
 import com.bantanger.im.domain.friendship.model.req.friend.FriendDto;
 import com.bantanger.im.domain.friendship.model.req.friend.ReadFriendShipRequestReq;
+import com.bantanger.im.domain.friendship.service.ImFriendService;
 import com.bantanger.im.domain.friendship.service.ImFriendShipRequestService;
+import com.bantanger.im.domain.message.seq.RedisSequence;
+import com.bantanger.im.service.sendmsg.MessageProducer;
+import com.bantanger.im.service.utils.UserSequenceRepository;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
-
 
 @Service
 public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestService {
@@ -48,24 +48,23 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
     @Override
     public ResponseVO getFriendRequest(String fromId, Integer appId) {
 
-        QueryWrapper<ImFriendShipRequestEntity> query = new QueryWrapper();
-        query.eq("app_id", appId);
-        query.eq("to_id", fromId);
-
-        List<ImFriendShipRequestEntity> requestList = imFriendShipRequestMapper.selectList(query);
+        List<ImFriendShipRequestEntity> requestList = imFriendShipRequestMapper.selectList(
+                new LambdaQueryWrapper<ImFriendShipRequestEntity>()
+                        .eq(ImFriendShipRequestEntity::getAppId, appId)
+                        .eq(ImFriendShipRequestEntity::getToId, fromId));
 
         return ResponseVO.successResponse(requestList);
     }
 
     //A + B
     @Override
-    public ResponseVO addFienshipRequest(String fromId, FriendDto dto, Integer appId) {
+    public ResponseVO addFriendshipRequest(String fromId, FriendDto dto, Integer appId) {
 
-        QueryWrapper<ImFriendShipRequestEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("app_id", appId);
-        queryWrapper.eq("from_id", fromId);
-        queryWrapper.eq("to_id", dto.getToId());
-        ImFriendShipRequestEntity request = imFriendShipRequestMapper.selectOne(queryWrapper);
+        ImFriendShipRequestEntity request = imFriendShipRequestMapper.selectOne(
+                new LambdaQueryWrapper<ImFriendShipRequestEntity>()
+                        .eq(ImFriendShipRequestEntity::getAppId, appId)
+                        .eq(ImFriendShipRequestEntity::getFromId, fromId)
+                        .eq(ImFriendShipRequestEntity::getToId, dto.getToId()));
 
         long seq = redisSequence.doGetSeq(appId + ":" +
                 Constants.SeqConstants.FriendShipRequestSeq);
@@ -86,7 +85,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
             imFriendShipRequestMapper.insert(request);
         } else {
             //修改记录内容和更新时间
-            if(StringUtils.isNotBlank(dto.getAddSource())){
+            if (StringUtils.isNotBlank(dto.getAddSource())) {
                 request.setAddWording(dto.getAddWording());
             }
             if (StringUtils.isNotBlank(dto.getRemark())) {
@@ -114,7 +113,10 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
     @Transactional
     public ResponseVO approvalFriendRequest(ApprovalFriendRequestReq req) {
 
-        ImFriendShipRequestEntity imFriendShipRequestEntity = imFriendShipRequestMapper.selectById(req.getId());
+        ImFriendShipRequestEntity imFriendShipRequestEntity = imFriendShipRequestMapper.selectOne(
+                new LambdaQueryWrapper<ImFriendShipRequestEntity>()
+                        .eq(ImFriendShipRequestEntity::getId, req.getId())
+                        .eq(ImFriendShipRequestEntity::getApproveStatus, ApproverFriendRequestStatusEnum.NORMAL.getCode()));
         if (imFriendShipRequestEntity == null) {
             throw new ApplicationException(FriendShipErrorCode.FRIEND_REQUEST_IS_NOT_EXIST);
         }
@@ -164,9 +166,6 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
 
     @Override
     public ResponseVO readFriendShipRequestReq(ReadFriendShipRequestReq req) {
-        QueryWrapper<ImFriendShipRequestEntity> query = new QueryWrapper<>();
-        query.eq("app_id", req.getAppId());
-        query.eq("to_id", req.getFromId());
 
         long seq = redisSequence.doGetSeq(req.getAppId() + ":" +
                 Constants.SeqConstants.FriendShipRequestSeq);
@@ -174,7 +173,9 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         ImFriendShipRequestEntity update = new ImFriendShipRequestEntity();
         update.setReadStatus(1);
         update.setSequence(seq);
-        imFriendShipRequestMapper.update(update, query);
+        imFriendShipRequestMapper.update(update, new LambdaUpdateWrapper<ImFriendShipRequestEntity>()
+                .eq(ImFriendShipRequestEntity::getAppId, req.getAppId())
+                .eq(ImFriendShipRequestEntity::getToId, req.getFromId()));
 
         userSequenceRepository.writeUserSeq(req.getAppId(),
                 req.getOperater(), Constants.SeqConstants.FriendShipRequestSeq, seq);

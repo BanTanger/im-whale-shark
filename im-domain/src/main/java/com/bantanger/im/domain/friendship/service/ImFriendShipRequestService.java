@@ -18,7 +18,7 @@ public interface ImFriendShipRequestService {
      * @param appId
      * @return
      */
-    ResponseVO addFienshipRequest(String fromId, FriendDto dto, Integer appId);
+    ResponseVO addFriendshipRequest(String fromId, FriendDto dto, Integer appId);
 
     /**
      * 好友审批

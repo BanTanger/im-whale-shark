@@ -3,6 +3,11 @@ package com.bantanger.im.common.enums.friend;
 public enum ApproverFriendRequestStatusEnum {
 
     /**
+     * 默认状态
+     */
+    NORMAL(0),
+
+    /**
      * 1 同意；2 拒绝。
      */
     AGREE(1),

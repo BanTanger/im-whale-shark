@@ -28,7 +28,6 @@ public class ImFriendShipGroupController {
     @Resource
     ImFriendShipGroupMemberService imFriendShipGroupMemberService;
 
-
     @RequestMapping("/add")
     public ResponseVO add(@RequestBody @Validated AddFriendShipGroupReq req, Integer appId)  {
         req.setAppId(appId);

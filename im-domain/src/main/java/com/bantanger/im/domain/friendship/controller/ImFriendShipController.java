@@ -45,80 +45,112 @@ public class ImFriendShipController {
      * }
      */
     @PostMapping("/importFriendShip")
-    public ResponseVO importFriendShip(@RequestBody @Validated ImportFriendShipReq req, Integer appId){
-        req.setAppId(appId);
+    public ResponseVO importFriendShip(@RequestBody @Validated ImportFriendShipReq req){
         return imFriendShipService.importFriendShip(req);
     }
 
-    @RequestMapping("/addFriend")
-    public ResponseVO addFriend(@RequestBody @Validated AddFriendReq req, Integer appId){
-        req.setAppId(appId);
+    /**
+     * 添加好友逻辑
+     * 分两种情况，如果对方设置好友验证，会走发送好友申请逻辑；否则直接添加双方强好友关系
+     * 数据库内置数据 bantanger 开启好友验证，其余 10001 ~ 10009 均未开启
+     * <br/> 情况一：添加未开启好友验证的用户
+     * <pre>
+     * curl -X POST \
+     *   http://localhost:18000/v1/friendship/addFriend \
+     *   -H 'Content-Type: application/json' \
+     *   -d '{
+     *     "fromId": "bantanger",
+     *     "toItem": {
+     *       "toId": "10004",
+     *       "remark": "你好，我叫 bantanger",
+     *       "addSource": "个人搜索",
+     *       "addWording": "你好，我叫 bantanger"
+     *     },
+     *     "appId": 10001,
+     *     "operater": "bantanger",
+     *     "clientType": 2,
+     *     "imei": "200"
+     *   }'
+     * </pre>
+     * <br/> 情况二：添加开启好友验证的用户
+     * <pre>
+     * curl -X POST \
+     *   http://localhost:18000/v1/friendship/addFriend \
+     *   -H 'Content-Type: application/json' \
+     *   -d '{
+     *     "fromId": "10005",
+     *     "toItem": {
+     *       "toId": "bantanger",
+     *       "remark": "你好，我叫 10005",
+     *       "addSource": "二维码",
+     *       "addWording": "你好，我叫 10005"
+     *     },
+     *     "appId": 10001,
+     *     "operater": "10005",
+     *     "clientType": 2,
+     *     "imei": "200"
+     *   }'
+     * </pre>
+     * @param req
+     * @return
+     */
+    @PostMapping("/addFriend")
+    public ResponseVO addFriend(@RequestBody @Validated AddFriendReq req){
         return imFriendShipService.addFriend(req);
     }
 
-    @RequestMapping("/updateFriend")
-    public ResponseVO updateFriend(@RequestBody @Validated UpdateFriendReq req, Integer appId){
-        req.setAppId(appId);
+    @PostMapping("/updateFriend")
+    public ResponseVO updateFriend(@RequestBody @Validated UpdateFriendReq req){
         return imFriendShipService.updateFriend(req);
     }
 
-    @RequestMapping("/deleteFriend")
-    public ResponseVO deleteFriend(@RequestBody @Validated DeleteFriendReq req, Integer appId){
-        req.setAppId(appId);
+    @PostMapping("/deleteFriend")
+    public ResponseVO deleteFriend(@RequestBody @Validated DeleteFriendReq req){
         return imFriendShipService.deleteFriend(req);
     }
 
-    @RequestMapping("/deleteAllFriend")
-    public ResponseVO deleteAllFriend(@RequestBody @Validated DeleteFriendReq req, Integer appId){
-        req.setAppId(appId);
+    @PostMapping("/deleteAllFriend")
+    public ResponseVO deleteAllFriend(@RequestBody @Validated DeleteFriendReq req){
         return imFriendShipService.deleteAllFriend(req);
     }
 
-    @RequestMapping("/getAllFriendShip")
-    public ResponseVO getAllFriendShip(@RequestBody @Validated GetAllFriendShipReq req, Integer appId){
-        req.setAppId(appId);
+    @PostMapping("/getAllFriendShip")
+    public ResponseVO getAllFriendShip(@RequestBody @Validated GetAllFriendShipReq req){
         return imFriendShipService.getAllFriendShip(req);
     }
 
-    @RequestMapping("/getRelation")
-    public ResponseVO getRelation(@RequestBody @Validated GetRelationReq req, Integer appId){
-        req.setAppId(appId);
+    @PostMapping("/getRelation")
+    public ResponseVO getRelation(@RequestBody @Validated GetRelationReq req){
         return imFriendShipService.getRelation(req);
     }
 
     @PostMapping("/checkFriend")
-    public ResponseVO checkFriend(@RequestBody @Validated CheckFriendShipReq req, Integer appId){
-        req.setAppId(appId);
+    public ResponseVO checkFriend(@RequestBody @Validated CheckFriendShipReq req){
         return imFriendShipService.checkFriendship(req);
     }
 
-    @RequestMapping("/addBlack")
-    public ResponseVO addBlack(@RequestBody @Validated AddFriendShipBlackReq req, Integer appId){
-        req.setAppId(appId);
+    @PostMapping("/addBlack")
+    public ResponseVO addBlack(@RequestBody @Validated AddFriendShipBlackReq req){
         return imFriendShipService.addBlack(req);
     }
 
-    @RequestMapping("/deleteBlack")
-    public ResponseVO deleteBlack(@RequestBody @Validated DeleteBlackReq req, Integer appId){
-        req.setAppId(appId);
+    @PostMapping("/deleteBlack")
+    public ResponseVO deleteBlack(@RequestBody @Validated DeleteBlackReq req){
         return imFriendShipService.deleteBlack(req);
     }
 
-    @RequestMapping("/checkBlck")
-    public ResponseVO checkBlck(@RequestBody @Validated CheckFriendShipReq req, Integer appId){
-        req.setAppId(appId);
+    @PostMapping("/checkBlck")
+    public ResponseVO checkBlck(@RequestBody @Validated CheckFriendShipReq req){
         return imFriendShipService.checkBlck(req);
     }
 
     /**
      * 同步好友列表
      * @param req
-     * @param appId
      * @return
      */
-    @RequestMapping("/syncFriendShipList")
-    public ResponseVO syncFriendShipList(@RequestBody @Validated SyncReq req, Integer appId){
-        req.setAppId(appId);
+    @PostMapping("/syncFriendShipList")
+    public ResponseVO syncFriendShipList(@RequestBody @Validated SyncReq req){
         return imFriendShipService.syncFriendShipList(req);
     }
 
