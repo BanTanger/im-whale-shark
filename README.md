@@ -147,7 +147,7 @@ docker run -d --name zookeeper -p 2181:2181 zookeeper
 ```
 rabbitmq:
 ```shell
-docker run -d -p 5672:5672 -p 15672:15672 --name rabbitmq
+docker run -d -p 5672:5672 -p 15672:15672 rabbitmq
 ```
 + 其中 15672 端口是连接 web 端页面的, 5672 端口是 Java 后端程序访问 rabbitmq 的
 

@@ -66,7 +66,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
                 // 执行策略
                 commandStrategy.systemStrategy(commandExecution);
             } else {
-                MqMessageProducer.sendMessage(msg, command);
+                MqMessageProducer.sendMessage(msg);
             }
         } finally {
             // 将对象归还给对象池
