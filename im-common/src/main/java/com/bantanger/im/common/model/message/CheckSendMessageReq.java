@@ -1,7 +1,9 @@
 package com.bantanger.im.common.model.message;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 这个 Controller 层的请求体放在 Common 层，供 TCP 层调度
@@ -10,6 +12,8 @@ import lombok.Data;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CheckSendMessageReq {
 
     private String fromId;

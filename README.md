@@ -159,7 +159,7 @@ docker run -d -p 5672:5672 -p 15672:15672 rabbitmq
 
 注意 tcp Application 方式启动需要配置 parameter args 
 
-![img.png](assert/design/photo/tcp模块Application方式启动需要配置paramargs.png)
+![img.png](/assert/design/photo/tcp模块Application方式启动需要配置paramargs.png)
 
 [//]: # (### py 脚本测试)
 
@@ -176,11 +176,11 @@ Docker 部署测试请访问 `localhost:19000`
 
 浏览方式通过 F12 查看服务端发送的 `json` 格式是否正确
 
-![](assert/design/photo/websocket窗口功能讲解.png)
+![](/assert/design/photo/websocket窗口功能讲解.png)
 
 如图所示: 平台 [appId = 10001] 的用户 [userId = 10001, clientType = 3, imei = 200] 在登录 Login 之后向群组 [groupId = 27a35ff2f9be4cc9a8d3db1ad3322804] 通过操作指令`群发模式`[command = 2104] 发送一条群组消息
 
-![websocket功能测试](assert/design/photo/websocket功能测试.png)
+![websocket功能测试](/assert/design/photo/websocket功能测试.png)
 
 ## 架构设计
 ### 私有协议
@@ -218,7 +218,7 @@ IM 的私有协议确立信息如下：
 
 
 ### 消息投递过程
-![一条消息的流转](assert/design/photo/消息流转.png)
+![一条消息的流转](/assert/design/photo/消息流转.png)
 
 流程如下：
 1. 客户端 userA 发送一条消息到服务器, 消息通过私有协议转化为二进制序列化, 通过 TCP 三次握手保证消息在传输层的稳定性（上下行 ACK 保证消息在应用层的稳定性 ）
@@ -240,7 +240,7 @@ IM 的私有协议确立信息如下：
 > 但如果让各个 Netty 节点之间两两也建立起 socket 连接，那么就可以实现基于 TCP、UDP 连接的消息投递
 
 ### 路由层
-![分布式路由层](assert/design/photo/分布式路由层.png)
+![分布式路由层](/assert/design/photo/分布式路由层.png)
 
 由于使用了分布式, 用户的信息会因为负载均衡分布在不同的服务器上，怎么保证多 Channel 的跨节点通讯就显得额外的重要。
 
@@ -270,7 +270,7 @@ IM 的私有协议确立信息如下：
 
 ### 读写扩散模型
 #### 写扩散
-![写扩散](assert/design/photo/写扩散.png)
+![写扩散](/assert/design/photo/写扩散.png)
 + 在架构中, 单聊会话消息采用写扩散
 
 写扩散优缺：
@@ -288,7 +288,7 @@ IM 的私有协议确立信息如下：
 + 先写扩散后读，实时性差。
 
 #### 读扩散
-![读扩散](assert/design/photo/读扩散.png)
+![读扩散](/assert/design/photo/读扩散.png)
 + 在架构中, 群聊会话消息采用读扩散
 
 读扩散优缺：
@@ -308,21 +308,21 @@ IM 的私有协议确立信息如下：
 #### 多端消息同步的弊端：
 由于 WhaleShark 实现了用户多端同步，因此需要保证一条消息既同步给发送方的其他端，又得保证消息能发送给目标对象的所有端。一条消息的处理流程如下：
 
-![多端消息同步的弊端](assert/design/photo/多端消息同步的弊端.png)
+![多端消息同步的弊端](/assert/design/photo/多端消息同步的弊端.png)
 
 如架构图所演示，一条消息如图所示就裂变成三条消息了，如果说端的类型更多 (设计上是有六种端: Windows、Mac、Web、Android、IOS、WebApi) 但实际上我们基本是通过 WebApi 来接收消息, 再同步给其他端，也就需要裂变出 `5 * 5 - 1 = 24` 条消息
 
 一口气发送如此多条消息对于服务器来说，压力是巨大的，因此我们需要重新设计一些策略来实现消息同步
 
 #### 多端消息同步改进：
-![多端消息同步改进](assert/design/photo/多端消息同步改进.png)
+![多端消息同步改进](/assert/design/photo/多端消息同步改进.png)
 1. 发送方 userA 发送消息给服务端
 2. 服务端接收发送方的消息之后向发送方回应消息接收确认 ACK 数据包表示服务端已经成功接收消息
 3. 先将消息同步给发送方其他端（在线端使用 TCP 通知投递，离线端存储最新的 1000 条数据到离线消息队列里）
 4. 发送消息给接收方所有端
 
 #### 群聊消息同步流程：
-![群聊消息同步流程](assert/design/photo/群聊消息同步流程.png)
+![群聊消息同步流程](/assert/design/photo/群聊消息同步流程.png)
 1. 发送方 userA 发送消息给服务端
 2. 服务端接收发送方的消息之后向发送方回应消息接收确认 ACK 数据包表示服务端已经成功接收消息
 3. 先将消息同步给发送方其他端（在线端使用 TCP 通知投递，离线端存储最新的 1000 条数据到离线消息队列里）
@@ -333,7 +333,7 @@ IM 的私有协议确立信息如下：
 ### 消息可靠传达模型
 我们难以保证消息全都可靠传达，不会产生丢失现象，在 IM 系统中也不允许丢失一条消息。如下图：
 
-![有了TCP为什么还要保证可靠性传达](assert/design/photo/有了TCP为什么还要保证可靠性传达.png)
+![有了TCP为什么还要保证可靠性传达](/assert/design/photo/有了TCP为什么还要保证可靠性传达.png)
 
 + 在传输层，TCP的三次握手保证了双方通讯的可靠性，稳定性。简而言之，用户发送的消息，
 在忽视应用层的情况下，无论如何都会从自身主机的 “发送缓冲区” 抵达对方主机的 “接收缓冲区”
@@ -343,7 +343,7 @@ IM 的私有协议确立信息如下：
 > 如果只是单台机器进行双向通信，则不会经历传输层拆包装包的过程，而是直接将数据包通过内核拷贝到另一个进程(socket)进行通讯
 
 在设计上，我们采用应用层两次握手（上下行 ACK）来保证消息在应用层的可靠传达
-![上下行ACK](assert/design/photo/上下行ACK.png)
+![上下行ACK](/assert/design/photo/上下行ACK.png)
 + 上行 ACK：服务端发送给消息发送方的接收确认 ACK
 + 下行 ACK：目标用户发送给消息发送方的接收确认 ACK
 
@@ -361,10 +361,10 @@ ps: 上行 ACK 也同理, 服务端的消息发送实际抵达 MQ 时有一个�
 RecvID, ServerID, ClientID, SendTime 做冗余避免查库提升性能
 
 #### 在线用户消息接收
-![在线用户消息确认](assert/design/photo/在线用户消息确认.png)
+![在线用户消息确认](/assert/design/photo/在线用户消息确认.png)
 
 #### 离线用户消息接收
-![离线用户消息确认](assert/design/photo/离线用户消息确认.png)
+![离线用户消息确认](/assert/design/photo/离线用户消息确认.png)
 
 #### ACK 丢失现象
 下面分别探讨上下行 ACK 丢失现象的处理流程
@@ -385,13 +385,13 @@ ACK 丢失现象解决策略: 由于我们 ack 中含有 msgId, 可以在客户�
 
 或者是消息到达时做一个缓存，缓存时间尽量短，缓存时间内的消息重试直接让接收方接收消息，不进行二次持久化。
 
-![消息幂等性保证](assert/design/photo/消息幂等性保证.png)
+![消息幂等性保证](/assert/design/photo/消息幂等性保证.png)
 
 为了避免客户端无限制重发的现象，我们可以对缓存做一个过期时间，只有在过期时间之前的缓存才能做幂等；
 当超过缓存时间时, 服务端忽略重投的消息, 直到客户端计时器超时并且已经超过了最大重试次数，
 才让客户端重新生成消息唯一id：messageId, 也就是重新做一个消息体
 
-![禁止客户端无限制重发](assert/design/photo/禁止客户端无限制重发.png)
+![禁止客户端无限制重发](/assert/design/photo/禁止客户端无限制重发.png)
 
 ### 消息有序性保证
 为了提高消息在服务端的处理流程(MQ消费,落库存储,ACK确认)，我们在程序实现中采用了线程池技术来提高消息处理时长

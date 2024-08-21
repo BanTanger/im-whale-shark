@@ -42,7 +42,7 @@ public class P2PMsgCommand extends BaseCommandStrategy {
         ResponseVO responseVO = feignMessageService.checkP2PSendMessage(req);
         if (responseVO.isOk()) {
             // 2. 如果成功就投递到 MQ
-            MqMessageProducer.sendMessage(msg, req.getCommand());
+            MqMessageProducer.sendMessage(msg);
         } else {
             // 3. 如果失败就发送 ACK 失败响应报文
             ChatMessageAck chatMessageAck = new ChatMessageAck(jsonObject.getString(MSG_ID));

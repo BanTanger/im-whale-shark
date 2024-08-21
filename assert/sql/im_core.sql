@@ -154,31 +154,31 @@ CREATE TABLE im_group_message_history
     PRIMARY KEY (app_id, group_id, message_key)
 );
 
-CREATE TABLE im_message_body
-(
-    app_id       INT(10)       NOT NULL,
-    message_key  BIGINT(50)    NOT NULL COMMENT 'messageBodyId'
-        PRIMARY KEY,
-    message_body VARCHAR(5000) NULL,
-    security_key VARCHAR(100)  NULL COMMENT '加密密钥',
-    message_time BIGINT        NULL,
-    create_time  BIGINT        NULL,
-    extra        VARCHAR(1000) NULL,
-    del_flag     INT(10)       NULL
-);
-
 CREATE TABLE im_message_history
 (
     app_id         INT(20)     NOT NULL COMMENT 'app_id',
-    from_id        VARCHAR(50) NOT NULL COMMENT 'from_id',
-    to_id          VARCHAR(50) NOT NULL COMMENT 'to_id',
-    owner_id       VARCHAR(50) NOT NULL COMMENT 'owner_id',
-    message_key    BIGINT(50)  NOT NULL COMMENT 'messageBodyId',
-    create_time    BIGINT      NULL,
-    sequence       BIGINT      NULL,
-    message_random INT(20)     NULL,
-    message_time   BIGINT      NULL COMMENT '来源',
+    from_id        VARCHAR(50) NOT NULL COMMENT '消息发送方 ID',
+    to_id          VARCHAR(50) NOT NULL COMMENT '消息接收方 ID',
+    owner_id       VARCHAR(50) NOT NULL COMMENT '消息拥有者 ID',
+    message_key    BIGINT(50)  NOT NULL COMMENT '消息体 ID, 逻辑外键',
+    create_time    BIGINT      NULL COMMENT '消息创建时间',
+    sequence       BIGINT      NULL COMMENT '消息偏序 seq',
+    message_random INT(20)     NULL COMMENT '加密密钥',
+    message_time   BIGINT      NULL COMMENT '消息发送时间',
     PRIMARY KEY (app_id, owner_id, message_key)
+);
+
+CREATE TABLE im_message_body
+(
+    app_id       INT(10)       NOT NULL COMMENT 'app_id',
+    message_key  BIGINT(50)    NOT NULL COMMENT 'messageBodyId'
+        PRIMARY KEY,
+    message_body VARCHAR(5000) NULL COMMENT '消息实体',
+    security_key VARCHAR(100)  NULL COMMENT '加密密钥',
+    message_time BIGINT        NULL COMMENT '消息发送时间',
+    create_time  BIGINT        NULL COMMENT '消息创建时间',
+    extra        VARCHAR(1000) NULL COMMENT '额外信息',
+    del_flag     INT(10)       NULL COMMENT '逻辑删除标志'
 );
 
 CREATE TABLE im_user_data
