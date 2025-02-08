@@ -1,0 +1,14 @@
+com\bantanger\jpa\support\UpdateHandler.class
+com\bantanger\jpa\converter\InstantLongConverter.class
+com\bantanger\jpa\support\QBaseJpaAggregate.class
+com\bantanger\jpa\support\EntityUpdater.class
+com\bantanger\jpa\support\Executor.class
+com\bantanger\jpa\converter\ValidStatusConverter.class
+com\bantanger\jpa\support\BaseEntityOperation.class
+com\bantanger\jpa\support\Loader.class
+com\bantanger\jpa\support\Create.class
+com\bantanger\jpa\support\EntityCreator.class
+com\bantanger\jpa\support\BaseJpaAggregate.class
+com\bantanger\jpa\support\EntityOperations.class
+com\bantanger\jpa\support\EntityOperation.class
+com\bantanger\jpa\support\BaseRepository.class

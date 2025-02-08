@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.bantanger</groupId>
+        <artifactId>im-whale-shark</artifactId>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.bantanger</groupId>
+    <artifactId>im-system</artifactId>
+    <version>2.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>im-codec</module>
+        <module>im-common</module>
+        <module>im-domain</module>
+        <module>im-infrastructure</module>
+        <module>im-message-store</module>
+        <module>im-tcp</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.bantanger</groupId>
+                <artifactId>im-codec</artifactId>
+                <version>2.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.bantanger</groupId>
+                <artifactId>im-common</artifactId>
+                <version>2.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.bantanger</groupId>
+                <artifactId>im-domain</artifactId>
+                <version>2.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.bantanger</groupId>
+                <artifactId>im-infrastructure</artifactId>
+                <version>2.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.bantanger</groupId>
+                <artifactId>im-message-store</artifactId>
+                <version>2.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.bantanger</groupId>
+                <artifactId>im-tcp</artifactId>
+                <version>2.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.bantanger</groupId>
+                <artifactId>bt-codegen-apt</artifactId>
+                <version>2.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.bantanger</groupId>
+                <artifactId>bt-common</artifactId>
+                <version>2.0-SNAPSHOT</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
