@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仿微信IM聊天</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            display: flex;
+            height: 100%;
+            max-width: 1400px;
+            width: 95%;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 左侧联系人列表 */
+        .contact-list {
+            width: 220px;
+            background-color: #eee;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .user-profile {
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #09bb07;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .user-status {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .search-bar {
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-radius: 3px;
+            background-color: #fff;
+            font-size: 14px;
+        }
+
+        .contact-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #eaeaea;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .contact-item:hover, .contact-item.active {
+            background-color: #e6e6e6;
+        }
+
+        .contact-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #7986cb;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .contact-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .contact-name {
+            font-weight: bold;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .contact-preview {
+            font-size: 13px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .contact-time {
+            font-size: 12px;
+            color: #aaa;
+            white-space: nowrap;
+        }
+
+        /* 右侧聊天区域 */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5;
+            min-width: 750px;
+        }
+
+        .chat-header {
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-action {
+            cursor: pointer;
+            color: #555;
+            font-size: 18px;
+        }
+
+        .messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #ebebeb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            max-width: 65%;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.received {
+            align-self: flex-start;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+        }
+
+        .message-content {
+            padding: 10px 15px;
+            border-radius: 3px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.received .message-content {
+            background-color: white;
+            border-radius: 0 8px 8px 8px;
+        }
+
+        .message.sent .message-content {
+            background-color: #95ec69;
+            border-radius: 8px 0 8px 8px;
+            text-align: right;
+        }
+
+        .message-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #7986cb;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin-right: 8px;
+        }
+
+        .message.sent .message-info {
+            flex-direction: row-reverse;
+        }
+
+        .message.sent .message-avatar {
+            margin-right: 0;
+            margin-left: 8px;
+            background-color: #09bb07;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        /* 添加已读回执样式 */
+        .message-status {
+            font-size: 12px;
+            color: #888;
+            margin-top: 3px;
+            text-align: right;
+        }
+
+        .message.received .message-status {
+            text-align: left;
+        }
+
+        .input-area {
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-top: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .tool-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #555;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .message-input {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            resize: none;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .send-button {
+            align-self: flex-end;
+            margin-top: 10px;
+            padding: 8px 20px;
+            background-color: #09bb07;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .send-button:hover {
+            background-color: #07a906;
+        }
+
+        /* 登录模态框 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 350px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #09bb07;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .login-button:hover {
+            background-color: #07a906;
+        }
+
+        /* 系统消息样式 */
+        .system-message {
+            text-align: center;
+            margin: 10px 0;
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .contact-list {
+                width: 100%;
+                height: 30%;
+            }
+
+            .chat-area {
+                height: 70%;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 登录模态框 -->
+<div class="modal" id="loginModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">登录聊天</h3>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="loginUserId">用户ID</label>
+            <input type="text" class="form-input" id="loginUserId" value="10001">
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="loginAppId">AppID</label>
+            <input type="text" class="form-input" id="loginAppId" value="10001">
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="loginClientType">客户端类型</label>
+            <input type="text" class="form-input" id="loginClientType" value="1">
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="loginImei">设备标识</label>
+            <input type="text" class="form-input" id="loginImei" value="web">
+        </div>
+        <button class="login-button" id="loginButton">登录</button>
+    </div>
+</div>
+
+<div class="container">
+    <!-- 左侧联系人列表 -->
+    <div class="contact-list">
+        <div class="user-profile">
+            <div class="user-avatar" id="currentUserAvatar">U</div>
+            <div class="user-info">
+                <div class="user-name" id="currentUserName">10001</div>
+                <div class="user-status">在线</div>
+            </div>
+        </div>
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="搜索">
+        </div>
+        <div id="contactsContainer">
+            <!-- 联系人列表将通过JS动态生成 -->
+            <div class="contact-item active" data-id="10002">
+                <div class="contact-avatar">B</div>
+                <div class="contact-info">
+                    <div class="contact-name">10002</div>
+                    <div class="contact-preview">点击开始聊天</div>
+                </div>
+            </div>
+            <div class="contact-item" data-id="10003">
+                <div class="contact-avatar">C</div>
+                <div class="contact-info">
+                    <div class="contact-name">10003</div>
+                    <div class="contact-preview">点击开始聊天</div>
+                </div>
+            </div>
+            <div class="contact-item" data-id="10004">
+                <div class="contact-avatar">D</div>
+                <div class="contact-info">
+                    <div class="contact-name">10004</div>
+                    <div class="contact-preview">点击开始聊天</div>
+                </div>
+            </div>
+            <div class="contact-item" data-id="10005">
+                <div class="contact-avatar">E</div>
+                <div class="contact-info">
+                    <div class="contact-name">10005</div>
+                    <div class="contact-preview">点击开始聊天</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧聊天区域 -->
+    <div class="chat-area">
+        <div class="chat-header">
+            <div class="chat-title" id="chatTitle">10002</div>
+            <div class="chat-actions">
+                <div class="chat-action">⋮</div>
+            </div>
+        </div>
+        <div class="messages" id="messagesContainer">
+            <!-- 消息将通过JS动态生成 -->
+            <div class="system-message">今天 12:00</div>
+
+            <div class="message received">
+                <div class="message-info">
+                    <div class="message-avatar">B</div>
+                </div>
+                <div class="message-content">你好，这是一条测试消息</div>
+                <div class="message-time">12:00</div>
+            </div>
+
+            <div class="message sent">
+                <div class="message-info">
+                    <div class="message-avatar">U</div>
+                </div>
+                <div class="message-content">你好，我收到了你的消息</div>
+                <div class="message-time">12:01</div>
+                <div class="message-status">已读</div>
+            </div>
+        </div>
+        <div class="input-area">
+            <div class="toolbar">
+                <button class="tool-button">😊</button>
+                <button class="tool-button">📎</button>
+            </div>
+            <textarea class="message-input" id="messageInput" placeholder="输入消息..."></textarea>
+            <button class="send-button" id="sendButton">发送</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // ByteBuffer 实现
+    ByteBuffer = function (arrayBuf, offset) {
+        var Type_Byte = 1;
+        var Type_Short = 2;
+        var Type_UShort = 3;
+        var Type_Int32 = 4;
+        var Type_UInt32 = 5;
+        var Type_String = 6;//变长字符串，前两个字节表示长度
+        var Type_VString = 7;//定长字符串
+        var Type_Int64 = 8;
+        var Type_Float = 9;
+        var Type_Double = 10;
+        var Type_ByteArray = 11;
+
+        var _org_buf = arrayBuf ? (arrayBuf.constructor == DataView ? arrayBuf : (arrayBuf.constructor == Uint8Array ? new DataView(arrayBuf.buffer, offset) : new DataView(arrayBuf, offset))) : new DataView(new Uint8Array([]).buffer);
+        var _offset = offset || 0;
+        var _list = [];
+        var _littleEndian = false;
+
+        //指定字节序 为BigEndian
+        this.bigEndian = function () {
+            _littleEndian = false;
+            return this;
+        };
+
+        //指定字节序 为LittleEndian
+        this.littleEndian = function () {
+            _littleEndian = true;
+            return this;
+        };
+
+        if (!ArrayBuffer.prototype.slice) {
+            ArrayBuffer.prototype.slice = function (start, end) {
+                var that = new Uint8Array(this);
+                if (end == undefined) end = that.length;
+                var result = new ArrayBuffer(end - start);
+                var resultArray = new Uint8Array(result);
+                for (var i = 0; i < resultArray.length; i++)
+                    resultArray[i] = that[i + start];
+                return result;
+            }
+        }
+
+        function utf8Write(view, offset, str) {
+            var c = 0;
+            for (var i = 0, l = str.length; i < l; i++) {
+                c = str.charCodeAt(i);
+                if (c < 0x80) {
+                    view.setUint8(offset++, c);
+                } else if (c < 0x800) {
+                    view.setUint8(offset++, 0xc0 | (c >> 6));
+                    view.setUint8(offset++, 0x80 | (c & 0x3f));
+                } else if (c < 0xd800 || c >= 0xe000) {
+                    view.setUint8(offset++, 0xe0 | (c >> 12));
+                    view.setUint8(offset++, 0x80 | (c >> 6) & 0x3f);
+                    view.setUint8(offset++, 0x80 | (c & 0x3f));
+                } else {
+                    i++;
+                    c = 0x10000 + (((c & 0x3ff) << 10) | (str.charCodeAt(i) & 0x3ff));
+                    view.setUint8(offset++, 0xf0 | (c >> 18));
+                    view.setUint8(offset++, 0x80 | (c >> 12) & 0x3f);
+                    view.setUint8(offset++, 0x80 | (c >> 6) & 0x3f);
+                    view.setUint8(offset++, 0x80 | (c & 0x3f));
+                }
+            }
+        }
+
+        function utf8Read(view, offset, length) {
+            var string = '', chr = 0;
+            for (var i = offset, end = offset + length; i < end; i++) {
+                var byte = view.getUint8(i);
+                if ((byte & 0x80) === 0x00) {
+                    string += String.fromCharCode(byte);
+                    continue;
+                }
+                if ((byte & 0xe0) === 0xc0) {
+                    string += String.fromCharCode(
+                        ((byte & 0x0f) << 6) |
+                        (view.getUint8(++i) & 0x3f)
+                    );
+                    continue;
+                }
+                if ((byte & 0xf0) === 0xe0) {
+                    string += String.fromCharCode(
+                        ((byte & 0x0f) << 12) |
+                        ((view.getUint8(++i) & 0x3f) << 6) |
+                        ((view.getUint8(++i) & 0x3f) << 0)
+                    );
+                    continue;
+                }
+                if ((byte & 0xf8) === 0xf0) {
+                    chr = ((byte & 0x07) << 18) |
+                        ((view.getUint8(++i) & 0x3f) << 12) |
+                        ((view.getUint8(++i) & 0x3f) << 6) |
+                        ((view.getUint8(++i) & 0x3f) << 0);
+                    if (chr >= 0x010000) { // surrogate pair
+                        chr -= 0x010000;
+                        string += String.fromCharCode((chr >>> 10) + 0xD800, (chr & 0x3FF) + 0xDC00);
+                    } else {
+                        string += String.fromCharCode(chr);
+                    }
+                    continue;
+                }
+                throw new Error('Invalid byte ' + byte.toString(16));
+            }
+            return string;
+        }
+
+        function utf8Length(str) {
+            var c = 0, length = 0;
+            for (var i = 0, l = str.length; i < l; i++) {
+                c = str.charCodeAt(i);
+                if (c < 0x80) {
+                    length += 1;
+                } else if (c < 0x800) {
+                    length += 2;
+                } else if (c < 0xd800 || c >= 0xe000) {
+                    length += 3;
+                } else {
+                    i++;
+                    length += 4;
+                }
+            }
+            return length;
+        }
+
+        this.byte = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getUint8(_offset, _littleEndian));
+                _offset += 1;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Byte, d: val, l: 1 });
+                _offset += 1;
+            }
+            return this;
+        };
+
+        this.short = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getInt16(_offset, _littleEndian));
+                _offset += 2;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Short, d: val, l: 2 });
+                _offset += 2;
+            }
+            return this;
+        };
+
+        this.ushort = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getUint16(_offset, _littleEndian));
+                _offset += 2;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_UShort, d: val, l: 2 });
+                _offset += 2;
+            }
+            return this;
+        };
+
+        this.int32 = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getInt32(_offset, _littleEndian));
+                _offset += 4;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Int32, d: val, l: 4 });
+                _offset += 4;
+            }
+            return this;
+        };
+
+        this.uint32 = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getUint32(_offset, _littleEndian));
+                _offset += 4;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_UInt32, d: val, l: 4 });
+                _offset += 4;
+            }
+            return this;
+        };
+
+        this.blength = function () {
+            return _offset;
+        };
+
+        this.string = function (val, index) {
+            if (arguments.length == 0) {
+                var len = _org_buf.getInt32(_offset, _littleEndian);
+                _offset += 4;
+                _list.push(utf8Read(_org_buf, _offset, len));
+                _offset += len;
+            } else {
+                var len = 0;
+                if (val) {
+                    len = utf8Length(val);
+                }
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_String, d: val, l: len });
+                _offset += len + 4;
+            }
+            return this;
+        };
+
+        this.vstring = function (val, len, index) {
+            if (!len) {
+                throw new Error('vstring must got len argument');
+                return this;
+            }
+            if (val == undefined || val == null) {
+                var vlen = 0;//实际长度
+                for (var i = _offset; i < _offset + len; i++) {
+                    if (_org_buf.getUint8(i) > 0) vlen++;
+                }
+                _list.push(utf8Read(_org_buf, _offset, vlen));
+                _offset += len;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_VString, d: val, l: len });
+                _offset += len;
+            }
+            return this;
+        };
+
+        this.int64 = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getFloat64(_offset, _littleEndian));
+                _offset += 8;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Int64, d: val, l: 8 });
+                _offset += 8;
+            }
+            return this;
+        };
+
+        this.float = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getFloat32(_offset, _littleEndian));
+                _offset += 4;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Float, d: val, l: 4 });
+                _offset += 4;
+            }
+            return this;
+        };
+
+        this.double = function (val, index) {
+            if (arguments.length == 0) {
+                _list.push(_org_buf.getFloat64(_offset, _littleEndian));
+                _offset += 8;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Double, d: val, l: 8 });
+                _offset += 8;
+            }
+            return this;
+        };
+
+        this.byteArray = function (val, len, index) {
+            if (!len) {
+                throw new Error('byteArray must got len argument');
+                return this;
+            }
+            if (val == undefined || val == null) {
+                var arr = new Uint8Array(_org_buf.buffer.slice(_offset, _offset + len));
+                _list.push(arr);
+                _offset += len;
+            } else {
+                _list.splice(index != undefined ? index : _list.length, 0, { t: Type_ByteArray, d: val, l: len });
+                _offset += len;
+            }
+            return this;
+        };
+
+        this.unpack = function () {
+            return _list;
+        };
+
+        this.packWithHead = function () {
+            return this.pack(true);
+        };
+
+        this.pack = function (ifHead) {
+            _org_buf = new DataView(new ArrayBuffer((ifHead) ? _offset + 4 : _offset));
+            var offset = 0;
+            if (ifHead) {
+                _org_buf.setUint32(offset, _offset, _littleEndian);
+                offset += 4;
+            }
+            for (var i = 0; i < _list.length; i++) {
+                switch (_list[i].t) {
+                    case Type_Byte:
+                        _org_buf.setInt8(offset, _list[i].d);
+                        offset += _list[i].l;
+                        break;
+                    case Type_Short:
+                        _org_buf.setInt16(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_UShort:
+                        _org_buf.setUint16(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_Int32:
+                        _org_buf.setInt32(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_UInt32:
+                        _org_buf.setUint32(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_String:
+                        //前4个字节表示字符串长度
+                        _org_buf.setUint32(offset, _list[i].l, _littleEndian);
+                        offset += 4;
+                        utf8Write(_org_buf, offset, _list[i].d);
+                        offset += _list[i].l;
+                        break;
+                    case Type_VString:
+                        utf8Write(_org_buf, offset, _list[i].d);
+                        var vlen = utf8Length(_list[i].d);//字符串实际长度
+                        //补齐\0
+                        for (var j = offset + vlen; j < offset + _list[i].l; j++) {
+                            _org_buf.setUint8(j, 0);
+                        }
+                        offset += _list[i].l;
+                        break;
+                    case Type_Int64:
+                        _org_buf.setFloat64(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_Float:
+                        _org_buf.setFloat32(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_Double:
+                        _org_buf.setFloat64(offset, _list[i].d, _littleEndian);
+                        offset += _list[i].l;
+                        break;
+                    case Type_ByteArray:
+                        var indx = 0;
+                        for (var j = offset; j < offset + _list[i].l; j++) {
+                            if (indx < _list[i].d.length) {
+                                _org_buf.setUint8(j, _list[i].d[indx]);
+                            } else {//不够的话，后面补齐0x00
+                                _org_buf.setUint8(j, 0);
+                            }
+                            indx++
+                        }
+                        offset += _list[i].l;
+                        break;
+                }
+            }
+            return _org_buf.buffer;
+        };
+
+        this.getAvailable = function () {
+            if (!_org_buf) return _offset;
+            return _org_buf.buffer.byteLength - _offset;
+        };
+    }
+
+    function uuid() {
+        var s = [];
+        var hexDigits = "0123456789abcdef";
+        for (var i = 0; i < 36; i++) {
+            s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+        }
+        s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+        s[8] = s[13] = s[18] = s[23] = "-";
+
+        var uuid = s.join("");
+        return uuid;
+    }
+
+    function getLen(str) {
+        var len = 0;
+        for (var i = 0; i < str.length; i++) {
+            var c = str.charCodeAt(i);
+            //单字节加1
+            if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
+                len++;
+            } else {
+                len += 3;
+            }
+        }
+        return len;
+    }
+
+    // 聊天应用逻辑
+    document.addEventListener('DOMContentLoaded', function() {
+        // 全局变量
+        var socket;
+        var currentUserId = "10001";
+        var currentAppId = "10001";
+        var currentClientType = "1";
+        var currentImei = "web";
+        var currentChatId = "10002"; // 默认聊天对象
+        var messageHistory = {}; // 存储消息历史
+        var contacts = [
+            { id: "10002", name: "10002", avatar: "B", lastMessage: "点击开始聊天" },
+            { id: "10003", name: "10003", avatar: "C", lastMessage: "点击开始聊天" },
+            { id: "10004", name: "10004", avatar: "D", lastMessage: "点击开始聊天" },
+            { id: "10005", name: "10005", avatar: "E", lastMessage: "点击开始聊天" }
+        ];
+
+        // DOM 元素
+        var loginModal = document.getElementById('loginModal');
+        var loginButton = document.getElementById('loginButton');
+        var loginUserId = document.getElementById('loginUserId');
+        var loginAppId = document.getElementById('loginAppId');
+        var loginClientType = document.getElementById('loginClientType');
+        var loginImei = document.getElementById('loginImei');
+        var currentUserName = document.getElementById('currentUserName');
+        var currentUserAvatar = document.getElementById('currentUserAvatar');
+        var contactsContainer = document.getElementById('contactsContainer');
+        var chatTitle = document.getElementById('chatTitle');
+        var messagesContainer = document.getElementById('messagesContainer');
+        var messageInput = document.getElementById('messageInput');
+        var sendButton = document.getElementById('sendButton');
+
+        // 初始化
+        initializeApp();
+
+        // 初始化应用
+        function initializeApp() {
+            // 设置默认登录信息
+            loginUserId.value = currentUserId;
+            loginAppId.value = currentAppId;
+            loginClientType.value = currentClientType;
+            loginImei.value = currentImei;
+
+            // 绑定事件
+            loginButton.addEventListener('click', handleLogin);
+            sendButton.addEventListener('click', handleSendMessage);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                }
+            });
+
+            // 初始化联系人列表点击事件
+            document.querySelectorAll('.contact-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.contact-item').forEach(function(el) {
+                        el.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    currentChatId = this.getAttribute('data-id');
+                    chatTitle.textContent = currentChatId;
+                    loadChatHistory(currentChatId);
+                });
+            });
+
+            // 初始化WebSocket连接
+            initializeWebSocket();
+        }
+
+        // 初始化WebSocket连接
+        function initializeWebSocket() {
+            if (window.WebSocket) {
+                socket = new WebSocket("ws://localhost:19002/ws");
+
+                socket.onbeforecopy = function (event) {
+                    event.preventDefault();
+                    socket.setRequestHeader("Origin", "localhost:19000");
+                };
+
+                socket.onopen = function (event) {
+                    socket.binaryType = "arraybuffer";
+                    addSystemMessage("连接已建立");
+                    // 自动登录
+                    if (loginModal.style.display !== 'none') {
+                        handleLogin();
+                    }
+                };
+
+                socket.onclose = function (event) {
+                    addSystemMessage("连接已断开");
+                };
+
+                socket.onmessage = handleServerMessage;
+            } else {
+                alert("您的浏览器不支持WebSocket！");
+            }
+        }
+
+        // 处理登录
+        function handleLogin() {
+            if (!window.WebSocket || socket.readyState !== WebSocket.OPEN) {
+                alert("WebSocket连接未建立，请稍后再试");
+                return;
+            }
+
+            currentUserId = loginUserId.value;
+            currentAppId = loginAppId.value;
+            currentClientType = loginClientType.value;
+            currentImei = loginImei.value;
+
+            var command = 9000;
+            var version = 1;
+            var messageType = 0x0;
+            var appId = parseInt(currentAppId);
+            var clientType = parseInt(currentClientType);
+
+            var data = {
+                "userId": currentUserId,
+                "appId": appId,
+                "clientType": clientType,
+                "imei": currentImei,
+                "customStatus": null,
+                "customClientName": ""
+            };
+
+            var jsonData = JSON.stringify(data);
+            var bodyLen = jsonData.length;
+            var imeiLen = getLen(currentImei);
+
+            let loginMsg = new ByteBuffer();
+            loginMsg.int32(command).int32(version)
+                .int32(clientType).int32(messageType)
+                .int32(appId).int32(imeiLen)
+                .int32(bodyLen).vstring(currentImei, imeiLen)
+                .vstring(jsonData, bodyLen);
+
+            socket.send(loginMsg.pack());
+
+            // 更新UI
+            currentUserName.textContent = currentUserId;
+            currentUserAvatar.textContent = currentUserId.charAt(0).toUpperCase();
+
+            // 隐藏登录模态框
+            loginModal.style.display = 'none';
+
+            addSystemMessage("登录成功，用户ID: " + currentUserId);
+        }
+
+        // 处理发送消息
+        function handleSendMessage() {
+            if (!window.WebSocket || socket.readyState !== WebSocket.OPEN) {
+                alert("WebSocket连接未建立，请稍后再试");
+                return;
+            }
+
+            var messageText = messageInput.value.trim();
+            if (!messageText) return;
+
+            var command = 1103; // 私聊消息
+            var version = 1;
+            var messageType = 0x0;
+            var appId = parseInt(currentAppId);
+            var clientType = parseInt(currentClientType);
+            var toId = currentChatId;
+
+            var messageId = uuid();
+            var messageData = {
+                "messageId": messageId,
+                "fromId": currentUserId,
+                "toId": toId,
+                "appId": appId,
+                "clientType": clientType,
+                "imei": currentImei,
+                "messageBody": messageText
+            };
+
+            var jsonData = JSON.stringify(messageData);
+            var bodyLen = getLen(jsonData);
+            var imeiLen = getLen(currentImei);
+
+            let sendMsg = new ByteBuffer();
+            sendMsg.int32(command).int32(version)
+                .int32(clientType).int32(messageType)
+                .int32(appId).int32(imeiLen)
+                .int32(bodyLen).vstring(currentImei, imeiLen)
+                .vstring(jsonData, bodyLen);
+
+            socket.send(sendMsg.pack());
+
+            // 添加消息到UI
+            addMessage(currentUserId, messageText, true, messageData);
+
+            // 更新联系人列表中的最后一条消息
+            updateContactLastMessage(toId, messageText);
+
+            // 清空输入框
+            messageInput.value = '';
+        }
+
+        // 处理服务器消息
+        function handleServerMessage(event) {
+            var bytebuf = new ByteBuffer(event.data);
+            let byteBuffer = bytebuf.int32().int32().unpack();
+
+            let command = byteBuffer[0];
+            let bodyLen = byteBuffer[1];
+            let unpack = bytebuf.vstring(null, bodyLen).unpack();
+            let msgBody = unpack[2];
+
+            console.log("收到服务端消息: ", command, msgBody);
+
+            if (command == 1103) { // 私聊消息
+                var d = JSON.parse(msgBody);
+                var data = d.data;
+
+                if (data.fromId == currentUserId) {
+                    // 自己发送的消息，更新消息状态为"已发送"
+                    updateMessageStatus(data.messageId, "已发送");
+                } else {
+                    // 收到他人消息
+                    addMessage(data.fromId, data.messageBody, false, data);
+                    updateContactLastMessage(data.fromId, data.messageBody);
+
+                    // 发送消息接收确认
+                    sendMessageAck(data);
+
+                    // 发送已读回执
+                    if (currentClientType == 1) {
+                        sendReadReceipt(data);
+                    }
+                }
+            } else if (command == 1107) { // 消息接收确认
+                try {
+                    var ackData = JSON.parse(msgBody);
+                    if (ackData.messageId) {
+                        updateMessageStatus(ackData.messageId, "已送达");
+                    }
+                } catch (e) {
+                    console.error("解析消息接收确认失败", e);
+                }
+            } else if (command == 1106) { // 已读回执
+                try {
+                    var readData = JSON.parse(msgBody);
+                    if (readData.messageSequence) {
+                        // 更新所有小于等于该序列号的消息为已读
+                        updateMessagesReadStatus(readData.fromId, readData.messageSequence);
+                    }
+                } catch (e) {
+                    console.error("解析已读回执失败", e);
+                }
+            } else if (command == 9999) { // 系统消息
+                try {
+                    var msg = JSON.parse(msgBody);
+                    if (msg.userId == "system") {
+                        addSystemMessage(msg.data);
+                    }
+                } catch (e) {
+                    console.error("解析系统消息失败", e);
+                }
+            }
+        }
+
+        // 更新消息状态
+        function updateMessageStatus(messageId, status) {
+            if (!messageId) return;
+
+            // 更新DOM
+            var statusDiv = document.querySelector(`.message-status[data-message-id="${messageId}"]`);
+            if (statusDiv) {
+                statusDiv.textContent = status;
+            }
+
+            // 更新内存中的消息历史
+            Object.keys(messageHistory).forEach(function(chatId) {
+                messageHistory[chatId].forEach(function(msg) {
+                    if (msg.messageId === messageId) {
+                        if (status === "已读") {
+                            msg.isRead = true;
+                        }
+                    }
+                });
+            });
+        }
+
+        // 更新消息已读状态（根据序列号）
+        function updateMessagesReadStatus(fromId, messageSequence) {
+            if (!messageSequence) return;
+
+            // 更新内存中的消息历史
+            if (messageHistory[fromId]) {
+                messageHistory[fromId].forEach(function(msg) {
+                    if (msg.messageSequence && msg.messageSequence <= messageSequence && msg.isSent) {
+                        msg.isRead = true;
+                        if (msg.messageId) {
+                            updateMessageStatus(msg.messageId, "已读");
+                        }
+                    }
+                });
+            }
+        }
+
+        // 发送消息接收确认
+        function sendMessageAck(data) {
+            var version = 1;
+            var messageType = 0x0;
+            var appId = parseInt(currentAppId);
+            var clientType = parseInt(currentClientType);
+            var imeiLen = getLen(currentImei);
+
+            var rAck = {
+                "fromId": currentUserId,
+                "toId": data.fromId,
+                "messageKey": data.messageKey,
+                "messageId": data.messageId,
+                "messageSequence": data.messageSequence,
+            };
+
+            var jsonData = JSON.stringify(rAck);
+            var bodyLen = jsonData.length;
+
+            let messageReciver = new ByteBuffer();
+            messageReciver.int32(1107)
+                .int32(version).int32(clientType)
+                .int32(messageType).int32(appId)
+                .int32(imeiLen).int32(bodyLen).vstring(currentImei, imeiLen)
+                .vstring(jsonData, bodyLen);
+
+            socket.send(messageReciver.pack());
+        }
+
+        // 发送已读回执
+        function sendReadReceipt(data) {
+            var version = 1;
+            var messageType = 0x0;
+            var appId = parseInt(currentAppId);
+            var clientType = parseInt(currentClientType);
+            var imeiLen = getLen(currentImei);
+
+            var toId = data.fromId;
+
+            var readedData = {
+                "fromId": currentUserId,
+                "toId": toId,
+                "conversationType": 0,
+                "messageSequence": data.messageSequence,
+            };
+
+            var readData = JSON.stringify(readedData);
+            var readBodyLen = readData.length;
+
+            let messageReader = new ByteBuffer();
+            messageReader.int32(1106)
+                .int32(version).int32(clientType)
+                .int32(messageType).int32(appId)
+                .int32(imeiLen).int32(readBodyLen).vstring(currentImei, imeiLen)
+                .vstring(readData, readBodyLen);
+
+            socket.send(messageReader.pack());
+        }
+
+        // 添加消息到UI
+        function addMessage(fromId, messageText, isSent, messageData) {
+            // 存储消息到历史记录
+            if (!messageHistory[currentChatId]) {
+                messageHistory[currentChatId] = [];
+            }
+
+            var messageObj = {
+                fromId: fromId,
+                text: messageText,
+                isSent: isSent,
+                time: new Date(),
+                messageId: messageData ? messageData.messageId : null,
+                messageSequence: messageData ? messageData.messageSequence : null,
+                isRead: false
+            };
+
+            messageHistory[currentChatId].push(messageObj);
+
+            // 如果当前不是正在查看的聊天，不更新UI
+            if (fromId != currentChatId && !isSent) return;
+
+            // 创建消息元素
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + (isSent ? 'sent' : 'received');
+            if (messageData && messageData.messageId) {
+                messageDiv.setAttribute('data-message-id', messageData.messageId);
+            }
+
+            var messageInfo = document.createElement('div');
+            messageInfo.className = 'message-info';
+
+            var messageAvatar = document.createElement('div');
+            messageAvatar.className = 'message-avatar';
+            messageAvatar.textContent = isSent ? currentUserId.charAt(0).toUpperCase() : fromId.charAt(0).toUpperCase();
+
+            var messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.textContent = messageText;
+
+            // 添加消息时间
+            var messageTimeDiv = document.createElement('div');
+            messageTimeDiv.className = 'message-time';
+            var now = new Date();
+            var timeStr = now.getHours().toString().padStart(2, '0') + ':' +
+                now.getMinutes().toString().padStart(2, '0');
+            messageTimeDiv.textContent = timeStr;
+
+            // 添加已读状态（仅发送的消息显示）
+            if (isSent) {
+                var messageStatusDiv = document.createElement('div');
+                messageStatusDiv.className = 'message-status';
+                messageStatusDiv.textContent = '发送中...';
+                if (messageData && messageData.messageId) {
+                    messageStatusDiv.setAttribute('data-message-id', messageData.messageId);
+                }
+                messageDiv.appendChild(messageStatusDiv);
+            }
+
+            messageInfo.appendChild(messageAvatar);
+            messageDiv.appendChild(messageInfo);
+            messageDiv.appendChild(messageContent);
+            messageDiv.appendChild(messageTimeDiv);
+
+            messagesContainer.appendChild(messageDiv);
+
+            // 滚动到底部
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            return messageDiv;
+        }
+
+        // 添加系统消息
+        function addSystemMessage(text) {
+            var systemDiv = document.createElement('div');
+            systemDiv.className = 'system-message';
+            systemDiv.textContent = text;
+
+            messagesContainer.appendChild(systemDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // 更新联系人最后一条消息
+        function updateContactLastMessage(contactId, message) {
+            var contactItem = document.querySelector(`.contact-item[data-id="${contactId}"]`);
+            if (contactItem) {
+                var previewElement = contactItem.querySelector('.contact-preview');
+                if (previewElement) {
+                    previewElement.textContent = message.length > 20 ? message.substring(0, 20) + '...' : message;
+                }
+            }
+        }
+
+        // 加载聊天历史
+        function loadChatHistory(chatId) {
+            // 清空消息容器
+            messagesContainer.innerHTML = '';
+
+            // 添加日期分隔符
+            var today = new Date();
+            var dateStr = today.getFullYear() + '年' + (today.getMonth() + 1) + '月' + today.getDate() + '日';
+            addSystemMessage(dateStr);
+
+            // 如果有历史消息，加载它们
+            if (messageHistory[chatId]) {
+                messageHistory[chatId].forEach(function(msg) {
+                    addMessage(msg.fromId, msg.text, msg.isSent, {
+                        messageId: msg.messageId,
+                        messageSequence: msg.messageSequence
+                    });
+                });
+            }
+        }
+    });
+</script>
+</body>
+</html>
