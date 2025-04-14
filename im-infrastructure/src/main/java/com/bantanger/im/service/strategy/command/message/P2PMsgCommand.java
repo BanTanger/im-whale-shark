@@ -29,9 +29,10 @@ public class P2PMsgCommand extends BaseCommandStrategy {
         Message msg = commandExecution.getMsg();
         FeignMessageService feignMessageService = commandExecution.getFeignMessageService();
 
-        CheckSendMessageReq req = new CheckSendMessageReq();
-        req.setAppId(msg.getMessageHeader().getAppId());
-        req.setCommand(msg.getMessageHeader().getCommand());
+        CheckSendMessageReq req = CheckSendMessageReq.builder()
+                .appId(msg.getMessageHeader().getAppId())
+                .command(msg.getMessageHeader().getCommand())
+                .build();
         JSONObject jsonObject = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()));
         String fromId = jsonObject.getString(FROM_ID);
         String toId = jsonObject.getString(TO_ID);
@@ -42,7 +43,7 @@ public class P2PMsgCommand extends BaseCommandStrategy {
         ResponseVO responseVO = feignMessageService.checkP2PSendMessage(req);
         if (responseVO.isOk()) {
             // 2. 如果成功就投递到 MQ
-            MqMessageProducer.sendMessage(msg, req.getCommand());
+            MqMessageProducer.sendMessage(msg);
         } else {
             // 3. 如果失败就发送 ACK 失败响应报文
             ChatMessageAck chatMessageAck = new ChatMessageAck(jsonObject.getString(MSG_ID));

@@ -15,8 +15,8 @@ public class DefaultPage implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("forward:/index.html");
-        // 添加仿微信聊天页面的映射
-        registry.addViewController("/wechat").setViewName("forward:/wechat.html");
+        // 添加增强版微信风格IM系统页面的映射
+        registry.addViewController("/wechat-plus").setViewName("forward:/wechat-plus.html");
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
         WebMvcConfigurer.super.addViewControllers(registry);
     }

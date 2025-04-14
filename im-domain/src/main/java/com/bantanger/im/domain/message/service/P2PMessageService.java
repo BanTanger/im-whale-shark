@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -66,15 +67,13 @@ public class P2PMessageService {
         // 设置临时缓存，避免消息无限制重发，当缓存失效. 不做处理
         String messageCacheByMessageId = messageStoreServiceImpl
                 .getMessageCacheByMessageId(messageContent.getAppId(), messageContent.getMessageId());
-        if (messageCacheByMessageId != null &&
-                messageCacheByMessageId.equals(MessageErrorCode.MESSAGE_CACHE_EXPIRE.getError())) {
+        if (Objects.equals(MessageErrorCode.MESSAGE_CACHE_EXPIRE.getError(), messageCacheByMessageId)) {
             // 说明缓存过期，服务端向客户端发送 ack 要求客户端重新生成 messageId
             // 不做处理。直到客户端计时器超时, 重投次数 超过了 最大重投次数
             // 客户端 本地，重新生成 messageId
             return ;
         }
-        MessageContent messageCache =
-                JSON.parseObject(messageCacheByMessageId, MessageContent.class);
+        MessageContent messageCache = JSON.parseObject(messageCacheByMessageId, MessageContent.class);
         if (messageCache != null){
             THREAD_POOL_EXECUTOR.execute(() -> {
                 // 线程池执行消息同步，发送，回应等任务流程
@@ -93,7 +92,7 @@ public class P2PMessageService {
         long seq = redisSequence.doGetSeq(messageContent.getAppId()
                 + Constants.SeqConstants.MessageSeq
                 + ConversationIdGenerate.generateP2PId(
-                messageContent.getFromId(), messageContent.getToId()));
+                        messageContent.getFromId(), messageContent.getToId()));
         messageContent.setMessageSequence(seq);
 
         THREAD_POOL_EXECUTOR.execute(() -> {

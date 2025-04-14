@@ -4,27 +4,26 @@ USE im_core;
 CREATE TABLE app_user
 (
     user_id     VARCHAR(20)  NOT NULL
-        PRIMARY KEY,
-    user_name   VARCHAR(255) NULL,
-    password    VARCHAR(255) NULL,
-    mobile      VARCHAR(255) NULL,
-    create_time BIGINT       NULL,
-    update_time BIGINT       NULL
+        PRIMARY KEY COMMENT '用户唯一标识',
+    user_name   VARCHAR(255) NULL COMMENT '用户名',
+    password    VARCHAR(255) NULL COMMENT '用户密码',
+    mobile      VARCHAR(255) NULL COMMENT '用户手机号',
+    create_time BIGINT       NULL COMMENT '创建时间，时间戳格式',
+    update_time BIGINT       NULL COMMENT '更新时间，时间戳格式'
 );
 
-CREATE TABLE im_conversation_set
-(
-    conversation_id   VARCHAR(255) NOT NULL,
-    conversation_type INT(10)      NOT NULL DEFAULT 0 COMMENT '0 单聊 1群聊 2机器人 3公众号',
-    from_id           VARCHAR(50)  NOT NULL,
-    to_id             VARCHAR(50)  NOT NULL,
-    is_mute           INT(10)      NOT NULL DEFAULT 0 COMMENT '是否免打扰 1免打扰',
-    is_top            INT(10)      NOT NULL DEFAULT 0 COMMENT '是否置顶 1置顶',
-    sequence          BIGINT       NOT NULL DEFAULT 0 COMMENT 'sequence',
-    read_sequence     BIGINT       NOT NULL DEFAULT 0 COMMENT '已读最大消息id',
-    app_id            INT(10)      NOT NULL,
+CREATE TABLE im_conversation_set(
+    conversation_id   VARCHAR(255) NOT NULL COMMENT '会话唯一标识',
+    conversation_type INT(10)      NOT NULL DEFAULT 0 COMMENT '会话类型：0 单聊，1 群聊，2 机器人，3 公众号',
+    from_id           VARCHAR(50)  NOT NULL COMMENT '会话发起方 ID',
+    to_id             VARCHAR(50)  NOT NULL COMMENT '会话接收方 ID',
+    is_mute           INT(10)      NOT NULL DEFAULT 0 COMMENT '是否免打扰：0 否，1 是',
+    is_top            INT(10)      NOT NULL DEFAULT 0 COMMENT '是否置顶：0 否，1 是',
+    sequence          BIGINT       NOT NULL DEFAULT 0 COMMENT '会话序列号，用于排序',
+    read_sequence     BIGINT       NOT NULL DEFAULT 0 COMMENT '已读最大消息序列号',
+    app_id            INT(10)      NOT NULL COMMENT '应用 ID',
     PRIMARY KEY (app_id, conversation_id)
-);
+) ENGINE = InnoDB COMMENT = '会话表';
 
 INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('0_10001_10002', 0, '10001', '10002', 0, 0, 0, 0, 10001);
 INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('0_bantanger_10001', 0, 'bantanger', '10001', 0, 0, 0, 0, 10001);
@@ -35,17 +34,17 @@ INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, fro
 
 CREATE TABLE im_friendship
 (
-    app_id          INT(20)       NOT NULL COMMENT 'app_id',
-    from_id         VARCHAR(50)   NOT NULL COMMENT 'from_id',
-    to_id           VARCHAR(50)   NOT NULL COMMENT 'to_id',
-    remark          VARCHAR(50)   NULL COMMENT '备注',
-    status          INT(10)       NOT NULL DEFAULT 1 COMMENT '状态 1.正常 2.删除',
-    black           INT(10)       NOT NULL DEFAULT 1 COMMENT '1.正常 2.拉黑',
-    create_time     BIGINT        NULL,
-    friend_sequence BIGINT        NOT NULL DEFAULT 1 COMMENT '好友申请序列id，保证按时间顺序排列',
-    black_sequence  BIGINT        NOT NULL DEFAULT 0 COMMENT '好友拉黑序列id，保证按时间顺序排列',
-    add_source      VARCHAR(20)   NULL COMMENT '来源',
-    extra           VARCHAR(1000) NULL COMMENT '来源',
+    app_id          INT(20)       NOT NULL COMMENT '应用 ID',
+    from_id         VARCHAR(50)   NOT NULL COMMENT '发起方用户 ID',
+    to_id           VARCHAR(50)   NOT NULL COMMENT '接收方用户 ID',
+    remark          VARCHAR(50)   NULL COMMENT '好友备注',
+    status          INT(10)       NOT NULL DEFAULT 1 COMMENT '好友状态：1 正常，2 删除',
+    black           INT(10)       NOT NULL DEFAULT 1 COMMENT '黑名单状态：1 正常，2 拉黑',
+    create_time     BIGINT        NULL COMMENT '创建时间，时间戳格式',
+    friend_sequence BIGINT        NOT NULL DEFAULT 1 COMMENT '好友申请序列号，用于排序',
+    black_sequence  BIGINT        NOT NULL DEFAULT 0 COMMENT '黑名单序列号，用于排序',
+    add_source      VARCHAR(20)   NULL COMMENT '添加好友来源',
+    extra           VARCHAR(1000) NULL COMMENT '额外信息',
     PRIMARY KEY (app_id, from_id, to_id)
 );
 
@@ -58,63 +57,63 @@ INSERT INTO im_core.im_friendship (app_id, from_id, to_id, remark, status, black
 
 CREATE TABLE im_friendship_group
 (
-    app_id      INT(20)     NOT NULL COMMENT 'app_id',
-    from_id     VARCHAR(50) NOT NULL comment 'from_id',
+    app_id      INT(20)     NOT NULL COMMENT '应用 ID',
+    from_id     VARCHAR(50) NOT NULL COMMENT '用户 ID',
     group_id    INT(50) AUTO_INCREMENT
-        PRIMARY KEY,
-    group_name  VARCHAR(50) NOT NULL DEFAULT '默认分组' comment '好友分组组名',
-    sequence    BIGINT      NOT NULL DEFAULT 0,
-    create_time BIGINT      NULL,
-    update_time BIGINT      NULL,
-    del_flag    INT(10)     NOT NULL DEFAULT 0,
+        PRIMARY KEY COMMENT '分组唯一标识',
+    group_name  VARCHAR(50) NOT NULL DEFAULT '默认分组' COMMENT '好友分组名称',
+    sequence    BIGINT      NOT NULL DEFAULT 0 COMMENT '分组序列号，用于排序',
+    create_time BIGINT      NULL COMMENT '创建时间，时间戳格式',
+    update_time BIGINT      NULL COMMENT '更新时间，时间戳格式',
+    del_flag    INT(10)     NOT NULL DEFAULT 0 COMMENT '删除标识：0 未删除，1 已删除',
     CONSTRAINT `UNIQUE`
         UNIQUE (app_id, from_id, group_name)
 ) COMMENT '好友分组表';
 
 CREATE TABLE im_friendship_group_member
 (
-    group_id BIGINT      NOT NULL
-        PRIMARY KEY,
-    to_id    VARCHAR(50) NULL
+    group_id INT(50) AUTO_INCREMENT
+        PRIMARY KEY COMMENT '分组 ID',
+    to_id    VARCHAR(50) NULL COMMENT '好友 ID'
 ) COMMENT '好友分组成员表';
 
 CREATE TABLE im_friendship_request
 (
-    id             INT(20) AUTO_INCREMENT COMMENT 'id'
+    id             INT(20) AUTO_INCREMENT COMMENT '请求唯一标识'
         PRIMARY KEY,
-    app_id         INT(20)     NULL COMMENT 'app_id',
-    from_id        VARCHAR(50) NULL COMMENT 'from_id',
-    to_id          VARCHAR(50) NULL COMMENT 'to_id',
-    remark         VARCHAR(50) NULL COMMENT '备注',
-    read_status    INT(10)     NULL COMMENT '是否已读 1已读',
+    app_id         INT(20)     NULL COMMENT '应用 ID',
+    from_id        VARCHAR(50) NULL COMMENT '发起方用户 ID',
+    to_id          VARCHAR(50) NULL COMMENT '接收方用户 ID',
+    remark         VARCHAR(50) NULL COMMENT '备注信息',
+    read_status    INT(10)     NULL COMMENT '是否已读：0 未读，1 已读',
     add_source     VARCHAR(20) NULL COMMENT '好友来源',
     add_wording    VARCHAR(50) NULL COMMENT '好友验证信息',
-    approve_status INT(10)     NULL COMMENT '审批状态 1同意 2拒绝',
-    create_time    BIGINT      NULL,
-    update_time    BIGINT      NULL,
-    sequence       BIGINT      NULL
+    approve_status INT(10)     NULL COMMENT '审批状态：1 同意，2 拒绝',
+    create_time    BIGINT      NULL COMMENT '创建时间，时间戳格式',
+    update_time    BIGINT      NULL COMMENT '更新时间，时间戳格式',
+    sequence       BIGINT      NULL COMMENT '请求序列号，用于排序'
 );
 
 INSERT INTO im_core.im_friendship_request (id, app_id, from_id, to_id, remark, read_status, add_source, add_wording, approve_status, create_time, update_time, sequence) VALUES (1, 10001, '10003', 'bantanger', 'minim tempor', 0, 'cillum', 'ipsum id', 0, 1681025483768, null, 1);
 
 CREATE TABLE im_group
 (
-    app_id           INT(20)       NOT NULL COMMENT 'app_id',
-    group_id         VARCHAR(50)   NOT NULL COMMENT 'group_id',
-    owner_id         VARCHAR(50)   NOT NULL COMMENT '群主',
-    group_type       INT(10)       NULL COMMENT '群类型 1私有群（类似微信） 2公开群(类似QQ）',
-    group_name       VARCHAR(100)  NULL,
-    mute             INT(10)       NULL COMMENT '是否全员禁言，0 不禁言；1 全员禁言',
-    apply_join_type  INT(10)       NULL COMMENT '0.禁止任何人申请加入, 1.表示需要群主或管理员审批, 2.表示允许无需审批自由加入群组',
-    photo            VARCHAR(300)  NULL,
-    max_member_count INT(20)       NULL,
-    introduction     VARCHAR(100)  NULL COMMENT '群简介',
-    notification     VARCHAR(1000) NULL COMMENT '群公告',
-    status           INT(5)        NULL COMMENT '群状态 0正常 1解散',
-    sequence         BIGINT        NULL,
-    create_time      BIGINT        NULL,
-    update_time      BIGINT        NULL,
-    extra            VARCHAR(1000) NULL COMMENT '来源',
+    app_id           INT(20)       NOT NULL COMMENT '应用 ID',
+    group_id         VARCHAR(50)   NOT NULL COMMENT '群组唯一标识',
+    owner_id         VARCHAR(50)   NOT NULL COMMENT '群主用户 ID',
+    group_type       INT(10)       NULL COMMENT '群组类型：1 私有群，2 公开群',
+    group_name       VARCHAR(100)  NULL COMMENT '群组名称',
+    mute             INT(10)       NULL COMMENT '是否全员禁言：0 否，1 是',
+    apply_join_type  INT(10)       NULL COMMENT '加入群组方式：0 禁止申请，1 需审批，2 自由加入',
+    photo            VARCHAR(300)  NULL COMMENT '群组头像 URL',
+    max_member_count INT(20)       NULL COMMENT '最大成员数量',
+    introduction     VARCHAR(100)  NULL COMMENT '群组简介',
+    notification     VARCHAR(1000) NULL COMMENT '群组公告',
+    status           INT(5)        NULL COMMENT '群组状态：0 正常，1 解散',
+    sequence         BIGINT        NULL COMMENT '群组序列号，用于排序',
+    create_time      BIGINT        NULL COMMENT '创建时间，时间戳格式',
+    update_time      BIGINT        NULL COMMENT '更新时间，时间戳格式',
+    extra            VARCHAR(1000) NULL COMMENT '额外信息',
     PRIMARY KEY (APP_ID, GROUP_ID)
 );
 
@@ -125,18 +124,18 @@ INSERT INTO im_core.im_group (app_id, group_id, owner_id, group_type, group_name
 CREATE TABLE im_group_member
 (
     group_member_id BIGINT AUTO_INCREMENT
-        PRIMARY KEY,
-    group_id        VARCHAR(50)   NOT NULL COMMENT 'group_id',
-    app_id          INT(10)       NULL,
-    member_id       VARCHAR(50)   NOT NULL COMMENT '成员ID',
-    role            INT(10)       NULL COMMENT '群成员类型，0 普通成员, 1 管理员, 2 群主， 3 禁言，4 已经移除的成员',
-    speak_date      BIGINT(100)   NULL,
-    mute            INT(10)       NULL COMMENT '是否全员禁言，0 不禁言；1 全员禁言',
+        PRIMARY KEY COMMENT '群成员唯一标识',
+    group_id        VARCHAR(50)   NOT NULL COMMENT '群组 ID',
+    app_id          INT(10)       NULL COMMENT '应用 ID',
+    member_id       VARCHAR(50)   NOT NULL COMMENT '成员用户 ID',
+    role            INT(10)       NULL COMMENT '成员角色：0 普通成员，1 管理员，2 群主，3 禁言，4 已移除',
+    speak_date      BIGINT(100)   NULL COMMENT '禁言结束时间，时间戳格式',
+    mute            INT(10)       NULL COMMENT '是否禁言：0 否，1 是',
     alias           VARCHAR(100)  NULL COMMENT '群昵称',
-    join_time       BIGINT        NULL COMMENT '加入时间',
-    leave_time      BIGINT        NULL COMMENT '离开时间',
-    join_type       VARCHAR(50)   NULL COMMENT '加入类型',
-    extra           VARCHAR(1000) NULL
+    join_time       BIGINT        NULL COMMENT '加入时间，时间戳格式',
+    leave_time      BIGINT        NULL COMMENT '离开时间，时间戳格式',
+    join_type       VARCHAR(50)   NULL COMMENT '加入方式',
+    extra           VARCHAR(1000) NULL COMMENT '额外信息'
 );
 
 INSERT INTO im_core.im_group_member (group_member_id, group_id, app_id, member_id, role, speak_date, mute, alias, join_time, leave_time, join_type, extra) VALUES (3, '27a35ff2f9be4cc9a8d3db1ad3322804', 10001, '10001', 1, null, null, null, 1679400643080, null, null, null);
@@ -145,62 +144,62 @@ INSERT INTO im_core.im_group_member (group_member_id, group_id, app_id, member_i
 
 CREATE TABLE im_group_message_history
 (
-    app_id         INT(20)     NOT NULL COMMENT 'app_id',
-    from_id        VARCHAR(50) NOT NULL COMMENT 'from_id',
-    group_id       VARCHAR(50) NOT NULL COMMENT 'group_id',
-    message_key    BIGINT(50)  NOT NULL COMMENT 'messageBodyId',
-    create_time    BIGINT      NULL,
-    sequence       BIGINT      NULL,
-    message_random INT(20)     NULL,
-    message_time   BIGINT      NULL COMMENT '来源',
+    app_id         INT(20)     NOT NULL COMMENT '应用 ID',
+    from_id        VARCHAR(50) NOT NULL COMMENT '发消息用户 ID',
+    group_id       VARCHAR(50) NOT NULL COMMENT '群组 ID',
+    message_key    BIGINT(50)  NOT NULL COMMENT '消息唯一标识',
+    create_time    BIGINT      NULL COMMENT '消息创建时间，时间戳格式',
+    sequence       BIGINT      NULL COMMENT '消息序列号，用于排序',
+    message_random INT(20)     NULL COMMENT '消息随机数',
+    message_time   BIGINT      NULL COMMENT '消息发送时间，时间戳格式',
     PRIMARY KEY (app_id, group_id, message_key)
 );
 
 CREATE TABLE im_message_body
 (
-    app_id       INT(10)       NOT NULL,
+    app_id       INT(10)       NOT NULL COMMENT '应用 ID',
     message_key  BIGINT(50)    NOT NULL
-        PRIMARY KEY,
-    message_body VARCHAR(5000) NULL,
-    security_key VARCHAR(100)  NULL,
-    message_time BIGINT        NULL,
-    create_time  BIGINT        NULL,
-    extra        VARCHAR(1000) NULL,
-    del_flag     INT(10)       NULL
+        PRIMARY KEY COMMENT '消息唯一标识',
+    message_body VARCHAR(5000) NULL COMMENT '消息内容',
+    security_key VARCHAR(100)  NULL COMMENT '消息安全密钥',
+    message_time BIGINT        NULL COMMENT '消息发送时间，时间戳格式',
+    create_time  BIGINT        NULL COMMENT '消息创建时间，时间戳格式',
+    extra        VARCHAR(1000) NULL COMMENT '额外信息',
+    del_flag     INT(10)       NULL COMMENT '删除标识：0 未删除，1 已删除'
 );
 
 CREATE TABLE im_message_history
 (
-    app_id         INT(20)     NOT NULL COMMENT 'app_id',
-    from_id        VARCHAR(50) NOT NULL COMMENT 'from_id',
-    to_id          VARCHAR(50) NOT NULL COMMENT 'to_id',
-    owner_id       VARCHAR(50) NOT NULL COMMENT 'owner_id',
-    message_key    BIGINT(50)  NOT NULL COMMENT 'messageBodyId',
-    create_time    BIGINT      NULL,
-    sequence       BIGINT      NULL,
-    message_random INT(20)     NULL,
-    message_time   BIGINT      NULL COMMENT '来源',
+    app_id         INT(20)     NOT NULL COMMENT '应用 ID',
+    from_id        VARCHAR(50) NOT NULL COMMENT '发消息用户 ID',
+    to_id          VARCHAR(50) NOT NULL COMMENT '接收消息用户 ID',
+    owner_id       VARCHAR(50) NOT NULL COMMENT '消息所属用户 ID',
+    message_key    BIGINT(50)  NOT NULL COMMENT '消息唯一标识',
+    create_time    BIGINT      NULL COMMENT '消息创建时间，时间戳格式',
+    sequence       BIGINT      NULL COMMENT '消息序列号，用于排序',
+    message_random INT(20)     NULL COMMENT '消息随机数',
+    message_time   BIGINT      NULL COMMENT '消息发送时间，时间戳格式',
     PRIMARY KEY (app_id, owner_id, message_key)
 );
 
 CREATE TABLE im_user_data
 (
-    user_id            VARCHAR(50)       NOT NULL,
-    app_id             INT               NOT NULL,
-    nick_name          VARCHAR(100)      NULL COMMENT '昵称',
-    password           VARCHAR(255)      NULL,
-    photo              VARCHAR(255)      NULL,
-    user_sex           INT(10)           NULL,
-    birth_day          VARCHAR(50)       NULL COMMENT '生日',
-    location           VARCHAR(50)       NULL COMMENT '地址',
-    self_signature     VARCHAR(255)      NULL COMMENT '个性签名',
-    friend_allow_type  INT(10) DEFAULT 1 NOT NULL COMMENT '加好友验证类型（Friend_AllowType） 1无需验证 2需要验证',
-    forbidden_flag     INT(10) DEFAULT 0 NOT NULL COMMENT '禁用标识 1禁用',
-    disable_add_friend INT(10) DEFAULT 0 NOT NULL COMMENT '管理员禁止用户添加加好友：0 未禁用 1 已禁用',
-    silent_flag        INT(10) DEFAULT 0 NOT NULL COMMENT '禁言标识 1禁言',
-    user_type          INT(10) DEFAULT 1 NOT NULL COMMENT '用户类型 1普通用户 2客服 3机器人',
-    del_flag           INT(20) DEFAULT 0 NOT NULL,
-    extra              VARCHAR(1000)     NULL,
+    user_id            VARCHAR(50)       NOT NULL COMMENT '用户唯一标识',
+    app_id             INT               NOT NULL COMMENT '应用 ID',
+    nick_name          VARCHAR(100)      NULL COMMENT '用户昵称',
+    password           VARCHAR(255)      NULL COMMENT '用户密码',
+    photo              VARCHAR(255)      NULL COMMENT '用户头像 URL',
+    user_sex           INT(10)           NULL COMMENT '用户性别：1 男，2 女',
+    birth_day          VARCHAR(50)       NULL COMMENT '用户生日',
+    location           VARCHAR(50)       NULL COMMENT '用户地址',
+    self_signature     VARCHAR(255)      NULL COMMENT '用户个性签名',
+    friend_allow_type  INT(10) DEFAULT 1 NOT NULL COMMENT '加好友验证类型：1 无需验证，2 需要验证',
+    forbidden_flag     INT(10) DEFAULT 0 NOT NULL COMMENT '禁用标识：0 未禁用，1 已禁用',
+    disable_add_friend INT(10) DEFAULT 0 NOT NULL COMMENT '禁止添加好友：0 未禁用，1 已禁用',
+    silent_flag        INT(10) DEFAULT 0 NOT NULL COMMENT '禁言标识：0 未禁言，1 已禁言',
+    user_type          INT(10) DEFAULT 1 NOT NULL COMMENT '用户类型：1 普通用户，2 客服，3 机器人',
+    del_flag           INT(20) DEFAULT 0 NOT NULL COMMENT '删除标识：0 未删除，1 已删除',
+    extra              VARCHAR(1000)     NULL COMMENT '额外信息',
     PRIMARY KEY (app_id, user_id)
 );
 
