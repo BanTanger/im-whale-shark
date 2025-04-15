@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeChatPlus - 即时通讯系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/wechat-plus.css">
+</head>
+<body>
+    <!-- 登录页面 -->
+    <div id="login-page" class="login-container">
+        <div class="login-card">
+            <div class="logo-area">
+                <h1>WeChatPlus</h1>
+                <p>即时通讯系统</p>
+            </div>
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="userId">用户ID</label>
+                    <input type="text" id="userId" placeholder="请输入用户ID">
+                </div>
+                <div class="form-group">
+                    <label for="appId">AppID</label>
+                    <input type="text" id="appId" value="10001" placeholder="请输入AppID">
+                </div>
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="clientType">客户端类型</label>
+                        <select id="clientType">
+                            <option value="1">Web</option>
+                            <option value="2">PC</option>
+                            <option value="3">Android</option>
+                            <option value="4">iOS</option>
+                            <option value="5">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group half">
+                        <label for="imei">设备标识</label>
+                        <input type="text" id="imei" value="web" placeholder="设备标识">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button id="login-btn" class="login-btn">登录</button>
+                </div>
+                <p class="recent-accounts-label">最近账号</p>
+                <div id="recent-accounts" class="recent-accounts"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主界面 -->
+    <div id="main-app" class="container hidden">
+        <!-- 左侧导航栏 -->
+        <div class="sidebar">
+            <div class="sidebar-avatar" id="current-avatar"></div>
+            <div class="sidebar-icon active" data-page="chats">
+                <i class="fa fa-comment"></i>
+            </div>
+            <div class="sidebar-icon" data-page="contacts">
+                <i class="fa fa-address-book"></i>
+            </div>
+            <div class="sidebar-icon" data-page="groups">
+                <i class="fa fa-users"></i>
+            </div>
+            <div class="sidebar-icon" data-page="settings">
+                <i class="fa fa-cog"></i>
+            </div>
+        </div>
+        
+        <!-- 中间列表 -->
+        <div class="list-container">
+            <!-- 用户信息 -->
+            <div class="user-profile">
+                <div class="user-avatar" id="profile-avatar"></div>
+                <div class="user-info">
+                    <div class="user-name" id="profile-name"></div>
+                    <div class="user-status" id="profile-status">在线</div>
+                </div>
+                <div class="user-actions">
+                    <i class="fa fa-plus-circle" id="new-chat-btn"></i>
+                </div>
+            </div>
+            
+            <!-- 搜索栏 -->
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="搜索">
+            </div>
+            
+            <!-- 会话列表 -->
+            <div class="page-content active" id="chats-page">
+                <div class="tabs">
+                    <div class="tab active" data-tab="recent">最近会话</div>
+                    <div class="tab" data-tab="archived">已归档</div>
+                </div>
+                <div class="list-content" id="conversations-list"></div>
+            </div>
+            
+            <!-- 联系人列表 -->
+            <div class="page-content" id="contacts-page">
+                <div class="tabs">
+                    <div class="tab active" data-tab="all">所有联系人</div>
+                    <div class="tab" data-tab="groups">分组</div>
+                </div>
+                <div class="list-content" id="contacts-list"></div>
+            </div>
+            
+            <!-- 群组列表 -->
+            <div class="page-content" id="groups-page">
+                <div class="tabs">
+                    <div class="tab active" data-tab="joined">已加入</div>
+                    <div class="tab" data-tab="create">创建群组</div>
+                </div>
+                <div class="list-content" id="groups-list"></div>
+                <div class="create-group-form hidden" id="create-group-form">
+                    <div class="form-group">
+                        <label for="group-name">群组名称</label>
+                        <input type="text" id="group-name" placeholder="请输入群组名称">
+                    </div>
+                    <div class="form-group">
+                        <label for="group-intro">群组介绍</label>
+                        <textarea id="group-intro" placeholder="请输入群组介绍"></textarea>
+                    </div>
+                    <button id="create-group-btn">创建群组</button>
+                </div>
+            </div>
+            
+            <!-- 设置页面 -->
+            <div class="page-content" id="settings-page">
+                <div class="settings-section">
+                    <h3>界面设置</h3>
+                    <div class="setting-item">
+                        <span>界面风格</span>
+                        <div class="toggle-container">
+                            <span class="toggle-label">经典</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="ui-style-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">现代</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <span>显示模式</span>
+                        <div class="toggle-container">
+                            <span class="toggle-label">浅色</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="theme-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">深色</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <span>字体大小</span>
+                        <div class="range-container">
+                            <input type="range" id="font-size-range" min="12" max="20" value="14">
+                            <span id="font-size-value">14px</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>账号设置</h3>
+                    <div class="setting-item">
+                        <span>用户ID</span>
+                        <span id="settings-user-id"></span>
+                    </div>
+                    <div class="setting-item">
+                        <span>客户端类型</span>
+                        <span id="settings-client-type"></span>
+                    </div>
+                    <div class="setting-item">
+                        <span>APP ID</span>
+                        <span id="settings-app-id"></span>
+                    </div>
+                    <div class="setting-item logout-btn-container">
+                        <button id="logout-btn">退出登录</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧聊天区域 -->
+        <div class="chat-container">
+            <!-- 聊天头部 -->
+            <div class="chat-header">
+                <div class="chat-title">
+                    <h2 id="chat-title">选择一个会话开始聊天</h2>
+                    <p id="chat-subtitle" class="chat-subtitle"></p>
+                </div>
+                <div class="chat-actions">
+                    <i class="fa fa-ellipsis-h" id="chat-menu-btn"></i>
+                </div>
+            </div>
+            
+            <!-- 聊天内容 -->
+            <div id="chat-messages" class="chat-messages">
+                <div class="no-conversation">
+                    <div class="no-conversation-icon">
+                        <i class="fa fa-comments-o"></i>
+                    </div>
+                    <p>选择一个联系人或群组开始聊天</p>
+                </div>
+            </div>
+            
+            <!-- 聊天工具栏 -->
+            <div class="chat-toolbar">
+                <div class="toolbar-btn">
+                    <i class="fa fa-smile-o"></i>
+                </div>
+                <div class="toolbar-btn">
+                    <i class="fa fa-file-o"></i>
+                </div>
+                <div class="toolbar-btn">
+                    <i class="fa fa-image"></i>
+                </div>
+            </div>
+            
+            <!-- 聊天输入区 -->
+            <div class="chat-input-container">
+                <textarea id="message-input" placeholder="输入消息..." disabled></textarea>
+                <button id="send-btn" disabled>发送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 菜单和弹窗 -->
+    <div id="context-menu" class="context-menu hidden"></div>
+    <div id="modal-backdrop" class="modal-backdrop hidden"></div>
+    <div id="modal-container" class="modal-container hidden"></div>
+    
+    <!-- 脚本引入 -->
+    <script src="js/byte-buffer.js"></script>
+    <script src="js/ws-client.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/message-handler.js"></script>
+    <script src="js/ui-controller.js"></script>
+    <script src="js/wechat-plus.js"></script>
+</body>
+</html> 

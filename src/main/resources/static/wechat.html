@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>IM 聊天</title>
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* 主布局 */
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* 联系人列表 */
+        .contact-list {
+            width: 280px;
+            border-right: 1px solid #eee;
+        }
+        
+        /* 聊天窗口 */
+        .chat-window {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 消息区域 */
+        .message-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        /* 输入框 */
+        .input-area {
+            height: 150px;
+            border-top: 1px solid #eee;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录模态框 -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <!-- 登录表单 -->
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- 联系人列表 -->
+        <div class="contact-list">
+
+        <!-- 聊天窗口 -->
+        <div class="chat-window">
+            <div class="message-area">
+                <!-- 消息气泡 -->
+            </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // WebSocket 连接管理
+        // 消息处理
+        // UI 交互
+    </script>
+</body>
+</html>
