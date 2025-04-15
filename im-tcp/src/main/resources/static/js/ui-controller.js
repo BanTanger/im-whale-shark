@@ -1,6 +1,6 @@
 /**
  * UI控制器类
- * 负责界面交互和主题切换等UI相关功能
+ * 负责处理UI相关的逻辑和交互
  */
 class UIController {
     /**
@@ -9,513 +9,687 @@ class UIController {
      */
     constructor(options = {}) {
         this.options = Object.assign({
+            elements: {},
+            onConversationSelect: () => {},
+            onSendMessage: () => {},
             onThemeChange: () => {},
             onStyleChange: () => {},
-            onFontSizeChange: () => {}
+            onFontSizeChange: () => {},
+            onCreateGroup: () => {},
+            onAddFriend: () => {}
         }, options);
         
-        this.currentTheme = 'light';
-        this.currentStyle = 'classic';
-        this.currentFontSize = 14;
-        
-        this.activePage = 'chats';
-        this.activeTab = {
-            chats: 'recent',
-            contacts: 'all',
-            groups: 'joined',
-        };
-        
+        this.elements = this.options.elements;
         this.currentConversation = null;
-        this.messageInputEnabled = false;
+        this.messageMap = new Map(); // 用于存储消息ID到DOM元素的映射
         
-        this.init();
+        this._setupEventListeners();
     }
     
     /**
-     * 初始化UI控制器
+     * 设置事件监听器
+     * @private
      */
-    init() {
-        this._loadSettings();
-        this._setupEventListeners();
-        this._applySettings();
+    _setupEventListeners() {
+        // 这里可以添加更多UI相关的事件监听器
+        
+        // 模态框背景点击事件
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        if (modalBackdrop) {
+            modalBackdrop.addEventListener('click', (e) => {
+                if (e.target === modalBackdrop) {
+                    modalBackdrop.classList.add('hidden');
+                    document.getElementById('modal-container').classList.add('hidden');
+                }
+            });
+        }
+        
+        // 侧边栏导航图标的点击事件
+        if (this.elements.sidebar && this.elements.sidebar.sidebarIcons) {
+            this.elements.sidebar.sidebarIcons.forEach(icon => {
+                icon.addEventListener('click', () => {
+                    const page = icon.getAttribute('data-page');
+                    if (page) {
+                        this._switchPage(page);
+                    }
+                });
+            });
+        }
+        
+        // 新聊天按钮点击事件
+        const newChatBtn = document.getElementById('new-chat-btn');
+        if (newChatBtn) {
+            console.log('找到新聊天按钮，添加点击事件');
+            
+            // 移除可能存在的旧事件处理程序
+            const newHandler = () => {
+                console.log('新聊天按钮被点击');
+                this._showAddFriendModal();
+                return false;
+            };
+            
+            // 使用捕获和冒泡阶段的监听器，确保点击事件被处理
+            newChatBtn.addEventListener('click', newHandler, true);
+            newChatBtn.addEventListener('click', newHandler);
+            
+            // 为了确保事件触发，添加鼠标按下事件
+            newChatBtn.addEventListener('mousedown', () => {
+                console.log('新聊天按钮鼠标按下');
+            });
+        } else {
+            console.warn('未找到新聊天按钮');
+        }
+        
+        // 发送消息按钮点击事件
+        if (this.elements.chat && this.elements.chat.sendBtn) {
+            this.elements.chat.sendBtn.addEventListener('click', () => {
+                const messageInput = this.elements.chat.messageInput;
+                if (messageInput && messageInput.value.trim()) {
+                    this._handleSendMessage(messageInput.value.trim());
+                    messageInput.value = '';
+                    messageInput.focus();
+                }
+            });
+        }
+        
+        // 消息输入框键盘事件
+        if (this.elements.chat && this.elements.chat.messageInput) {
+            this.elements.chat.messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const messageInput = this.elements.chat.messageInput;
+                    if (messageInput.value.trim()) {
+                        this._handleSendMessage(messageInput.value.trim());
+                        messageInput.value = '';
+                    }
+                }
+            });
+            
+            // 输入时启用/禁用发送按钮
+            this.elements.chat.messageInput.addEventListener('input', () => {
+                if (this.elements.chat.sendBtn) {
+                    this.elements.chat.sendBtn.disabled = !this.elements.chat.messageInput.value.trim();
+                }
+            });
+        }
+        
+        // 群组页面的标签和创建群组表单
+        const groupsPage = document.getElementById('groups-page');
+        if (groupsPage) {
+            // 标签切换事件
+            const tabs = groupsPage.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    
+                    // 更新标签激活状态
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // 处理特殊标签
+                    const groupsList = document.getElementById('groups-list');
+                    const createGroupForm = document.getElementById('create-group-form');
+                    
+                    if (tabName === 'create') {
+                        // 显示创建群组表单
+                        if (groupsList) groupsList.classList.add('hidden');
+                        if (createGroupForm) createGroupForm.classList.remove('hidden');
+                    } else {
+                        // 显示群组列表
+                        if (groupsList) groupsList.classList.remove('hidden');
+                        if (createGroupForm) createGroupForm.classList.add('hidden');
+                    }
+                });
+            });
+            
+            // 创建群组按钮
+            const createGroupBtn = document.getElementById('create-group-btn');
+            if (createGroupBtn) {
+                createGroupBtn.addEventListener('click', () => {
+                    const groupName = document.getElementById('group-name');
+                    const groupIntro = document.getElementById('group-intro');
+                    
+                    if (groupName && groupName.value.trim()) {
+                        this._handleCreateGroup({
+                            groupName: groupName.value.trim(),
+                            introduction: groupIntro ? groupIntro.value.trim() : ''
+                        });
+                        
+                        // 清空表单
+                        groupName.value = '';
+                        if (groupIntro) groupIntro.value = '';
+                    } else {
+                        alert('请输入群组名称');
+                    }
+                });
+            }
+        }
+        
+        // 联系人页面的标签
+        const contactsPage = document.getElementById('contacts-page');
+        if (contactsPage) {
+            const tabs = contactsPage.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // 更新标签激活状态
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // 这里可以添加切换联系人分组的逻辑
+                });
+            });
+        }
+        
+        // 设置页面的按钮和控件
+        if (this.elements.settings) {
+            // 主题切换
+            if (this.elements.settings.themeToggle) {
+                this.elements.settings.themeToggle.addEventListener('change', () => {
+                    const theme = this.elements.settings.themeToggle.checked ? 'dark' : 'light';
+                    if (this.options.onThemeChange) {
+                        this.options.onThemeChange(theme);
+                    }
+                });
+            }
+            
+            // UI风格切换
+            if (this.elements.settings.uiStyleToggle) {
+                this.elements.settings.uiStyleToggle.addEventListener('change', () => {
+                    const style = this.elements.settings.uiStyleToggle.checked ? 'modern' : 'classic';
+                    if (this.options.onStyleChange) {
+                        this.options.onStyleChange(style);
+                    }
+                });
+            }
+            
+            // 字体大小调整
+            if (this.elements.settings.fontSizeRange) {
+                this.elements.settings.fontSizeRange.addEventListener('input', () => {
+                    const fontSize = this.elements.settings.fontSizeRange.value;
+                    if (this.options.onFontSizeChange) {
+                        this.options.onFontSizeChange(fontSize);
+                    }
+                });
+            }
+            
+            // 退出登录按钮
+            if (this.elements.settings.logoutBtn) {
+                this.elements.settings.logoutBtn.addEventListener('click', () => {
+                    this._handleLogout();
+                });
+            }
+        }
     }
     
     /**
      * 切换页面
      * @param {string} page 页面名称
+     * @private
      */
-    switchPage(page) {
-        const validPages = ['chats', 'contacts', 'groups', 'settings'];
-        if (!validPages.includes(page)) {
-            console.error(`无效的页面名称: ${page}`);
-            return;
+    _switchPage(page) {
+        // 更新侧边栏图标的激活状态
+        if (this.elements.sidebar && this.elements.sidebar.sidebarIcons) {
+            this.elements.sidebar.sidebarIcons.forEach(icon => {
+                if (icon.getAttribute('data-page') === page) {
+                    icon.classList.add('active');
+                } else {
+                    icon.classList.remove('active');
+                }
+            });
         }
         
-        // 更新导航图标激活状态
-        document.querySelectorAll('.sidebar-icon').forEach(icon => {
-            icon.classList.remove('active');
-        });
-        document.querySelector(`.sidebar-icon[data-page="${page}"]`).classList.add('active');
-        
-        // 更新页面显示
-        document.querySelectorAll('.page-content').forEach(pageEl => {
-            pageEl.classList.remove('active');
-        });
-        document.getElementById(`${page}-page`).classList.add('active');
-        
-        this.activePage = page;
+        // 更新页面内容的显示状态
+        const pageContents = document.querySelectorAll('.page-content');
+        if (pageContents && pageContents.length > 0) {
+            pageContents.forEach(content => {
+                if (content.id === `${page}-page`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
     }
     
     /**
-     * 切换标签页
-     * @param {string} page 页面名称
-     * @param {string} tab 标签页名称
+     * 处理发送消息
+     * @param {string} content 消息内容
+     * @private
      */
-    switchTab(page, tab) {
-        const tabContainer = document.querySelector(`#${page}-page .tabs`);
-        if (!tabContainer) return;
-        
-        // 更新标签激活状态
-        tabContainer.querySelectorAll('.tab').forEach(tabEl => {
-            tabEl.classList.remove('active');
-        });
-        tabContainer.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
-        
-        // 特殊处理某些标签切换
-        if (page === 'groups' && tab === 'create') {
-            document.getElementById('groups-list').classList.add('hidden');
-            document.getElementById('create-group-form').classList.remove('hidden');
-        } else if (page === 'groups' && tab === 'joined') {
-            document.getElementById('groups-list').classList.remove('hidden');
-            document.getElementById('create-group-form').classList.add('hidden');
-        }
-        
-        this.activeTab[page] = tab;
-    }
-    
-    /**
-     * 添加会话项
-     * @param {Object} conversation 会话数据
-     */
-    addConversationItem(conversation) {
-        const conversationsList = document.getElementById('conversations-list');
-        
-        // 检查是否已存在该会话
-        const existingItem = document.getElementById(`conversation-${conversation.id}`);
-        if (existingItem) {
-            this.updateConversationItem(conversation);
+    _handleSendMessage(content) {
+        if (!this.currentConversation || !content || !this.options.onSendMessage) {
             return;
         }
         
-        const itemElement = document.createElement('div');
-        itemElement.id = `conversation-${conversation.id}`;
-        itemElement.className = 'conversation-item';
-        itemElement.setAttribute('data-id', conversation.id);
-        itemElement.setAttribute('data-type', conversation.type);
+        const messageData = {
+            conversationId: this.currentConversation.id,
+            conversationType: this.currentConversation.type,
+            targetId: this.currentConversation.targetId,
+            content: content
+        };
         
-        // 如果是私聊，设置toId属性
-        if (conversation.type === 'chat') {
-            itemElement.setAttribute('data-to-id', conversation.toId);
-        } else if (conversation.type === 'group') {
-            itemElement.setAttribute('data-group-id', conversation.groupId);
+        this.options.onSendMessage(messageData);
+    }
+    
+    /**
+     * 设置用户信息
+     * @param {Object} userInfo 用户信息
+     */
+    setUserInfo(userInfo) {
+        if (!userInfo) return;
+        
+        // 设置头像
+        const avatar = userInfo.userId.charAt(0).toUpperCase();
+        
+        if (this.elements.sidebar && this.elements.sidebar.currentAvatar) {
+            this.elements.sidebar.currentAvatar.textContent = avatar;
         }
         
-        // 设置头像显示的第一个字符
-        const avatarChar = conversation.name ? conversation.name.charAt(0) : (conversation.type === 'chat' ? conversation.toId.charAt(0) : 'G');
+        if (this.elements.sidebar && this.elements.sidebar.profileAvatar) {
+            this.elements.sidebar.profileAvatar.textContent = avatar;
+        }
         
-        itemElement.innerHTML = `
-            <div class="conversation-avatar">${avatarChar}</div>
-            <div class="conversation-info">
-                <div class="conversation-header">
-                    <div class="conversation-name">${conversation.name || (conversation.type === 'chat' ? conversation.toId : `群聊(${conversation.groupId})`)}</div>
-                    <div class="conversation-time">${this._formatTime(conversation.timestamp)}</div>
-                </div>
-                <div class="conversation-message">${conversation.lastMessage || ''}</div>
-            </div>
-            ${conversation.unread ? `<div class="conversation-badge">${conversation.unread}</div>` : ''}
-        `;
+        // 设置用户名
+        if (this.elements.sidebar && this.elements.sidebar.profileName) {
+            this.elements.sidebar.profileName.textContent = userInfo.userId;
+        }
+    }
+    
+    /**
+     * 更新会话列表
+     * @param {Array} conversations 会话列表
+     */
+    updateConversationsList(conversations) {
+        if (!this.elements.lists || !this.elements.lists.conversationsList) return;
         
-        itemElement.addEventListener('click', () => {
+        // 清空列表
+        this.elements.lists.conversationsList.innerHTML = '';
+        
+        // 按最后消息时间排序
+        const sortedConversations = [...conversations].sort((a, b) => {
+            const timeA = a.lastMessage ? a.lastMessage.timestamp : 0;
+            const timeB = b.lastMessage ? b.lastMessage.timestamp : 0;
+            return timeB - timeA;
+        });
+        
+        // 添加会话项
+        sortedConversations.forEach(conversation => {
+            const item = this._createConversationItem(conversation);
+            this.elements.lists.conversationsList.appendChild(item);
+        });
+    }
+    
+    /**
+     * 创建会话列表项
+     * @param {Object} conversation 会话对象
+     * @returns {HTMLElement} 会话列表项元素
+     * @private
+     */
+    _createConversationItem(conversation) {
+        const item = document.createElement('div');
+        item.className = 'conversation-item';
+        item.setAttribute('data-id', conversation.id);
+        if (this.currentConversation && this.currentConversation.id === conversation.id) {
+            item.classList.add('active');
+        }
+        
+        // 头像
+        const avatar = document.createElement('div');
+        avatar.className = 'conversation-avatar';
+        avatar.textContent = conversation.avatar;
+        
+        // 信息区域
+        const info = document.createElement('div');
+        info.className = 'conversation-info';
+        
+        // 头部（名称和时间）
+        const header = document.createElement('div');
+        header.className = 'conversation-header';
+        
+        const name = document.createElement('div');
+        name.className = 'conversation-name';
+        name.textContent = conversation.name;
+        
+        const time = document.createElement('div');
+        time.className = 'conversation-time';
+        time.textContent = conversation.lastMessage ? this._formatTime(conversation.lastMessage.timestamp) : '';
+        
+        header.appendChild(name);
+        header.appendChild(time);
+        
+        // 消息预览
+        const message = document.createElement('div');
+        message.className = 'conversation-message';
+        message.textContent = conversation.lastMessage ? conversation.lastMessage.content : '';
+        
+        info.appendChild(header);
+        info.appendChild(message);
+        
+        // 未读数徽章
+        if (conversation.unreadCount && conversation.unreadCount > 0) {
+            const badge = document.createElement('div');
+            badge.className = 'conversation-badge';
+            badge.textContent = conversation.unreadCount > 99 ? '99+' : conversation.unreadCount;
+            info.appendChild(badge);
+        }
+        
+        item.appendChild(avatar);
+        item.appendChild(info);
+        
+        // 添加点击事件
+        item.addEventListener('click', () => {
             this.selectConversation(conversation);
         });
         
-        // 添加到列表中，最新的对话放在最前面
-        if (conversationsList.firstChild) {
-            conversationsList.insertBefore(itemElement, conversationsList.firstChild);
+        return item;
+    }
+    
+    /**
+     * 更新联系人列表
+     * @param {Array} contacts 联系人列表
+     */
+    updateContactsList(contacts) {
+        if (!this.elements.lists || !this.elements.lists.contactsList) return;
+        
+        // 清空列表
+        this.elements.lists.contactsList.innerHTML = '';
+        
+        // 按名称排序
+        const sortedContacts = [...contacts].sort((a, b) => {
+            return a.name.localeCompare(b.name);
+        });
+        
+        // 添加联系人项
+        sortedContacts.forEach(contact => {
+            const item = this._createContactItem(contact);
+            this.elements.lists.contactsList.appendChild(item);
+        });
+    }
+    
+    /**
+     * 创建联系人列表项
+     * @param {Object} contact 联系人对象
+     * @returns {HTMLElement} 联系人列表项元素
+     * @private
+     */
+    _createContactItem(contact) {
+        const item = document.createElement('div');
+        item.className = 'contact-item';
+        item.setAttribute('data-id', contact.id);
+        
+        // 头像
+        const avatar = document.createElement('div');
+        avatar.className = 'contact-avatar';
+        avatar.textContent = contact.avatar;
+        
+        // 名称
+        const name = document.createElement('div');
+        name.className = 'contact-name';
+        name.textContent = contact.name;
+        
+        item.appendChild(avatar);
+        item.appendChild(name);
+        
+        // 添加点击事件
+        item.addEventListener('click', () => {
+            this._handleContactClick(contact);
+        });
+        
+        return item;
+    }
+    
+    /**
+     * 处理联系人点击
+     * @param {Object} contact 联系人对象
+     * @private
+     */
+    _handleContactClick(contact) {
+        // 创建或获取与该联系人的会话
+        const conversationId = `C2C_${contact.id}`;
+        
+        // 检查是否已有该会话
+        const conversationItem = document.querySelector(`.conversation-item[data-id="${conversationId}"]`);
+        if (conversationItem) {
+            // 已有会话，直接点击
+            conversationItem.click();
         } else {
-            conversationsList.appendChild(itemElement);
+            // 创建新会话
+            const conversation = {
+                id: conversationId,
+                type: 'C2C',
+                targetId: contact.id,
+                name: contact.name,
+                avatar: contact.avatar
+            };
+            this.selectConversation(conversation);
         }
     }
     
     /**
-     * 更新会话项
-     * @param {Object} conversation 会话数据
+     * 更新群组列表
+     * @param {Array} groups 群组列表
      */
-    updateConversationItem(conversation) {
-        const itemElement = document.getElementById(`conversation-${conversation.id}`);
-        if (!itemElement) {
-            this.addConversationItem(conversation);
-            return;
-        }
+    updateGroupsList(groups) {
+        if (!this.elements.lists || !this.elements.lists.groupsList) return;
         
-        // 更新最新消息和时间
-        const messageEl = itemElement.querySelector('.conversation-message');
-        const timeEl = itemElement.querySelector('.conversation-time');
+        // 清空列表
+        this.elements.lists.groupsList.innerHTML = '';
         
-        if (messageEl && conversation.lastMessage) {
-            messageEl.textContent = conversation.lastMessage;
-        }
+        // 按名称排序
+        const sortedGroups = [...groups].sort((a, b) => {
+            return a.name.localeCompare(b.name);
+        });
         
-        if (timeEl && conversation.timestamp) {
-            timeEl.textContent = this._formatTime(conversation.timestamp);
-        }
+        // 添加群组项
+        sortedGroups.forEach(group => {
+            const item = this._createGroupItem(group);
+            this.elements.lists.groupsList.appendChild(item);
+        });
+    }
+    
+    /**
+     * 创建群组列表项
+     * @param {Object} group 群组对象
+     * @returns {HTMLElement} 群组列表项元素
+     * @private
+     */
+    _createGroupItem(group) {
+        const item = document.createElement('div');
+        item.className = 'contact-item';
+        item.setAttribute('data-id', group.id);
         
-        // 更新未读消息数
-        const badgeEl = itemElement.querySelector('.conversation-badge');
-        if (conversation.unread && conversation.unread > 0) {
-            if (badgeEl) {
-                badgeEl.textContent = conversation.unread;
-            } else {
-                const badge = document.createElement('div');
-                badge.className = 'conversation-badge';
-                badge.textContent = conversation.unread;
-                itemElement.appendChild(badge);
-            }
-        } else if (badgeEl) {
-            badgeEl.remove();
-        }
+        // 头像
+        const avatar = document.createElement('div');
+        avatar.className = 'contact-avatar';
+        avatar.textContent = group.avatar;
         
-        // 移动到顶部（最新的对话）
-        const conversationsList = document.getElementById('conversations-list');
-        if (conversationsList.firstChild !== itemElement) {
-            conversationsList.removeChild(itemElement);
-            conversationsList.insertBefore(itemElement, conversationsList.firstChild);
-        }
+        // 名称
+        const name = document.createElement('div');
+        name.className = 'contact-name';
+        name.textContent = `${group.name} (${group.memberCount || 0}人)`;
         
-        // 如果当前正在查看这个会话，更新标题
-        if (this.currentConversation && this.currentConversation.id === conversation.id) {
+        item.appendChild(avatar);
+        item.appendChild(name);
+        
+        // 添加点击事件
+        item.addEventListener('click', () => {
+            this._handleGroupClick(group);
+        });
+        
+        return item;
+    }
+    
+    /**
+     * 处理群组点击
+     * @param {Object} group 群组对象
+     * @private
+     */
+    _handleGroupClick(group) {
+        // 创建或获取与该群组的会话
+        const conversationId = `GROUP_${group.id}`;
+        
+        // 检查是否已有该会话
+        const conversationItem = document.querySelector(`.conversation-item[data-id="${conversationId}"]`);
+        if (conversationItem) {
+            // 已有会话，直接点击
+            conversationItem.click();
+        } else {
+            // 创建新会话
+            const conversation = {
+                id: conversationId,
+                type: 'GROUP',
+                targetId: group.id,
+                name: group.name,
+                avatar: group.avatar
+            };
             this.selectConversation(conversation);
         }
     }
     
     /**
      * 选择会话
-     * @param {Object} conversation 会话数据
+     * @param {Object} conversation 会话对象
      */
     selectConversation(conversation) {
+        if (!conversation) return;
+        
+        // 更新当前会话
         this.currentConversation = conversation;
         
-        // 更新选中状态
-        document.querySelectorAll('.conversation-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        
-        const itemElement = document.getElementById(`conversation-${conversation.id}`);
-        if (itemElement) {
-            itemElement.classList.add('active');
-            
-            // 清除未读标记
-            const badgeEl = itemElement.querySelector('.conversation-badge');
-            if (badgeEl) {
-                badgeEl.remove();
+        // 更新会话列表项的选中状态
+        const conversationItems = document.querySelectorAll('.conversation-item');
+        conversationItems.forEach(item => {
+            if (item.getAttribute('data-id') === conversation.id) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
             }
-        }
+        });
         
         // 更新聊天标题
-        const titleEl = document.getElementById('chat-title');
-        const subtitleEl = document.getElementById('chat-subtitle');
-        
-        if (titleEl) {
-            titleEl.textContent = conversation.name || (conversation.type === 'chat' ? conversation.toId : `群聊(${conversation.groupId})`);
+        if (this.elements.chat && this.elements.chat.chatTitle) {
+            this.elements.chat.chatTitle.textContent = conversation.name || conversation.targetId;
         }
         
-        if (subtitleEl) {
-            if (conversation.type === 'chat') {
-                subtitleEl.textContent = '单聊';
-            } else if (conversation.type === 'group') {
-                subtitleEl.textContent = `群聊 · ${conversation.memberCount || 0}人`;
-            }
+        // 更新聊天副标题
+        if (this.elements.chat && this.elements.chat.chatSubtitle) {
+            this.elements.chat.chatSubtitle.textContent = conversation.type === 'C2C' ? '私聊' : '群聊';
         }
         
-        // 启用消息输入
-        this.enableMessageInput();
-        
-        // 移除"无会话"提示
-        const noConversationEl = document.querySelector('.chat-messages .no-conversation');
-        if (noConversationEl) {
-            noConversationEl.style.display = 'none';
-        }
-        
-        // 触发会话选择回调
-        if (this.options.onConversationSelect) {
-            this.options.onConversationSelect(conversation);
-        }
+        // 调用回调函数
+        this.options.onConversationSelect(conversation);
     }
     
     /**
-     * 启用消息输入
+     * 获取当前会话
+     * @returns {Object|null} 当前会话对象
      */
-    enableMessageInput() {
-        const inputEl = document.getElementById('message-input');
-        const sendBtn = document.getElementById('send-btn');
-        
-        if (inputEl) {
-            inputEl.disabled = false;
-            inputEl.focus();
-        }
-        
-        if (sendBtn) {
-            sendBtn.disabled = false;
-        }
-        
-        this.messageInputEnabled = true;
+    getCurrentConversation() {
+        return this.currentConversation;
     }
     
     /**
-     * 禁用消息输入
+     * 清空消息列表
      */
-    disableMessageInput() {
-        const inputEl = document.getElementById('message-input');
-        const sendBtn = document.getElementById('send-btn');
+    clearMessages() {
+        if (!this.elements.chat || !this.elements.chat.messagesContainer) return;
         
-        if (inputEl) {
-            inputEl.disabled = true;
-            inputEl.value = '';
+        // 移除所有消息元素，但保留无会话提示
+        const noConversation = this.elements.chat.messagesContainer.querySelector('.no-conversation');
+        this.elements.chat.messagesContainer.innerHTML = '';
+        
+        if (noConversation) {
+            this.elements.chat.messagesContainer.appendChild(noConversation);
         }
         
-        if (sendBtn) {
-            sendBtn.disabled = true;
+        // 隐藏或显示无会话提示
+        if (this.currentConversation) {
+            if (noConversation) noConversation.style.display = 'none';
+        } else {
+            if (noConversation) noConversation.style.display = 'flex';
         }
         
-        this.messageInputEnabled = false;
+        // 清空消息映射
+        this.messageMap.clear();
     }
     
     /**
-     * 添加联系人项
-     * @param {Object} contact 联系人数据
-     */
-    addContactItem(contact) {
-        const contactsList = document.getElementById('contacts-list');
-        
-        // 检查是否已存在该联系人
-        const existingItem = document.getElementById(`contact-${contact.userId}`);
-        if (existingItem) return;
-        
-        const itemElement = document.createElement('div');
-        itemElement.id = `contact-${contact.userId}`;
-        itemElement.className = 'contact-item';
-        itemElement.setAttribute('data-id', contact.userId);
-        
-        // 设置头像显示的第一个字符
-        const avatarChar = contact.nickname ? contact.nickname.charAt(0) : contact.userId.charAt(0);
-        
-        // 判断是否有备注
-        const displayName = contact.remark || contact.nickname || contact.userId;
-        
-        itemElement.innerHTML = `
-            <div class="contact-avatar">${avatarChar}</div>
-            <div class="contact-info">
-                <div class="contact-header">
-                    <div class="contact-name">${displayName}</div>
-                    ${contact.black === 1 ? '<span class="contact-label">已拉黑</span>' : ''}
-                </div>
-            </div>
-        `;
-        
-        // 点击联系人创建或切换到对应会话
-        itemElement.addEventListener('click', () => {
-            this._createChatFromContact(contact);
-        });
-        
-        contactsList.appendChild(itemElement);
-    }
-    
-    /**
-     * 从联系人创建聊天会话
-     * @param {Object} contact 联系人数据
-     * @private
-     */
-    _createChatFromContact(contact) {
-        // 首先检查是否已存在该会话
-        const conversationId = `chat-${contact.userId}`;
-        const existingConversation = document.querySelector(`.conversation-item[data-to-id="${contact.userId}"]`);
-        
-        if (existingConversation) {
-            // 如果存在，直接点击它
-            existingConversation.click();
-            this.switchPage('chats');
-            return;
-        }
-        
-        // 创建新会话
-        const conversation = {
-            id: conversationId,
-            type: 'chat',
-            toId: contact.userId,
-            name: contact.remark || contact.nickname || contact.userId,
-            timestamp: Date.now(),
-            lastMessage: '',
-            unread: 0
-        };
-        
-        this.addConversationItem(conversation);
-        this.switchPage('chats');
-        this.selectConversation(conversation);
-    }
-    
-    /**
-     * 添加群组项
-     * @param {Object} group 群组数据
-     */
-    addGroupItem(group) {
-        const groupsList = document.getElementById('groups-list');
-        
-        // 检查是否已存在该群组
-        const existingItem = document.getElementById(`group-${group.groupId}`);
-        if (existingItem) return;
-        
-        const itemElement = document.createElement('div');
-        itemElement.id = `group-${group.groupId}`;
-        itemElement.className = 'contact-item';
-        itemElement.setAttribute('data-id', group.groupId);
-        
-        // 设置头像显示的第一个字符
-        const avatarChar = group.groupName ? group.groupName.charAt(0) : 'G';
-        
-        itemElement.innerHTML = `
-            <div class="contact-avatar">${avatarChar}</div>
-            <div class="contact-info">
-                <div class="contact-header">
-                    <div class="contact-name">${group.groupName || `群聊(${group.groupId})`}</div>
-                    <span class="contact-label">${group.memberCount || 0}人</span>
-                </div>
-            </div>
-        `;
-        
-        // 点击群组创建或切换到对应会话
-        itemElement.addEventListener('click', () => {
-            this._createChatFromGroup(group);
-        });
-        
-        groupsList.appendChild(itemElement);
-    }
-    
-    /**
-     * 从群组创建聊天会话
-     * @param {Object} group 群组数据
-     * @private
-     */
-    _createChatFromGroup(group) {
-        // 首先检查是否已存在该会话
-        const conversationId = `group-${group.groupId}`;
-        const existingConversation = document.querySelector(`.conversation-item[data-group-id="${group.groupId}"]`);
-        
-        if (existingConversation) {
-            // 如果存在，直接点击它
-            existingConversation.click();
-            this.switchPage('chats');
-            return;
-        }
-        
-        // 创建新会话
-        const conversation = {
-            id: conversationId,
-            type: 'group',
-            groupId: group.groupId,
-            name: group.groupName || `群聊(${group.groupId})`,
-            timestamp: Date.now(),
-            lastMessage: '',
-            unread: 0,
-            memberCount: group.memberCount || 0
-        };
-        
-        this.addConversationItem(conversation);
-        this.switchPage('chats');
-        this.selectConversation(conversation);
-    }
-    
-    /**
-     * 添加消息到聊天窗口
-     * @param {Object} message 消息数据
+     * 添加消息
+     * @param {Object} message 消息对象
      */
     addMessage(message) {
-        const messagesContainer = document.getElementById('chat-messages');
-        if (!messagesContainer) return;
+        if (!this.elements.chat || !this.elements.chat.messagesContainer || !message) return;
         
-        // 如果当前没有选中会话，不添加消息
-        if (!this.currentConversation) return;
-        
-        // 如果消息不属于当前会话，不添加
-        if (message.type === 'chat' && 
-            ((this.currentConversation.type === 'chat' && 
-              (message.fromId !== this.currentConversation.toId && message.toId !== this.currentConversation.toId)) ||
-             this.currentConversation.type === 'group')) {
-            return;
+        // 隐藏无会话提示
+        const noConversation = this.elements.chat.messagesContainer.querySelector('.no-conversation');
+        if (noConversation) {
+            noConversation.style.display = 'none';
         }
         
-        if (message.type === 'group' && 
-            (this.currentConversation.type !== 'group' || 
-             message.groupId !== this.currentConversation.groupId)) {
-            return;
+        // 创建消息元素
+        const messageEl = this._createMessageElement(message);
+        this.elements.chat.messagesContainer.appendChild(messageEl);
+        
+        // 存储消息ID到DOM元素的映射
+        if (message.id) {
+            this.messageMap.set(message.id, messageEl);
+        }
+    }
+    
+    /**
+     * 创建消息元素
+     * @param {Object} message 消息对象
+     * @returns {HTMLElement} 消息元素
+     * @private
+     */
+    _createMessageElement(message) {
+        const messageContainer = document.createElement('div');
+        messageContainer.className = `message ${message.isOwn ? 'message-self' : 'message-other'}`;
+        messageContainer.setAttribute('data-id', message.id);
+        
+        // 头像
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.textContent = message.fromId ? message.fromId.charAt(0).toUpperCase() : 'U';
+        
+        // 消息内容和信息
+        const contentWrapper = document.createElement('div');
+        contentWrapper.className = 'message-content-wrapper';
+        
+        // 消息头部（用户名）
+        const header = document.createElement('div');
+        header.className = 'message-header';
+        header.textContent = message.fromId;
+        
+        // 消息内容
+        const content = document.createElement('div');
+        content.className = 'message-content';
+        content.textContent = message.content;
+        
+        // 消息信息（时间和状态）
+        const info = document.createElement('div');
+        info.className = 'message-info';
+        
+        const time = document.createElement('span');
+        time.className = 'message-time';
+        time.textContent = this._formatTime(message.timestamp);
+        info.appendChild(time);
+        
+        if (message.isOwn) {
+            const status = document.createElement('span');
+            status.className = 'message-status';
+            status.textContent = this._getStatusText(message.status);
+            info.appendChild(status);
         }
         
-        const messageElement = document.createElement('div');
-        messageElement.id = `message-${message.id}`;
-        messageElement.className = `message ${this._isCurrentUser(message.fromId) ? 'message-self' : 'message-other'}`;
+        contentWrapper.appendChild(header);
+        contentWrapper.appendChild(content);
+        contentWrapper.appendChild(info);
         
-        // 获取发送者的第一个字符作为头像
-        const avatarChar = message.fromId.charAt(0);
+        messageContainer.appendChild(avatar);
+        messageContainer.appendChild(contentWrapper);
         
-        // 创建消息头部（包含头像）
-        const headerElement = document.createElement('div');
-        headerElement.className = 'message-header';
-        headerElement.innerHTML = `
-            <div class="message-avatar">${avatarChar}</div>
-        `;
-        messageElement.appendChild(headerElement);
-        
-        // 创建消息内容
-        const contentElement = document.createElement('div');
-        contentElement.className = 'message-content';
-        contentElement.textContent = message.content;
-        messageElement.appendChild(contentElement);
-        
-        // 创建消息信息（时间和状态）
-        const infoElement = document.createElement('div');
-        infoElement.className = 'message-info';
-        
-        let statusHtml = '';
-        if (this._isCurrentUser(message.fromId)) {
-            switch(message.status) {
-                case 'sending':
-                    statusHtml = '<span class="message-status">发送中</span>';
-                    break;
-                case 'sent':
-                    statusHtml = '<span class="message-status">已发送</span>';
-                    break;
-                case 'delivered':
-                    statusHtml = '<span class="message-status">已送达</span>';
-                    break;
-                case 'read':
-                    statusHtml = '<span class="message-status message-read">已读</span>';
-                    break;
-                case 'failed':
-                    statusHtml = '<span class="message-status" style="color: red;">发送失败</span>';
-                    break;
-            }
-        }
-        
-        infoElement.innerHTML = `
-            <span class="message-time">${this._formatTime(message.timestamp)}</span>
-            ${statusHtml}
-        `;
-        messageElement.appendChild(infoElement);
-        
-        // 添加到消息容器
-        messagesContainer.appendChild(messageElement);
-        
-        // 滚动到底部
-        this._scrollToBottom();
+        return messageContainer;
     }
     
     /**
@@ -524,408 +698,47 @@ class UIController {
      * @param {string} status 消息状态
      */
     updateMessageStatus(messageId, status) {
-        const messageElement = document.getElementById(`message-${messageId}`);
-        if (!messageElement) return;
+        if (!messageId || !status) return;
         
-        const statusElement = messageElement.querySelector('.message-status');
-        if (!statusElement) return;
-        
-        statusElement.classList.remove('message-read');
-        
-        switch(status) {
-            case 'sending':
-                statusElement.textContent = '发送中';
-                break;
-            case 'sent':
-                statusElement.textContent = '已发送';
-                break;
-            case 'delivered':
-                statusElement.textContent = '已送达';
-                break;
-            case 'read':
-                statusElement.textContent = '已读';
-                statusElement.classList.add('message-read');
-                break;
-            case 'failed':
-                statusElement.textContent = '发送失败';
-                statusElement.style.color = 'red';
-                break;
-        }
-    }
-    
-    /**
-     * 切换主题
-     * @param {string} theme 主题名称 ('light' 或 'dark')
-     */
-    switchTheme(theme) {
-        if (theme !== 'light' && theme !== 'dark') {
-            console.error(`无效的主题: ${theme}`);
-            return;
-        }
-        
-        document.body.classList.remove('dark-theme');
-        
-        if (theme === 'dark') {
-            document.body.classList.add('dark-theme');
-        }
-        
-        this.currentTheme = theme;
-        localStorage.setItem('theme', theme);
-        
-        if (this.options.onThemeChange) {
-            this.options.onThemeChange(theme);
-        }
-    }
-    
-    /**
-     * 切换界面风格
-     * @param {string} style 界面风格 ('classic' 或 'modern')
-     */
-    switchStyle(style) {
-        if (style !== 'classic' && style !== 'modern') {
-            console.error(`无效的界面风格: ${style}`);
-            return;
-        }
-        
-        document.body.classList.remove('modern-style');
-        
-        if (style === 'modern') {
-            document.body.classList.add('modern-style');
-        }
-        
-        this.currentStyle = style;
-        localStorage.setItem('style', style);
-        
-        if (this.options.onStyleChange) {
-            this.options.onStyleChange(style);
-        }
-    }
-    
-    /**
-     * 设置字体大小
-     * @param {number} size 字体大小
-     */
-    setFontSize(size) {
-        if (isNaN(size) || size < 12 || size > 20) {
-            console.error(`无效的字体大小: ${size}`);
-            return;
-        }
-        
-        document.documentElement.style.setProperty('--font-size-base', `${size}px`);
-        document.documentElement.style.setProperty('--font-size-small', `${size - 2}px`);
-        document.documentElement.style.setProperty('--font-size-large', `${size + 2}px`);
-        document.documentElement.style.setProperty('--font-size-xl', `${size + 4}px`);
-        
-        this.currentFontSize = size;
-        localStorage.setItem('fontSize', size);
-        
-        // 更新显示的字体大小值
-        const fontSizeValueEl = document.getElementById('font-size-value');
-        if (fontSizeValueEl) {
-            fontSizeValueEl.textContent = `${size}px`;
-        }
-        
-        if (this.options.onFontSizeChange) {
-            this.options.onFontSizeChange(size);
-        }
-    }
-    
-    /**
-     * 显示模态框
-     * @param {Object} options 模态框选项
-     */
-    showModal(options) {
-        const backdrop = document.getElementById('modal-backdrop');
-        const container = document.getElementById('modal-container');
-        
-        if (!backdrop || !container) return;
-        
-        container.innerHTML = `
-            <div class="modal-header">
-                <h3>${options.title || '提示'}</h3>
-            </div>
-            <div class="modal-body">
-                ${options.content || ''}
-            </div>
-            <div class="modal-footer">
-                ${options.showCancel ? '<button class="btn btn-secondary" id="modal-cancel">取消</button>' : ''}
-                <button class="btn btn-primary" id="modal-confirm">${options.confirmText || '确定'}</button>
-            </div>
-        `;
-        
-        backdrop.classList.remove('hidden');
-        container.classList.remove('hidden');
-        
-        // 绑定按钮事件
-        const confirmBtn = document.getElementById('modal-confirm');
-        const cancelBtn = document.getElementById('modal-cancel');
-        
-        if (confirmBtn) {
-            confirmBtn.addEventListener('click', () => {
-                this.hideModal();
-                if (options.onConfirm) options.onConfirm();
-            });
-        }
-        
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', () => {
-                this.hideModal();
-                if (options.onCancel) options.onCancel();
-            });
-        }
-    }
-    
-    /**
-     * 隐藏模态框
-     */
-    hideModal() {
-        const backdrop = document.getElementById('modal-backdrop');
-        const container = document.getElementById('modal-container');
-        
-        if (!backdrop || !container) return;
-        
-        backdrop.classList.add('hidden');
-        container.classList.add('hidden');
-    }
-    
-    /**
-     * 显示上下文菜单
-     * @param {Event} event 事件对象
-     * @param {Array} items 菜单项
-     */
-    showContextMenu(event, items) {
-        event.preventDefault();
-        
-        const menuEl = document.getElementById('context-menu');
-        if (!menuEl) return;
-        
-        // 清空菜单
-        menuEl.innerHTML = '';
-        
-        // 添加菜单项
-        items.forEach(item => {
-            const itemEl = document.createElement('div');
-            itemEl.className = `menu-item ${item.danger ? 'danger' : ''}`;
-            itemEl.textContent = item.text;
-            
-            itemEl.addEventListener('click', () => {
-                this.hideContextMenu();
-                if (item.onClick) item.onClick();
-            });
-            
-            menuEl.appendChild(itemEl);
-        });
-        
-        // 定位菜单
-        const x = event.clientX;
-        const y = event.clientY;
-        
-        menuEl.style.top = `${y}px`;
-        menuEl.style.left = `${x}px`;
-        
-        // 显示菜单
-        menuEl.classList.remove('hidden');
-        
-        // 点击其他区域关闭菜单
-        setTimeout(() => {
-            window.addEventListener('click', this._handleOutsideClick = () => {
-                this.hideContextMenu();
-            }, { once: true });
-        }, 0);
-    }
-    
-    /**
-     * 隐藏上下文菜单
-     */
-    hideContextMenu() {
-        const menuEl = document.getElementById('context-menu');
-        if (!menuEl) return;
-        
-        menuEl.classList.add('hidden');
-        
-        if (this._handleOutsideClick) {
-            window.removeEventListener('click', this._handleOutsideClick);
-            this._handleOutsideClick = null;
-        }
-    }
-    
-    /**
-     * 设置用户信息
-     * @param {Object} user 用户信息
-     */
-    setUserInfo(user) {
-        this.currentUser = user;
-        
-        // 更新用户头像
-        const avatarEls = document.querySelectorAll('#current-avatar, #profile-avatar');
-        avatarEls.forEach(el => {
-            if (el) {
-                el.textContent = user.userId.charAt(0);
+        const messageEl = this.messageMap.get(messageId);
+        if (messageEl) {
+            const statusEl = messageEl.querySelector('.message-status');
+            if (statusEl) {
+                statusEl.textContent = this._getStatusText(status);
             }
-        });
-        
-        // 更新用户名
-        const nameEl = document.getElementById('profile-name');
-        if (nameEl) {
-            nameEl.textContent = user.userId;
-        }
-        
-        // 更新设置页面的用户信息
-        const userIdEl = document.getElementById('settings-user-id');
-        const clientTypeEl = document.getElementById('settings-client-type');
-        const appIdEl = document.getElementById('settings-app-id');
-        
-        if (userIdEl) userIdEl.textContent = user.userId;
-        if (clientTypeEl) clientTypeEl.textContent = user.clientType;
-        if (appIdEl) appIdEl.textContent = user.appId;
-    }
-    
-    /**
-     * 加载设置
-     * @private
-     */
-    _loadSettings() {
-        this.currentTheme = localStorage.getItem('theme') || 'light';
-        this.currentStyle = localStorage.getItem('style') || 'classic';
-        this.currentFontSize = parseInt(localStorage.getItem('fontSize')) || 14;
-    }
-    
-    /**
-     * 应用设置
-     * @private
-     */
-    _applySettings() {
-        this.switchTheme(this.currentTheme);
-        this.switchStyle(this.currentStyle);
-        this.setFontSize(this.currentFontSize);
-        
-        // 更新UI控件状态
-        const themeToggle = document.getElementById('theme-toggle');
-        const styleToggle = document.getElementById('ui-style-toggle');
-        const fontSizeRange = document.getElementById('font-size-range');
-        
-        if (themeToggle) {
-            themeToggle.checked = this.currentTheme === 'dark';
-        }
-        
-        if (styleToggle) {
-            styleToggle.checked = this.currentStyle === 'modern';
-        }
-        
-        if (fontSizeRange) {
-            fontSizeRange.value = this.currentFontSize;
         }
     }
     
     /**
-     * 设置事件监听器
+     * 获取状态文本
+     * @param {string} status 状态标识
+     * @returns {string} 状态文本
      * @private
      */
-    _setupEventListeners() {
-        // 导航图标点击
-        document.querySelectorAll('.sidebar-icon').forEach(icon => {
-            icon.addEventListener('click', () => {
-                const page = icon.getAttribute('data-page');
-                if (page) this.switchPage(page);
-            });
-        });
-        
-        // 标签切换
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabName = tab.getAttribute('data-tab');
-                const page = tab.closest('.page-content').id.replace('-page', '');
-                if (tabName && page) this.switchTab(page, tabName);
-            });
-        });
-        
-        // 主题切换
-        const themeToggle = document.getElementById('theme-toggle');
-        if (themeToggle) {
-            themeToggle.addEventListener('change', () => {
-                this.switchTheme(themeToggle.checked ? 'dark' : 'light');
-            });
-        }
-        
-        // 风格切换
-        const styleToggle = document.getElementById('ui-style-toggle');
-        if (styleToggle) {
-            styleToggle.addEventListener('change', () => {
-                this.switchStyle(styleToggle.checked ? 'modern' : 'classic');
-            });
-        }
-        
-        // 字体大小调整
-        const fontSizeRange = document.getElementById('font-size-range');
-        if (fontSizeRange) {
-            fontSizeRange.addEventListener('input', () => {
-                this.setFontSize(parseInt(fontSizeRange.value));
-            });
-        }
-        
-        // 退出登录按钮
-        const logoutBtn = document.getElementById('logout-btn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                this.showModal({
-                    title: '退出登录',
-                    content: '确定要退出登录吗？',
-                    showCancel: true,
-                    onConfirm: () => {
-                        if (this.options.onLogout) {
-                            this.options.onLogout();
-                        }
-                    }
-                });
-            });
-        }
-        
-        // 发送消息
-        const sendBtn = document.getElementById('send-btn');
-        const messageInput = document.getElementById('message-input');
-        
-        if (sendBtn && messageInput) {
-            const sendMessage = () => {
-                const content = messageInput.value.trim();
-                if (!content || !this.currentConversation) return;
-                
-                if (this.options.onSendMessage) {
-                    const messageData = {
-                        type: this.currentConversation.type,
-                        content: content
-                    };
-                    
-                    if (this.currentConversation.type === 'chat') {
-                        messageData.toId = this.currentConversation.toId;
-                    } else if (this.currentConversation.type === 'group') {
-                        messageData.groupId = this.currentConversation.groupId;
-                    }
-                    
-                    this.options.onSendMessage(messageData);
-                }
-                
-                messageInput.value = '';
-            };
-            
-            sendBtn.addEventListener('click', sendMessage);
-            
-            messageInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter' && !event.shiftKey) {
-                    event.preventDefault();
-                    sendMessage();
-                }
-            });
+    _getStatusText(status) {
+        switch (status) {
+            case 'sending':
+                return '发送中';
+            case 'sent':
+                return '已发送';
+            case 'delivered':
+                return '已送达';
+            case 'read':
+                return '已读';
+            case 'failed':
+                return '发送失败';
+            default:
+                return '';
         }
     }
     
     /**
-     * 判断是否为当前用户
-     * @param {string} userId 用户ID
-     * @returns {boolean} 是否为当前用户
-     * @private
+     * 滚动到底部
      */
-    _isCurrentUser(userId) {
-        return this.currentUser && userId === this.currentUser.userId;
+    scrollToBottom() {
+        if (!this.elements.chat || !this.elements.chat.messagesContainer) return;
+        
+        this.elements.chat.messagesContainer.scrollTop = this.elements.chat.messagesContainer.scrollHeight;
     }
     
     /**
@@ -939,25 +752,211 @@ class UIController {
         
         const date = new Date(timestamp);
         const now = new Date();
-        const diff = now - date;
+        const isToday = date.getDate() === now.getDate() &&
+                       date.getMonth() === now.getMonth() &&
+                       date.getFullYear() === now.getFullYear();
         
-        // 一天内显示时间，否则显示日期
-        if (diff < 24 * 60 * 60 * 1000 && date.getDate() === now.getDate()) {
-            return date.toTimeString().slice(0, 5);
+        if (isToday) {
+            return this._formatTimeOnly(date);
         } else {
-            return `${date.getMonth() + 1}月${date.getDate()}日`;
+            return this._formatDatetime(date);
         }
     }
     
     /**
-     * 滚动到底部
+     * 格式化时间（仅时分）
+     * @param {Date} date 日期对象
+     * @returns {string} 格式化后的时间
      * @private
      */
-    _scrollToBottom() {
-        const messagesContainer = document.getElementById('chat-messages');
-        if (messagesContainer) {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    _formatTimeOnly(date) {
+        return `${this._padZero(date.getHours())}:${this._padZero(date.getMinutes())}`;
+    }
+    
+    /**
+     * 格式化日期时间
+     * @param {Date} date 日期对象
+     * @returns {string} 格式化后的日期时间
+     * @private
+     */
+    _formatDatetime(date) {
+        return `${date.getMonth() + 1}月${date.getDate()}日 ${this._formatTimeOnly(date)}`;
+    }
+    
+    /**
+     * 数字补零
+     * @param {number} num 数字
+     * @returns {string} 补零后的字符串
+     * @private
+     */
+    _padZero(num) {
+        return num < 10 ? `0${num}` : `${num}`;
+    }
+    
+    /**
+     * 退出登录
+     * @private
+     */
+    _handleLogout() {
+        // 确认是否退出
+        if (window.confirm('确定要退出登录吗？')) {
+            // 关闭WebSocket连接
+            if (window.wsClient && typeof window.wsClient.disconnect === 'function') {
+                window.wsClient.disconnect();
+            }
+            
+            // 清除本地状态
+            this.currentConversation = null;
+            
+            // 刷新页面，回到登录界面
+            window.location.reload();
         }
+    }
+    
+    /**
+     * 处理创建群组
+     * @param {Object} groupData 群组数据
+     * @private
+     */
+    _handleCreateGroup(groupData) {
+        if (!groupData.groupName || !this.options.onCreateGroup) {
+            return;
+        }
+        
+        this.options.onCreateGroup(groupData);
+    }
+    
+    /**
+     * 显示添加好友的模态框
+     * @private
+     */
+    _showAddFriendModal() {
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const modalContainer = document.getElementById('modal-container');
+        
+        if (!modalBackdrop || !modalContainer) {
+            console.error('找不到模态框元素');
+            return;
+        }
+        
+        console.log('显示添加好友模态框');
+        
+        // 创建模态框内容
+        modalContainer.innerHTML = `
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>添加好友</h3>
+                    <div class="modal-close"><i class="fa fa-times"></i></div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="friend-id">好友ID</label>
+                        <input type="text" id="friend-id" placeholder="请输入好友ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="friend-remark">备注名称</label>
+                        <input type="text" id="friend-remark" placeholder="请输入备注名称(可选)">
+                    </div>
+                    <div class="form-group">
+                        <label for="friend-wording">验证消息</label>
+                        <input type="text" id="friend-wording" value="请求添加您为好友" placeholder="请输入验证消息">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancel-add-friend">取消</button>
+                    <button id="confirm-add-friend">添加</button>
+                </div>
+            </div>
+        `;
+        
+        try {
+            // 确保模态框元素在DOM中
+            if (!document.body.contains(modalBackdrop)) {
+                document.body.appendChild(modalBackdrop);
+            }
+            if (!document.body.contains(modalContainer)) {
+                document.body.appendChild(modalContainer);
+            }
+            
+            // 显示模态框
+            modalBackdrop.classList.remove('hidden');
+            modalContainer.classList.remove('hidden');
+            
+            // 设置点击背景关闭模态框（确保事件只绑定一次）
+            modalBackdrop.removeEventListener('click', this._closeBackdropHandler);
+            this._closeBackdropHandler = (e) => {
+                if (e.target === modalBackdrop) {
+                    modalBackdrop.classList.add('hidden');
+                    modalContainer.classList.add('hidden');
+                }
+            };
+            modalBackdrop.addEventListener('click', this._closeBackdropHandler);
+            
+            // 立即绑定事件，无需延迟
+            const closeBtn = modalContainer.querySelector('.modal-close');
+            const cancelBtn = document.getElementById('cancel-add-friend');
+            const confirmBtn = document.getElementById('confirm-add-friend');
+            
+            const closeModal = () => {
+                modalBackdrop.classList.add('hidden');
+                modalContainer.classList.add('hidden');
+            };
+            
+            if (closeBtn) {
+                closeBtn.removeEventListener('click', closeModal);
+                closeBtn.addEventListener('click', closeModal);
+            }
+            
+            if (cancelBtn) {
+                cancelBtn.removeEventListener('click', closeModal);
+                cancelBtn.addEventListener('click', closeModal);
+            }
+            
+            if (confirmBtn) {
+                const self = this;
+                const clickHandler = function() {
+                    const friendId = document.getElementById('friend-id');
+                    const friendRemark = document.getElementById('friend-remark');
+                    const friendWording = document.getElementById('friend-wording');
+                    
+                    if (friendId && friendId.value.trim()) {
+                        self._handleAddFriend({
+                            userId: friendId.value.trim(),
+                            remark: friendRemark ? friendRemark.value.trim() : '',
+                            addWording: friendWording ? friendWording.value.trim() : '请求添加您为好友'
+                        });
+                        
+                        closeModal();
+                    } else {
+                        alert('请输入好友ID');
+                    }
+                };
+                
+                confirmBtn.removeEventListener('click', clickHandler);
+                confirmBtn.addEventListener('click', clickHandler);
+            }
+            
+            // 设置初始焦点
+            const friendIdInput = document.getElementById('friend-id');
+            if (friendIdInput) {
+                friendIdInput.focus();
+            }
+        } catch (error) {
+            console.error('显示添加好友模态框时出错:', error);
+        }
+    }
+    
+    /**
+     * 处理添加好友
+     * @param {Object} friendData 好友数据
+     * @private
+     */
+    _handleAddFriend(friendData) {
+        if (!friendData.userId || !this.options.onAddFriend) {
+            return;
+        }
+        
+        this.options.onAddFriend(friendData);
     }
 }
 

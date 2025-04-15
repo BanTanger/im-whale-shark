@@ -13,6 +13,7 @@ class WebSocketClient {
      * @param {Function} options.onError 发生错误时的回调
      * @param {number} options.heartbeatInterval 心跳间隔(毫秒)
      * @param {number} options.reconnectInterval 重连间隔(毫秒)
+     * @param {string} options.apiBaseUrl 后端API基础URL
      */
     constructor(options = {}) {
         this.options = Object.assign({
@@ -22,7 +23,8 @@ class WebSocketClient {
             onClose: () => {},
             onError: () => {},
             heartbeatInterval: 30000,
-            reconnectInterval: 5000
+            reconnectInterval: 5000,
+            apiBaseUrl: 'http://localhost:18000'
         }, options);
         
         this.connected = false;
@@ -31,6 +33,7 @@ class WebSocketClient {
         this.reconnectTimer = null;
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 10;
+        this.userInfo = null;
         
         // 确保全局ByteBuffer类已定义
         if (typeof ByteBuffer !== 'function') {
@@ -407,6 +410,221 @@ class WebSocketClient {
         s[8] = s[13] = s[18] = s[23] = "-";
         
         return s.join("");
+    }
+    
+    /**
+     * 发送HTTP请求到后端REST API
+     * @param {string} endpoint API端点
+     * @param {string} method HTTP方法
+     * @param {Object} data 请求数据
+     * @returns {Promise<Object>} 响应数据
+     * @private
+     */
+    async _httpRequest(endpoint, method = 'GET', data = null) {
+        try {
+            const url = `${this.options.apiBaseUrl}${endpoint}`;
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            const config = {
+                method,
+                headers
+            };
+            
+            if (data && (method === 'POST' || method === 'PUT')) {
+                config.body = JSON.stringify(data);
+            }
+            
+            const response = await fetch(url, config);
+            const result = await response.json();
+            
+            if (!result.ok) {
+                throw new Error(result.msg || '请求失败');
+            }
+            
+            return result;
+        } catch (error) {
+            console.error(`API请求失败 [${endpoint}]:`, error);
+            throw error;
+        }
+    }
+    
+    /**
+     * 设置当前用户信息
+     * @param {Object} userInfo 用户信息
+     */
+    setUserInfo(userInfo) {
+        this.userInfo = userInfo;
+    }
+    
+    /**
+     * 获取当前用户信息
+     * @returns {Object|null} 用户信息
+     */
+    getUserInfo() {
+        return this.userInfo;
+    }
+    
+    /**
+     * 获取好友列表
+     * @returns {Promise<Array>} 好友列表
+     */
+    async getFriendshipList() {
+        if (!this.userInfo) {
+            throw new Error('用户未登录');
+        }
+        
+        const reqData = {
+            fromId: this.userInfo.userId,
+            appId: this.userInfo.appId || 10001
+        };
+        
+        const response = await this._httpRequest('/v1/friendship/getAllFriendShip', 'POST', reqData);
+        return response.data || [];
+    }
+    
+    /**
+     * 添加好友
+     * @param {Object} params 添加好友参数
+     * @returns {Promise<Object>} 添加结果
+     */
+    async addFriend(params) {
+        if (!this.userInfo) {
+            throw new Error('用户未登录');
+        }
+        
+        const reqData = {
+            fromId: this.userInfo.userId,
+            toItem: {
+                toId: params.toId,
+                remark: params.remark || '',
+                addSource: params.addSource || '个人搜索',
+                addWording: params.addWording || '请求添加您为好友'
+            },
+            appId: this.userInfo.appId || 10001,
+            operater: this.userInfo.userId,
+            clientType: this.userInfo.clientType || 1,
+            imei: this.userInfo.imei || 'web'
+        };
+        
+        return this._httpRequest('/v1/friendship/addFriend', 'POST', reqData);
+    }
+    
+    /**
+     * 获取加入的群组列表
+     * @returns {Promise<Array>} 群组列表
+     */
+    async getJoinedGroups() {
+        if (!this.userInfo) {
+            throw new Error('用户未登录');
+        }
+        
+        const reqData = {
+            userId: this.userInfo.userId,
+            appId: this.userInfo.appId || 10001,
+            operater: this.userInfo.userId
+        };
+        
+        const response = await this._httpRequest('/v1/group/getJoinedGroup', 'POST', reqData);
+        return response.data || [];
+    }
+    
+    /**
+     * 获取群组信息
+     * @param {string} groupId 群组ID
+     * @returns {Promise<Object>} 群组信息
+     */
+    async getGroupInfo(groupId) {
+        if (!this.userInfo) {
+            throw new Error('用户未登录');
+        }
+        
+        const reqData = {
+            groupId: groupId,
+            appId: this.userInfo.appId || 10001
+        };
+        
+        const response = await this._httpRequest('/v1/group/getGroupInfo', 'POST', reqData);
+        return response.data || null;
+    }
+    
+    /**
+     * 创建群组
+     * @param {Object} params 创建群组参数
+     * @returns {Promise<Object>} 创建结果
+     */
+    async createGroup(params) {
+        if (!this.userInfo) {
+            throw new Error('用户未登录');
+        }
+        
+        const reqData = {
+            ownerId: this.userInfo.userId,
+            groupName: params.groupName,
+            groupType: params.groupType || 1,
+            memberIds: params.memberIds || [],
+            appId: this.userInfo.appId || 10001,
+            operater: this.userInfo.userId
+        };
+        
+        return this._httpRequest('/v1/group/createGroup', 'POST', reqData);
+    }
+    
+    /**
+     * 发送同步请求获取离线消息
+     * @returns {Promise<Object>} 同步结果
+     */
+    async syncOfflineMessages() {
+        if (!this.userInfo) {
+            throw new Error('用户未登录');
+        }
+        
+        const reqData = {
+            userId: this.userInfo.userId,
+            appId: this.userInfo.appId || 10001,
+            lastSequence: 0
+        };
+        
+        return this._httpRequest('/v1/message/syncOfflineMessageList', 'POST', reqData);
+    }
+    
+    /**
+     * 同步好友列表
+     * @param {number} lastSequence 上次同步序列号
+     * @returns {Promise<Object>} 同步结果
+     */
+    async syncFriendshipList(lastSequence = 0) {
+        if (!this.userInfo) {
+            throw new Error('用户未登录');
+        }
+        
+        const reqData = {
+            userId: this.userInfo.userId,
+            appId: this.userInfo.appId || 10001,
+            lastSequence: lastSequence
+        };
+        
+        return this._httpRequest('/v1/friendship/syncFriendShipList', 'POST', reqData);
+    }
+    
+    /**
+     * 同步群组列表
+     * @param {number} lastSequence 上次同步序列号
+     * @returns {Promise<Object>} 同步结果
+     */
+    async syncJoinedGroupList(lastSequence = 0) {
+        if (!this.userInfo) {
+            throw new Error('用户未登录');
+        }
+        
+        const reqData = {
+            userId: this.userInfo.userId,
+            appId: this.userInfo.appId || 10001,
+            lastSequence: lastSequence
+        };
+        
+        return this._httpRequest('/v1/group/syncJoinedGroup', 'POST', reqData);
     }
 }
 

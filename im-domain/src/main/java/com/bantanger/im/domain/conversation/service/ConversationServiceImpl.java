@@ -147,7 +147,7 @@ public class ConversationServiceImpl implements ConversationService {
 
         QueryWrapper<ImConversationSetEntity> query = new QueryWrapper<>();
         query.eq("from_id", req.getOperater());
-        query.gt("sequence", req.getLastSequence());
+        query.ge("sequence", req.getLastSequence());
         query.eq("app_id", req.getAppId());
         query.last("limit " + req.getMaxLimit());
         query.orderByAsc("sequence");

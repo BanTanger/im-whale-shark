@@ -28,9 +28,9 @@ CREATE TABLE im_conversation_set(
 INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('0_10001_10002', 0, '10001', '10002', 0, 0, 0, 0, 10001);
 INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('0_bantanger_10001', 0, 'bantanger', '10001', 0, 0, 0, 0, 10001);
 INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('0_bantanger_10002', 0, 'bantanger', '10002', 0, 0, 0, 0, 10001);
-INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('1_10001_27a35ff2f9be4cc9a8d3db1ad3322804', 0, '10001', '27a35ff2f9be4cc9a8d3db1ad3322804', 0, 0, 0, 0, 10001);
-INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('1_bantanger_27a35ff2f9be4cc9a8d3db1ad3322804', 0, 'bantanger', '27a35ff2f9be4cc9a8d3db1ad3322804', 0, 0, 0, 0, 10001);
-INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('1_10002_27a35ff2f9be4cc9a8d3db1ad3322804', 0, '10002', '27a35ff2f9be4cc9a8d3db1ad3322804', 0, 0, 0, 0, 10001);
+INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('1_10001_27a35ff2f9be4cc9a8d3db1ad3322804', 1, '10001', '27a35ff2f9be4cc9a8d3db1ad3322804', 0, 0, 0, 0, 10001);
+INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('1_bantanger_27a35ff2f9be4cc9a8d3db1ad3322804', 1, 'bantanger', '27a35ff2f9be4cc9a8d3db1ad3322804', 0, 0, 0, 0, 10001);
+INSERT INTO im_core.im_conversation_set (conversation_id, conversation_type, from_id, to_id, is_mute, is_top, sequence, read_sequence, app_id) VALUES ('1_10002_27a35ff2f9be4cc9a8d3db1ad3322804', 1, '10002', '27a35ff2f9be4cc9a8d3db1ad3322804', 0, 0, 0, 0, 10001);
 
 CREATE TABLE im_friendship
 (

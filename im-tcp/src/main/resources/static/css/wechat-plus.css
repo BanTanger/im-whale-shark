@@ -266,9 +266,27 @@ body {
 }
 
 .user-actions {
-    font-size: 20px;
-    color: var(--text-secondary);
+    margin-left: auto;
+    font-size: 22px;
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+}
+
+#new-chat-btn {
     cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#new-chat-btn:hover {
+    transform: scale(1.1);
+    color: var(--accent-hover);
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .search-bar {
@@ -446,8 +464,54 @@ body {
 
 /* 创建群组表单 */
 .create-group-form {
-    padding: 15px;
+    padding: 20px;
     background-color: var(--bg-secondary);
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 15px;
+}
+
+.create-group-form .form-group {
+    margin-bottom: 15px;
+}
+
+.create-group-form .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-secondary);
+    font-size: var(--font-size-small);
+}
+
+.create-group-form .form-group input,
+.create-group-form .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+}
+
+.create-group-form .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+#create-group-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: var(--font-size-base);
+    transition: background-color 0.2s;
+}
+
+#create-group-btn:hover {
+    background-color: var(--accent-hover);
 }
 
 /* 设置页面 */
@@ -796,76 +860,126 @@ input:checked + .toggle-slider:before {
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 100;
+    z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: opacity 0.3s ease;
+}
+
+.modal-backdrop.hidden {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
 }
 
 .modal-container {
-    background-color: var(--bg-secondary);
-    border-radius: 8px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 400px;
     max-width: 90%;
+    z-index: 1001;
+    animation: modal-appear 0.3s ease-out;
+}
+
+.modal-container.hidden {
+    display: none;
+}
+
+@keyframes modal-appear {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.modal {
+    padding: 0;
+    width: 100%;
+    border-radius: 8px;
     overflow: hidden;
-    z-index: 101;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .modal-header {
-    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
     border-bottom: 1px solid var(--border-color);
+    background-color: var(--accent-color);
+    color: white;
 }
 
 .modal-header h3 {
-    color: var(--text-primary);
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.modal-close {
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.modal-close:hover {
+    transform: scale(1.2);
 }
 
 .modal-body {
-    padding: 15px;
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
 .modal-footer {
-    padding: 15px;
-    border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
 }
 
-.btn {
-    padding: 8px 15px;
+.modal-footer button {
+    margin-left: 10px;
+    padding: 8px 16px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
-.btn-primary {
-    background-color: var(--accent-color);
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: var(--accent-hover);
-}
-
-.btn-secondary {
+#cancel-add-friend {
     background-color: var(--bg-primary);
     color: var(--text-primary);
 }
 
-.btn-secondary:hover {
+#cancel-add-friend:hover {
     background-color: var(--border-color);
 }
 
-.btn-danger {
-    background-color: #f44336;
+#confirm-add-friend {
+    background-color: var(--accent-color);
     color: white;
 }
 
-.btn-danger:hover {
-    background-color: #d32f2f;
+#confirm-add-friend:hover {
+    background-color: var(--accent-hover);
 }
 
 /* 响应式设计 */

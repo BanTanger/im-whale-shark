@@ -22,37 +22,27 @@ public class ImGroupMemberController {
     ImGroupMemberService groupMemberService;
 
     @RequestMapping("/importGroupMember")
-    public ResponseVO importGroupMember(@RequestBody @Validated ImportGroupMemberReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO importGroupMember(@RequestBody @Validated ImportGroupMemberReq req)  {
         return groupMemberService.importGroupMember(req);
     }
 
     @RequestMapping("/add")
-    public ResponseVO addMember(@RequestBody @Validated AddGroupMemberReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO addMember(@RequestBody @Validated AddGroupMemberReq req)  {
         return groupMemberService.addMember(req);
     }
 
     @RequestMapping("/remove")
-    public ResponseVO removeMember(@RequestBody @Validated RemoveGroupMemberReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO removeMember(@RequestBody @Validated RemoveGroupMemberReq req)  {
         return groupMemberService.removeMember(req);
     }
 
     @RequestMapping("/update")
-    public ResponseVO updateGroupMember(@RequestBody @Validated UpdateGroupMemberReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO updateGroupMember(@RequestBody @Validated UpdateGroupMemberReq req)  {
         return groupMemberService.updateGroupMember(req);
     }
 
     @RequestMapping("/speak")
-    public ResponseVO speak(@RequestBody @Validated SpeaMemberReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO speak(@RequestBody @Validated SpeaMemberReq req)  {
         return groupMemberService.speak(req);
     }
 

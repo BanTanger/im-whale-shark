@@ -27,20 +27,17 @@ public class ImUserDataController {
     ImUserService imUserService;
 
     @PostMapping("/getUserInfo")
-    public ResponseVO getUserInfo(@RequestBody GetUserInfoReq req, Integer appId){//@Validated
-        req.setAppId(appId);
+    public ResponseVO getUserInfo(@RequestBody GetUserInfoReq req){
         return imUserService.getUserInfo(req);
     }
 
     @PostMapping("/getSingleUserInfo")
-    public ResponseVO getSingleUserInfo(@RequestBody @Validated UserId req, Integer appId){
-        req.setAppId(appId);
+    public ResponseVO getSingleUserInfo(@RequestBody @Validated UserId req){
         return imUserService.getSingleUserInfo(req.getUserId(),req.getAppId());
     }
 
     @PostMapping("/modifyUserInfo")
-    public ResponseVO modifyUserInfo(@RequestBody @Validated ModifyUserInfoReq req, Integer appId){
-        req.setAppId(appId);
+    public ResponseVO modifyUserInfo(@RequestBody @Validated ModifyUserInfoReq req){
         return imUserService.modifyUserInfo(req);
     }
 }

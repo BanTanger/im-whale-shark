@@ -61,113 +61,82 @@ public class ImGroupController {
      * }
      */
     @RequestMapping("/importGroup")
-    public ResponseVO importGroup(@RequestBody @Validated ImportGroupReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO importGroup(@RequestBody @Validated ImportGroupReq req)  {
         return groupService.importGroup(req);
     }
 
     /**
      * 创建群组信息
      * @param req
-     * @param appId
-     * @param identifier
      * @return
      */
     @RequestMapping("/createGroup")
-    public ResponseVO createGroup(@RequestBody @Validated CreateGroupReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO createGroup(@RequestBody @Validated CreateGroupReq req)  {
         return groupService.createGroup(req);
     }
 
     /**
      * 获取群组信息
      * @param req
-     * @param appId
      * @return
      */
     @RequestMapping("/getGroupInfo")
-    public ResponseVO getGroupInfo(@RequestBody @Validated GetGroupReq req, Integer appId)  {
-        req.setAppId(appId);
+    public ResponseVO getGroupInfo(@RequestBody @Validated GetGroupReq req)  {
         return groupService.getGroup(req);
     }
 
     /**
      * 更新群组信息
      * @param req
-     * @param appId
-     * @param identifier
      * @return
      */
     @RequestMapping("/update")
-    public ResponseVO update(@RequestBody @Validated UpdateGroupReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO update(@RequestBody @Validated UpdateGroupReq req)  {
         return groupService.updateBaseGroupInfo(req);
     }
 
     /**
      * 获取用户加入的所有群组列表信息
      * @param req
-     * @param appId
-     * @param identifier
      * @return
      */
     @RequestMapping("/getJoinedGroup")
-    public ResponseVO getJoinedGroup(@RequestBody @Validated GetJoinedGroupReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO getJoinedGroup(@RequestBody @Validated GetJoinedGroupReq req)  {
         return groupService.getJoinedGroup(req);
     }
 
     /**
      * 解散群组
      * @param req
-     * @param appId
-     * @param identifier
      * @return
      */
     @RequestMapping("/destroyGroup")
-    public ResponseVO destroyGroup(@RequestBody @Validated DestroyGroupReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO destroyGroup(@RequestBody @Validated DestroyGroupReq req)  {
         return groupService.destroyGroup(req);
     }
 
     /**
      * 转让群组
      * @param req
-     * @param appId
-     * @param identifier
      * @return
      */
     @RequestMapping("/transferGroup")
-    public ResponseVO transferGroup(@RequestBody @Validated TransferGroupReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO transferGroup(@RequestBody @Validated TransferGroupReq req)  {
         return groupService.transferGroup(req);
     }
 
     @RequestMapping("/forbidSendMessage")
-    public ResponseVO forbidSendMessage(@RequestBody @Validated MuteGroupReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO forbidSendMessage(@RequestBody @Validated MuteGroupReq req)  {
         return groupService.muteGroup(req);
     }
 
     @RequestMapping("/sendMessage")
-    public ResponseVO sendMessage(@RequestBody @Validated SendGroupMessageReq
-                                          req, Integer appId,
-                                  String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
+    public ResponseVO sendMessage(@RequestBody @Validated SendGroupMessageReq req)  {
         return ResponseVO.successResponse(groupMessageService.send(req));
     }
 
     @RequestMapping("/syncJoinedGroup")
-    public ResponseVO syncJoinedGroup(@RequestBody @Validated SyncReq req, Integer appId)  {
-        req.setAppId(appId);
+    public ResponseVO syncJoinedGroup(@RequestBody @Validated SyncReq req)  {
         return groupService.syncJoinedGroupList(req);
     }
 

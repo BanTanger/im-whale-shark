@@ -70,9 +70,7 @@ public class MessageController {
     }
 
     @RequestMapping("/syncOfflineMessageList")
-    public ResponseVO syncP2POfflineMessageList(@RequestBody @Validated SyncReq req,
-                                             Integer appId) {
-        req.setAppId(appId);
+    public ResponseVO syncP2POfflineMessageList(@RequestBody @Validated SyncReq req) {
         return messageSyncServiceImpl.syncOfflineMessage(req);
     }
 

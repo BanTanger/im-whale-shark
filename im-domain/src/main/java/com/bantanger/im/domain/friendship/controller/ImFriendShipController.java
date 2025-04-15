@@ -19,8 +19,8 @@ public class ImFriendShipController {
 
     /**
      * importFriendShip
-     * http://localhost:8000/v1/friendship/importFriendShip?appId=10001
-     * @param req
+     * <p>http://localhost:8000/v1/friendship/importFriendShip</p>
+     * <pre>
      * {
      *     "fromId":"lld2",
      *     "friendItem":[
@@ -29,8 +29,8 @@ public class ImFriendShipController {
      *             "toId":"123456"
      *         }
      *     ]
-     * }
-     * @return
+     * }</pre>
+     * <pre>
      * 第一次插入(成功)：{
      *     "code": 200,
      *     "msg": "success",
@@ -42,7 +42,10 @@ public class ImFriendShipController {
      *     "msg": "success",
      *     "data": { "successId": [],"errorId": ["123456"]},
      *     "ok": true
-     * }
+     * }</pre>
+     * @param req
+     * @return
+     *
      */
     @PostMapping("/importFriendShip")
     public ResponseVO importFriendShip(@RequestBody @Validated ImportFriendShipReq req){
@@ -53,6 +56,7 @@ public class ImFriendShipController {
      * 添加好友逻辑
      * 分两种情况，如果对方设置好友验证，会走发送好友申请逻辑；否则直接添加双方强好友关系
      * 数据库内置数据 bantanger 开启好友验证，其余 10001 ~ 10009 均未开启
+     * <br/>
      * <br/> 情况一：添加未开启好友验证的用户
      * <pre>
      * curl -X POST \

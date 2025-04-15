@@ -232,9 +232,188 @@
     <!-- 脚本引入 -->
     <script src="js/byte-buffer.js"></script>
     <script src="js/ws-client.js"></script>
-    <script src="js/api-client.js"></script>
     <script src="js/message-handler.js"></script>
+    <script src="js/im-client.js"></script>
+    <script src="js/im-api-client.js"></script>
     <script src="js/ui-controller.js"></script>
     <script src="js/wechat-plus.js"></script>
+    <script>
+        // 开发调试辅助函数
+        window.APP_DEBUG = {
+            // 触发创建群组
+            createGroup: function(groupName, introduction = '') {
+                console.log('手动触发创建群组:', {groupName, introduction});
+                if (window.state && window.state.apiClient) {
+                    return window.state.apiClient.createGroup({
+                        userId: window.state.user.userId,
+                        groupName: groupName,
+                        introduction: introduction
+                    }).then(result => {
+                        console.log('创建群组结果:', result);
+                        return result;
+                    }).catch(err => {
+                        console.error('创建群组失败:', err);
+                        throw err;
+                    });
+                } else {
+                    console.error('API客户端不可用');
+                }
+            },
+            
+            // 触发添加好友
+            addFriend: function(toId, remark = '') {
+                console.log('手动触发添加好友:', {toId, remark});
+                if (window.state && window.state.apiClient) {
+                    return window.state.apiClient.addFriend({
+                        fromId: window.state.user.userId,
+                        toId: toId,
+                        remark: remark,
+                        addSource: '控制台',
+                        addWording: '请求添加您为好友',
+                        clientType: window.state.user.clientType,
+                        imei: window.state.user.imei
+                    }).then(result => {
+                        console.log('添加好友结果:', result);
+                        return result;
+                    }).catch(err => {
+                        console.error('添加好友失败:', err);
+                        throw err;
+                    });
+                } else {
+                    console.error('API客户端不可用');
+                }
+            },
+            
+            // 显示添加好友模态框
+            showAddFriendModal: function() {
+                console.log('手动触发添加好友模态框');
+                if (window.state && window.state.uiController) {
+                    window.state.uiController._showAddFriendModal();
+                    return true;
+                } else {
+                    console.error('UI控制器不可用');
+                    return false;
+                }
+            },
+            
+            // 强制显示添加好友模态框（不依赖UI控制器）
+            forceAddFriendModal: function() {
+                console.log('强制显示添加好友模态框');
+                try {
+                    // 获取或创建模态框元素
+                    let modalBackdrop = document.getElementById('modal-backdrop');
+                    let modalContainer = document.getElementById('modal-container');
+                    
+                    if (!modalBackdrop) {
+                        modalBackdrop = document.createElement('div');
+                        modalBackdrop.id = 'modal-backdrop';
+                        modalBackdrop.className = 'modal-backdrop';
+                        document.body.appendChild(modalBackdrop);
+                    }
+                    
+                    if (!modalContainer) {
+                        modalContainer = document.createElement('div');
+                        modalContainer.id = 'modal-container';
+                        modalContainer.className = 'modal-container';
+                        document.body.appendChild(modalContainer);
+                    }
+                    
+                    // 创建模态框内容
+                    modalContainer.innerHTML = `
+                        <div class="modal">
+                            <div class="modal-header">
+                                <h3>添加好友</h3>
+                                <div class="modal-close"><i class="fa fa-times"></i></div>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="friend-id">好友ID</label>
+                                    <input type="text" id="friend-id" placeholder="请输入好友ID">
+                                </div>
+                                <div class="form-group">
+                                    <label for="friend-remark">备注名称</label>
+                                    <input type="text" id="friend-remark" placeholder="请输入备注名称(可选)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="friend-wording">验证消息</label>
+                                    <input type="text" id="friend-wording" value="请求添加您为好友" placeholder="请输入验证消息">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="cancel-add-friend">取消</button>
+                                <button id="confirm-add-friend">添加</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 显示模态框
+                    modalBackdrop.classList.remove('hidden');
+                    modalContainer.classList.remove('hidden');
+                    
+                    // 设置关闭模态框的事件
+                    const closeModal = () => {
+                        modalBackdrop.classList.add('hidden');
+                        modalContainer.classList.add('hidden');
+                    };
+                    
+                    // 添加点击背景关闭模态框
+                    modalBackdrop.onclick = (e) => {
+                        if (e.target === modalBackdrop) {
+                            closeModal();
+                        }
+                    };
+                    
+                    // 添加点击关闭按钮关闭模态框
+                    const closeBtn = modalContainer.querySelector('.modal-close');
+                    if (closeBtn) {
+                        closeBtn.onclick = closeModal;
+                    }
+                    
+                    // 添加点击取消按钮关闭模态框
+                    const cancelBtn = document.getElementById('cancel-add-friend');
+                    if (cancelBtn) {
+                        cancelBtn.onclick = closeModal;
+                    }
+                    
+                    // 添加点击确认按钮处理添加好友
+                    const confirmBtn = document.getElementById('confirm-add-friend');
+                    if (confirmBtn) {
+                        confirmBtn.onclick = () => {
+                            const friendId = document.getElementById('friend-id');
+                            const friendRemark = document.getElementById('friend-remark');
+                            const friendWording = document.getElementById('friend-wording');
+                            
+                            if (friendId && friendId.value.trim()) {
+                                if (window.state && window.state.user) {
+                                    this.addFriend(
+                                        friendId.value.trim(), 
+                                        friendRemark ? friendRemark.value.trim() : ''
+                                    );
+                                } else {
+                                    console.error('用户未登录，无法添加好友');
+                                }
+                                closeModal();
+                            } else {
+                                alert('请输入好友ID');
+                            }
+                        };
+                    }
+                    
+                    // 设置初始焦点
+                    const friendIdInput = document.getElementById('friend-id');
+                    if (friendIdInput) {
+                        friendIdInput.focus();
+                    }
+                    
+                    return true;
+                } catch (error) {
+                    console.error('强制显示添加好友模态框出错:', error);
+                    return false;
+                }
+            }
+        };
+        console.log('调试辅助函数已加载，可使用 APP_DEBUG.createGroup() 和 APP_DEBUG.addFriend() 进行测试');
+        console.log('添加了新的调试方法 APP_DEBUG.showAddFriendModal() 和 APP_DEBUG.forceAddFriendModal() 用于测试添加好友模态框');
+    </script>
 </body>
 </html> 

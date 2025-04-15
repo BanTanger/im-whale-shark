@@ -1,532 +1,371 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录测试</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>WhaleShark IM - 简单登录</title>
     <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            background-color: #f5f5f5;
             padding: 20px;
         }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #1a73e8;
+            margin-bottom: 20px;
+        }
+
+        .login-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
         }
-        input {
+
+        input[type="text"] {
             width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
         }
+
         button {
-            padding: 10px 15px;
-            background-color: #4CAF50;
+            background-color: #1a73e8;
             color: white;
             border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
         }
+
         button:hover {
-            background-color: #45a049;
+            background-color: #1765cc;
         }
-        .result {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
-            min-height: 100px;
+
+        .chat-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
         }
-        .log {
-            margin-top: 20px;
-            padding: 10px;
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .message-container {
+            height: 300px;
             border: 1px solid #ddd;
-            background-color: #f9f9f9;
-            height: 200px;
+            border-radius: 4px;
+            padding: 10px;
             overflow-y: auto;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+        }
+
+        .input-container {
+            display: flex;
+        }
+
+        .input-container textarea {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: none;
+            height: 80px;
+            margin-right: 10px;
+        }
+
+        .input-container button {
+            align-self: flex-end;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            display: inline-block;
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <h1>WebSocket登录测试</h1>
-    
-    <div class="form-group">
-        <label for="userId">用户ID</label>
-        <input type="text" id="userId" value="10001">
+    <div class="container">
+        <h1>WhaleShark IM - 简单聊天界面</h1>
+        
+        <div class="login-container" id="loginContainer">
+            <h2>登录</h2>
+            <div class="form-group">
+                <label for="userId">用户ID</label>
+                <input type="text" id="userId" placeholder="请输入用户ID">
+            </div>
+            <div class="form-group">
+                <label for="appId">应用ID</label>
+                <input type="text" id="appId" value="10001" placeholder="应用ID">
+            </div>
+            <div class="form-group">
+                <label for="clientType">客户端类型</label>
+                <input type="text" id="clientType" value="1" placeholder="客户端类型">
+            </div>
+            <div class="form-group">
+                <label for="imei">设备标识</label>
+                <input type="text" id="imei" value="web" placeholder="设备标识">
+            </div>
+            <button id="loginButton">登录</button>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="chat-header">
+                <h2>聊天</h2>
+                <button id="logoutButton">退出登录</button>
+            </div>
+            <div class="message-container" id="messageContainer"></div>
+            <div class="input-container">
+                <div style="flex: 1;">
+                    <div class="form-group">
+                        <label for="toId">发送给用户/群组ID</label>
+                        <input type="text" id="toId" placeholder="接收方ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="command">命令类型</label>
+                        <input type="text" id="command" value="1103" placeholder="命令类型 (1103: 单聊, 2104: 群聊)">
+                    </div>
+                    <div class="form-group">
+                        <label for="messageInput">消息内容</label>
+                        <textarea id="messageInput" placeholder="输入消息内容"></textarea>
+                    </div>
+                </div>
+                <button id="sendButton">发送</button>
+            </div>
+        </div>
+
+        <a href="index.html" class="back-button">返回选择界面</a>
     </div>
-    
-    <div class="form-group">
-        <label for="appId">应用ID</label>
-        <input type="text" id="appId" value="10001">
-    </div>
-    
-    <div class="form-group">
-        <label for="clientType">客户端类型</label>
-        <input type="text" id="clientType" value="1">
-    </div>
-    
-    <div class="form-group">
-        <label for="imei">IMEI</label>
-        <input type="text" id="imei" value="web">
-    </div>
-    
-    <button id="loginButton">登录</button>
-    
-    <h3>响应结果</h3>
-    <div class="result" id="result"></div>
-    
-    <h3>日志</h3>
-    <div class="log" id="log"></div>
 
-    <script type="text/javascript">
-        // ByteBuffer实现
-        ByteBuffer = function (arrayBuf, offset) {
-            var Type_Byte = 1;
-            var Type_Short = 2;
-            var Type_UShort = 3;
-            var Type_Int32 = 4;
-            var Type_UInt32 = 5;
-            var Type_String = 6;//变长字符串，前两个字节表示长度
-            var Type_VString = 7;//定长字符串
-            var Type_Int64 = 8;
-            var Type_Float = 9;
-            var Type_Double = 10;
-            var Type_ByteArray = 11;
-
-            var _org_buf = arrayBuf ? (arrayBuf.constructor == DataView ? arrayBuf : (arrayBuf.constructor == Uint8Array ? new DataView(arrayBuf.buffer, offset) : new DataView(arrayBuf, offset))) : new DataView(new Uint8Array([]).buffer);
-            var _offset = offset || 0;
-            var _list = [];
-            var _littleEndian = false;
-
-            //指定字节序 为BigEndian
-            this.bigEndian = function () {
-                _littleEndian = false;
-                return this;
-            };
-
-            //指定字节序 为LittleEndian
-            this.littleEndian = function () {
-                _littleEndian = true;
-                return this;
-            };
-
-            if (!ArrayBuffer.prototype.slice) {
-                ArrayBuffer.prototype.slice = function (start, end) {
-                    var that = new Uint8Array(this);
-                    if (end == undefined) end = that.length;
-                    var result = new ArrayBuffer(end - start);
-                    var resultArray = new Uint8Array(result);
-                    for (var i = 0; i < resultArray.length; i++)
-                        resultArray[i] = that[i + start];
-                    return result;
-                }
-            }
-
-            function utf8Write(view, offset, str) {
-                var c = 0;
-                for (var i = 0, l = str.length; i < l; i++) {
-                    c = str.charCodeAt(i);
-                    if (c < 0x80) {
-                        view.setUint8(offset++, c);
-                    } else if (c < 0x800) {
-                        view.setUint8(offset++, 0xc0 | (c >> 6));
-                        view.setUint8(offset++, 0x80 | (c & 0x3f));
-                    } else if (c < 0xd800 || c >= 0xe000) {
-                        view.setUint8(offset++, 0xe0 | (c >> 12));
-                        view.setUint8(offset++, 0x80 | (c >> 6) & 0x3f);
-                        view.setUint8(offset++, 0x80 | (c & 0x3f));
-                    } else {
-                        i++;
-                        c = 0x10000 + (((c & 0x3ff) << 10) | (str.charCodeAt(i) & 0x3ff));
-                        view.setUint8(offset++, 0xf0 | (c >> 18));
-                        view.setUint8(offset++, 0x80 | (c >> 12) & 0x3f);
-                        view.setUint8(offset++, 0x80 | (c >> 6) & 0x3f);
-                        view.setUint8(offset++, 0x80 | (c & 0x3f));
-                    }
-                }
-            }
-
-            function utf8Read(view, offset, length) {
-                var string = '', chr = 0;
-                for (var i = offset, end = offset + length; i < end; i++) {
-                    var byte = view.getUint8(i);
-                    if ((byte & 0x80) === 0x00) {
-                        string += String.fromCharCode(byte);
-                        continue;
-                    }
-                    if ((byte & 0xe0) === 0xc0) {
-                        string += String.fromCharCode(
-                            ((byte & 0x0f) << 6) |
-                            (view.getUint8(++i) & 0x3f)
-                        );
-                        continue;
-                    }
-                    if ((byte & 0xf0) === 0xe0) {
-                        string += String.fromCharCode(
-                            ((byte & 0x0f) << 12) |
-                            ((view.getUint8(++i) & 0x3f) << 6) |
-                            ((view.getUint8(++i) & 0x3f) << 0)
-                        );
-                        continue;
-                    }
-                    if ((byte & 0xf8) === 0xf0) {
-                        chr = ((byte & 0x07) << 18) |
-                            ((view.getUint8(++i) & 0x3f) << 12) |
-                            ((view.getUint8(++i) & 0x3f) << 6) |
-                            ((view.getUint8(++i) & 0x3f) << 0);
-                        if (chr >= 0x010000) { // surrogate pair
-                            chr -= 0x010000;
-                            string += String.fromCharCode((chr >>> 10) + 0xD800, (chr & 0x3FF) + 0xDC00);
-                        } else {
-                            string += String.fromCharCode(chr);
-                        }
-                        continue;
-                    }
-                    throw new Error('Invalid byte ' + byte.toString(16));
-                }
-                return string;
-            }
-
-            function utf8Length(str) {
-                var c = 0, length = 0;
-                for (var i = 0, l = str.length; i < l; i++) {
-                    c = str.charCodeAt(i);
-                    if (c < 0x80) {
-                        length += 1;
-                    } else if (c < 0x800) {
-                        length += 2;
-                    } else if (c < 0xd800 || c >= 0xe000) {
-                        length += 3;
-                    } else {
-                        i++;
-                        length += 4;
-                    }
-                }
-                return length;
-            }
-
-            this.byte = function (val, index) {
-                if (arguments.length == 0) {
-                    _list.push(_org_buf.getUint8(_offset, _littleEndian));
-                    _offset += 1;
-                } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Byte, d: val, l: 1 });
-                    _offset += 1;
-                }
-                return this;
-            };
-
-            this.short = function (val, index) {
-                if (arguments.length == 0) {
-                    _list.push(_org_buf.getInt16(_offset, _littleEndian));
-                    _offset += 2;
-                } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Short, d: val, l: 2 });
-                    _offset += 2;
-                }
-                return this;
-            };
-
-            this.ushort = function (val, index) {
-                if (arguments.length == 0) {
-                    _list.push(_org_buf.getUint16(_offset, _littleEndian));
-                    _offset += 2;
-                } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_UShort, d: val, l: 2 });
-                    _offset += 2;
-                }
-                return this;
-            };
-
-            this.int32 = function (val, index) {
-                if (arguments.length == 0) {
-                    _list.push(_org_buf.getInt32(_offset, _littleEndian));
-                    _offset += 4;
-                } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Int32, d: val, l: 4 });
-                    _offset += 4;
-                }
-                return this;
-            };
-
-            this.uint32 = function (val, index) {
-                if (arguments.length == 0) {
-                    _list.push(_org_buf.getUint32(_offset, _littleEndian));
-                    _offset += 4;
-                } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_UInt32, d: val, l: 4 });
-                    _offset += 4;
-                }
-                return this;
-            };
-
-            /**
-             * 新加的方法，获取bytebuffer的长度
-             */
-            this.blength = function () {
-                return _offset;
-            };
-
-            /**
-             * 变长字符串 前4个字节表示字符串长度
-             **/
-            this.string = function (val, index) {
-                if (arguments.length == 0) {
-                    var len = _org_buf.getInt32(_offset, _littleEndian);
-                    _offset += 4;
-                    _list.push(utf8Read(_org_buf, _offset, len));
-                    _offset += len;
-                } else {
-                    var len = 0;
-                    if (val) {
-                        len = utf8Length(val);
-                    }
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_String, d: val, l: len });
-                    _offset += len + 4;
-                }
-                return this;
-            };
-
-            /**
-             * 定长字符串 val为null时，读取定长字符串（需指定长度len）
-             **/
-            this.vstring = function (val, len, index) {
-                if (!len) {
-                    throw new Error('vstring must got len argument');
-                    return this;
-                }
-                if (val == undefined || val == null) {
-                    var vlen = 0;//实际长度
-                    for (var i = _offset; i < _offset + len; i++) {
-                        if (_org_buf.getUint8(i) > 0) vlen++;
-                    }
-                    _list.push(utf8Read(_org_buf, _offset, vlen));
-                    _offset += len;
-                } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_VString, d: val, l: len });
-                    _offset += len;
-                }
-                return this;
-            };
-
-            this.int64 = function (val, index) {
-                if (arguments.length == 0) {
-                    _list.push(_org_buf.getFloat64(_offset, _littleEndian));
-                    _offset += 8;
-                } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Int64, d: val, l: 8 });
-                    _offset += 8;
-                }
-                return this;
-            };
-
-            this.float = function (val, index) {
-                if (arguments.length == 0) {
-                    _list.push(_org_buf.getFloat32(_offset, _littleEndian));
-                    _offset += 4;
-                } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Float, d: val, l: 4 });
-                    _offset += 4;
-                }
-                return this;
-            };
-
-            this.double = function (val, index) {
-                if (arguments.length == 0) {
-                    _list.push(_org_buf.getFloat64(_offset, _littleEndian));
-                    _offset += 8;
-                } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Double, d: val, l: 8 });
-                    _offset += 8;
-                }
-                return this;
-            };
-
-            /**
-             * 写入或读取一段字节数组
-             **/
-            this.byteArray = function (val, len, index) {
-                if (!len) {
-                    throw new Error('byteArray must got len argument');
-                    return this;
-                }
-                if (val == undefined || val == null) {
-                    var arr = new Uint8Array(_org_buf.buffer.slice(_offset, _offset + len));
-                    _list.push(arr);
-                    _offset += len;
-                } else {
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_ByteArray, d: val, l: len });
-                    _offset += len;
-                }
-                return this;
-            };
-
-            /**
-             * 解包成数据数组
-             **/
-            this.unpack = function () {
-                return _list;
-            };
-
-            /**
-             * 打包成二进制,在前面加上4个字节表示包长
-             **/
-            this.packWithHead = function () {
-                return this.pack(true);
-            };
-
-            /**
-             * 打包成二进制
-             * @param ifHead 是否在前面加上4个字节表示包长
-             **/
-            this.pack = function (ifHead) {
-                _org_buf = new DataView(new ArrayBuffer((ifHead) ? _offset + 4 : _offset));
-                var offset = 0;
-                if (ifHead) {
-                    _org_buf.setUint32(offset, _offset, _littleEndian);
-                    offset += 4;
-                }
-                for (var i = 0; i < _list.length; i++) {
-                    switch (_list[i].t) {
-                        case Type_Byte:
-                            _org_buf.setInt8(offset, _list[i].d);
-                            offset += _list[i].l;
-                            break;
-                        case Type_Short:
-                            _org_buf.setInt16(offset, _list[i].d, _littleEndian);
-                            offset += _list[i].l;
-                            break;
-                        case Type_UShort:
-                            _org_buf.setUint16(offset, _list[i].d, _littleEndian);
-                            offset += _list[i].l;
-                            break;
-                        case Type_Int32:
-                            _org_buf.setInt32(offset, _list[i].d, _littleEndian);
-                            offset += _list[i].l;
-                            break;
-                        case Type_UInt32:
-                            _org_buf.setUint32(offset, _list[i].d, _littleEndian);
-                            offset += _list[i].l;
-                            break;
-                        case Type_String:
-                            //前4个字节表示字符串长度
-                            _org_buf.setUint32(offset, _list[i].l, _littleEndian);
-                            offset += 4;
-                            utf8Write(_org_buf, offset, _list[i].d);
-                            offset += _list[i].l;
-                            break;
-                        case Type_VString:
-                            utf8Write(_org_buf, offset, _list[i].d);
-                            var vlen = utf8Length(_list[i].d);//字符串实际长度
-                            //补齐\0
-                            for (var j = offset + vlen; j < offset + _list[i].l; j++) {
-                                _org_buf.setUint8(j, 0);
-                            }
-                            offset += _list[i].l;
-                            break;
-                        case Type_Int64:
-                            _org_buf.setFloat64(offset, _list[i].d, _littleEndian);
-                            offset += _list[i].l;
-                            break;
-                        case Type_Float:
-                            _org_buf.setFloat32(offset, _list[i].d, _littleEndian);
-                            offset += _list[i].l;
-                            break;
-                        case Type_Double:
-                            _org_buf.setFloat64(offset, _list[i].d, _littleEndian);
-                            offset += _list[i].l;
-                            break;
-                        case Type_ByteArray:
-                            var indx = 0;
-                            for (var j = offset; j < offset + _list[i].l; j++) {
-                                if (indx < _list[i].d.length) {
-                                    _org_buf.setUint8(j, _list[i].d[indx]);
-                                } else {//不够的话，后面补齐0x00
-                                    _org_buf.setUint8(j, 0);
-                                }
-                                indx++
-                            }
-                            offset += _list[i].l;
-                            break;
-                    }
-                }
-                return _org_buf.buffer;
-            };
-
-            /**
-             * 未读数据长度
-             **/
-            this.getAvailable = function () {
-                if (!_org_buf) return _offset;
-                return _org_buf.buffer.byteLength - _offset;
-            };
-        }
-    </script>
-    
-    <script src="js/api-client.js"></script>
+    <script src="js/byte-buffer.js"></script>
+    <script src="js/ws-client.js"></script>
+    <script src="js/message-handler.js"></script>
+    <script src="js/im-client.js"></script>
     <script>
-        // 日志输出函数
-        function log(message) {
-            const logElement = document.getElementById('log');
-            const time = new Date().toLocaleTimeString();
-            logElement.innerHTML += `<div>${time}: ${message}</div>`;
-            // 滚动到底部
-            logElement.scrollTop = logElement.scrollHeight;
-        }
-        
-        // 覆盖console.log等方法，将输出重定向到页面
-        const originalConsoleLog = console.log;
-        const originalConsoleError = console.error;
-        
-        console.log = function() {
-            originalConsoleLog.apply(console, arguments);
-            log(Array.from(arguments).join(' '));
-        };
-        
-        console.error = function() {
-            originalConsoleError.apply(console, arguments);
-            log('错误: ' + Array.from(arguments).join(' '));
-        };
-        
-        // 初始化API客户端
-        const apiClient = new ImApiClient();
-        
-        // 登录按钮点击事件
-        document.getElementById('loginButton').addEventListener('click', async function() {
-            const userId = document.getElementById('userId').value;
-            const appId = parseInt(document.getElementById('appId').value);
-            const clientType = parseInt(document.getElementById('clientType').value);
-            const imei = document.getElementById('imei').value;
-            
-            log(`尝试登录，用户ID: ${userId}, 应用ID: ${appId}, 客户端类型: ${clientType}, IMEI: ${imei}`);
-            
-            const resultElement = document.getElementById('result');
-            resultElement.textContent = '登录中...';
-            
-            try {
-                // 设置应用ID
-                apiClient.setAppId(appId);
-                
-                // 调用登录方法
-                const result = await apiClient.login({
-                    userId,
-                    appId,
-                    clientType,
-                    imei
-                });
-                
-                log('登录成功');
-                log(JSON.stringify(result, null, 2));
-                
-                // 显示登录结果
-                resultElement.textContent = JSON.stringify(result, null, 2);
-            } catch (error) {
-                log(`登录失败: ${error.message}`);
-                resultElement.textContent = `登录失败: ${error.message}`;
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginContainer = document.getElementById('loginContainer');
+            const chatContainer = document.getElementById('chatContainer');
+            const loginButton = document.getElementById('loginButton');
+            const logoutButton = document.getElementById('logoutButton');
+            const sendButton = document.getElementById('sendButton');
+            const messageContainer = document.getElementById('messageContainer');
+            const messageInput = document.getElementById('messageInput');
+
+            let wsClient = null;
+            let imClient = null;
+
+            // 生成唯一ID
+            function uuid() {
+                var s = [];
+                var hexDigits = "0123456789abcdef";
+                for (var i = 0; i < 36; i++) {
+                    s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+                }
+                s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+                s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+                s[8] = s[13] = s[18] = s[23] = "-";
+
+                var uuid = s.join("");
+                return uuid;
             }
+
+            // 添加消息到聊天窗口
+            function addMessage(sender, content, isSystem = false) {
+                const messageElement = document.createElement('div');
+                messageElement.style.padding = '8px';
+                messageElement.style.marginBottom = '8px';
+                messageElement.style.borderRadius = '4px';
+                
+                if (isSystem) {
+                    messageElement.style.backgroundColor = '#f0f0f0';
+                    messageElement.style.color = '#666';
+                    messageElement.textContent = content;
+                } else {
+                    if (sender === document.getElementById('userId').value) {
+                        messageElement.style.backgroundColor = '#e3f2fd';
+                        messageElement.style.marginLeft = 'auto';
+                        messageElement.style.marginRight = '0';
+                        messageElement.style.maxWidth = '80%';
+                        messageElement.style.textAlign = 'right';
+                        messageElement.innerHTML = `<strong>我:</strong> ${content}`;
+                    } else {
+                        messageElement.style.backgroundColor = '#f1f1f1';
+                        messageElement.style.marginRight = 'auto';
+                        messageElement.style.marginLeft = '0';
+                        messageElement.style.maxWidth = '80%';
+                        messageElement.innerHTML = `<strong>${sender}:</strong> ${content}`;
+                    }
+                }
+                
+                messageContainer.appendChild(messageElement);
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
+
+            // 处理WebSocket消息
+            function handleMessage(command, messageBody) {
+                console.log(`收到消息: Command=${command}, Body=${messageBody}`);
+                
+                const userId = document.getElementById('userId').value;
+                
+                if (command === 1103) {
+                    // 私聊消息
+                    const data = JSON.parse(messageBody).data;
+                    addMessage(data.fromId, data.messageBody);
+                    
+                    // 发送已读回执
+                    if (userId !== data.fromId) {
+                        imClient.sendReadReceipt(data.fromId, data.messageSequence, 0);
+                    }
+                } else if (command === 2104) {
+                    // 群聊消息
+                    const data = JSON.parse(messageBody).data;
+                    addMessage(data.fromId, data.messageBody);
+                    
+                    // 发送已读回执
+                    if (userId !== data.fromId) {
+                        imClient.sendGroupReadReceipt(data.fromId, data.groupId, data.messageSequence);
+                    }
+                } else if (command === 9999) {
+                    // 系统消息
+                    const msg = JSON.parse(messageBody);
+                    
+                    if (msg.userId === "system") {
+                        addMessage("系统", msg.data, true);
+                    } else if (msg.userId === userId) {
+                        const msgInfo = JSON.parse(msg.data);
+                        addMessage(userId, msgInfo.msgBody);
+                    } else {
+                        const msgInfo = JSON.parse(msg.data);
+                        addMessage(msg.toId, msgInfo.msgBody);
+                    }
+                }
+            }
+
+            // 登录按钮点击事件
+            loginButton.addEventListener('click', function() {
+                const userId = document.getElementById('userId').value;
+                const appId = parseInt(document.getElementById('appId').value);
+                const clientType = parseInt(document.getElementById('clientType').value);
+                const imei = document.getElementById('imei').value;
+                
+                if (!userId) {
+                    alert('请输入用户ID');
+                    return;
+                }
+                
+                // 创建WebSocket客户端
+                wsClient = new WebSocketClient('ws://localhost:19002/ws');
+                
+                // 创建消息处理器
+                const messageHandler = new MessageHandler();
+                messageHandler.onMessage = handleMessage;
+                
+                // 创建IM客户端
+                imClient = new ImClient(wsClient, messageHandler);
+                
+                // 连接WebSocket
+                wsClient.connect().then(() => {
+                    // 登录
+                    imClient.login(userId, appId, clientType, imei)
+                        .then(() => {
+                            // 登录成功，显示聊天界面
+                            loginContainer.style.display = 'none';
+                            chatContainer.style.display = 'block';
+                            addMessage('系统', '登录成功，可以开始聊天了', true);
+                        })
+                        .catch(error => {
+                            alert(`登录失败: ${error.message}`);
+                        });
+                }).catch(error => {
+                    alert(`连接失败: ${error.message}`);
+                });
+            });
+
+            // 发送按钮点击事件
+            sendButton.addEventListener('click', function() {
+                const toId = document.getElementById('toId').value;
+                const command = parseInt(document.getElementById('command').value);
+                const messageText = messageInput.value;
+                
+                if (!toId) {
+                    alert('请输入接收方ID');
+                    return;
+                }
+                
+                if (!messageText) {
+                    alert('请输入消息内容');
+                    return;
+                }
+                
+                // 根据command判断是私聊还是群聊
+                if (command === 1103) {
+                    // 私聊消息
+                    imClient.sendPrivateMessage(toId, messageText).then(() => {
+                        // 清空输入框
+                        messageInput.value = '';
+                    }).catch(error => {
+                        alert(`发送失败: ${error.message}`);
+                    });
+                } else if (command === 2104) {
+                    // 群聊消息
+                    imClient.sendGroupMessage(toId, messageText).then(() => {
+                        // 清空输入框
+                        messageInput.value = '';
+                    }).catch(error => {
+                        alert(`发送失败: ${error.message}`);
+                    });
+                } else {
+                    alert('不支持的命令类型');
+                }
+            });
+
+            // 退出登录按钮点击事件
+            logoutButton.addEventListener('click', function() {
+                if (wsClient) {
+                    wsClient.close();
+                }
+                loginContainer.style.display = 'block';
+                chatContainer.style.display = 'none';
+                messageContainer.innerHTML = '';
+            });
         });
     </script>
 </body>
