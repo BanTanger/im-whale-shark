@@ -14,6 +14,8 @@ import com.bantanger.im.service.support.postprocessor.PostContext;
 import com.bantanger.im.service.support.postprocessor.PostProcessorContainer;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
+
 import static com.bantanger.im.common.constant.Constants.MsgPackConstants.*;
 import static com.bantanger.im.common.enums.command.MessageCommand.MSG_P2P;
 
@@ -44,9 +46,18 @@ public class CheckLegalMsgCommand extends BaseCommandStrategy {
         }
 
         // 主流程业务逻辑执行: 调用业务层校验消息发送方的内部接口
-        CheckSendMessageReq req = getCheckSendMsgReq(commandExecution.getMsg());
+        Message msg = commandExecution.getMsg();
         FeignMessageService feignMessageService = commandExecution.getFeignMessageService();
-        ResponseVO responseVO = feignMessageService.checkP2PSendMessage(req);
+        JSONObject msgPack = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()));
+        ResponseVO responseVO = null;
+
+        if (Objects.equals(msg.getMessageHeader().getCommand(), MSG_P2P.getCommand())) {
+            responseVO = feignMessageService.checkP2PSendMessage(
+                    buildCheckSendMessageReq(msg, msgPack, TO_ID));
+        } else {
+            responseVO = feignMessageService.checkGroupSendMessage(
+                    buildCheckSendMessageReq(msg, msgPack, GROUP_ID));
+        }
 
         feignDataPostContext.setMainProcessRes(responseVO);
 
@@ -55,15 +66,14 @@ public class CheckLegalMsgCommand extends BaseCommandStrategy {
 
     }
 
-    private CheckSendMessageReq getCheckSendMsgReq(Message msg) {
-        JSONObject msgPack = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()));
+    private static CheckSendMessageReq buildCheckSendMessageReq(
+            Message msg, JSONObject msgPack, String toId) {
 
         return CheckSendMessageReq.builder()
                 .command(msg.getMessageHeader().getCommand())
                 .appId(msg.getMessageHeader().getAppId())
                 .fromId(msgPack.getString(FROM_ID))
-                .toId(msgPack.getString(msg.getMessageHeader().getCommand()
-                                .equals(MSG_P2P.getCommand()) ? TO_ID : GROUP_ID))
+                .toId(msgPack.getString(toId))
                 .build();
     }
 

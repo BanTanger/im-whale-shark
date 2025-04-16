@@ -4,6 +4,8 @@ import com.bantanger.im.common.enums.command.GroupEventCommand;
 import com.bantanger.im.common.enums.command.MessageCommand;
 import com.bantanger.im.common.enums.command.SystemCommand;
 import com.bantanger.im.service.strategy.command.message.CheckLegalMsgCommand;
+import com.bantanger.im.service.strategy.command.message.GroupMsgCommand;
+import com.bantanger.im.service.strategy.command.message.P2PMsgCommand;
 import com.bantanger.im.service.strategy.command.system.LoginCommand;
 import com.bantanger.im.service.strategy.command.system.LogoutCommand;
 import com.bantanger.im.service.strategy.command.system.PingCommand;
@@ -25,7 +27,9 @@ public class CommandFactoryConfig {
     private static final LoginCommand LOGIN_COMMAND = new LoginCommand();
     private static final LogoutCommand LOGOUT_COMMAND = new LogoutCommand();
     private static final PingCommand PING_COMMAND = new PingCommand();
-    private static final CheckLegalMsgCommand CHECK_LEGAL_MSG_COMMAND = new CheckLegalMsgCommand();
+    private static final P2PMsgCommand P2P_MSG_COMMAND = new P2PMsgCommand();
+    private static final GroupMsgCommand GROUP_MSG_COMMAND = new GroupMsgCommand();
+//    private static final CheckLegalMsgCommand CHECK_LEGAL_MSG_COMMAND = new CheckLegalMsgCommand();
 
     public static void init() {
         // 系统命令策略
@@ -33,8 +37,8 @@ public class CommandFactoryConfig {
         commandStrategyMap.put(SystemCommand.LOGOUT.getCommand(), LOGOUT_COMMAND);
         commandStrategyMap.put(SystemCommand.PING.getCommand(), PING_COMMAND);
         // 消息命令策略
-        commandStrategyMap.put(MessageCommand.MSG_P2P.getCommand(), CHECK_LEGAL_MSG_COMMAND);
-        commandStrategyMap.put(GroupEventCommand.MSG_GROUP.getCommand(), CHECK_LEGAL_MSG_COMMAND);
+        commandStrategyMap.put(MessageCommand.MSG_P2P.getCommand(), P2P_MSG_COMMAND);
+        commandStrategyMap.put(GroupEventCommand.MSG_GROUP.getCommand(), GROUP_MSG_COMMAND);
     }
 
 }
