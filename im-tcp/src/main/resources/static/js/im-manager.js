@@ -315,16 +315,54 @@ class MessageHandler {
                     
                     // 使用imClient的messageCache
                     const messageList = this.imClient.messageCache.get(conversationId);
+                    
+                    // 如果会话不存在，尝试创建一个新的会话
+                    if (!this.imClient.conversations.has(conversationId)) {
+                        console.log(`群聊会话 ${conversationId} 不存在，尝试创建`);
+                        
+                        // 创建会话对象
+                        const conversation = {
+                            id: conversationId,
+                            type: 'GROUP',
+                            targetId: processedMessage.groupId,
+                            name: `群组 ${processedMessage.groupId}`,
+                            lastMessage: {
+                                content: processedMessage.content,
+                                timestamp: processedMessage.timestamp
+                            },
+                            unreadCount: 1
+                        };
+                        
+                        // 保存会话
+                        this.imClient.conversations.set(conversationId, conversation);
+                        
+                        // 触发会话创建回调
+                        if (this.imClient.callbacks.onConversationsCreated) {
+                            this.imClient.callbacks.onConversationsCreated([conversation]);
+                        }
+                        
+                        // 触发会话列表更新回调
+                        if (this.imClient.callbacks.onConversationsUpdated) {
+                            const updatedConversations = Array.from(this.imClient.conversations.values());
+                            this.imClient.callbacks.onConversationsUpdated(updatedConversations);
+                        }
+                    }
+                    
+                    // 再次检查消息是否在缓存中
                     if (messageList && messageList.some(m => m.id === processedMessage.id)) {
                         console.log('消息已在缓存中，跳过处理:', processedMessage.id);
                         return null;
                     }
+                    
+                    // 确保消息会被添加到缓存中
+                    this.imClient._addToMessageCache(processedMessage);
                 }
             }
             
             // 自动发送已读回执
             this._sendGroupReadReceipt(processedMessage);
             
+            console.log('触发群聊消息回调:', processedMessage.id);
             this.options.onGroupMessage(processedMessage);
             return processedMessage;
         } catch (error) {
@@ -786,10 +824,12 @@ class IMApiClient {
             groupType: data.groupType || 1,
             introduction: data.introduction || '',
             notification: data.notification || '',
-            memberIds: data.memberIds || [],
+            member: data.member || [], // 成员列表，使用GroupMemberDto对象集合
             appId: this.options.appId,
             operater: data.userId
         };
+        
+        console.log('创建群组请求参数:', req);
         
         const response = await this._post('/v1/group/createGroup', req);
         
@@ -960,6 +1000,75 @@ class IMApiClient {
     }
     
     /**
+     * 批量同步多个会话的消息
+     * @param {string} userId 用户ID
+     * @param {Array<Object>} conversations 会话同步信息列表，每个元素包含conversationId、conversationType和sequence
+     * @param {number} maxCount 单个会话最大拉取消息数量
+     * @returns {Promise<Object>} 同步结果
+     */
+    async batchSyncMessage(userId, conversations, maxCount = 10) {
+        const req = {
+            userId: userId,
+            appId: this.options.appId,
+            conversations: conversations,
+            maxCount: maxCount,
+            operater: userId
+        };
+        
+        console.log('批量同步消息 - 请求参数:', req);
+        
+        // 使用专门的18001端口进行批量同步消息请求
+        const messageStoreUrl = 'http://localhost:18001';
+        const response = await this._postToSpecificUrl(messageStoreUrl, '/v1/message/batchSyncMessage', req);
+        
+        if (!response.isOk()) {
+            throw new Error(response.msg || '批量同步消息失败');
+        }
+        
+        console.log('批量同步消息 - 响应结果:', response.data);
+        return response.data;
+    }
+    
+    /**
+     * 向指定URL发送HTTP POST请求
+     * @param {string} baseUrl 基础URL
+     * @param {string} endpoint 接口路径
+     * @param {Object} data 请求数据
+     * @returns {Promise<Object>} 响应结果
+     * @private
+     */
+    async _postToSpecificUrl(baseUrl, endpoint, data) {
+        try {
+            const url = `${baseUrl}${endpoint}`;
+            console.log('向特定URL发送请求:', url);
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            // 为响应对象添加一个便捷的isOk方法
+            result.isOk = function() {
+                return this.code === 200 || this.code === 0;
+            };
+            
+            return result;
+        } catch (error) {
+            console.error('HTTP请求失败:', error, '请求URL:', baseUrl + endpoint);
+            return { 
+                code: -1, 
+                msg: error.message,
+                isOk: function() { return false; }
+            };
+        }
+    }
+    
+    /**
      * 发送HTTP POST请求
      * @param {string} endpoint 接口路径
      * @param {Object} data 请求数据
@@ -1025,11 +1134,17 @@ class IMClient {
             onFriendStatusChange: () => {},
             onGroupStatusChange: () => {},
             onMessageAck: () => {},
-            onReadReceipt: () => {}
+            onReadReceipt: () => {},
+            onConversationsUpdated: () => {}, // 添加会话列表更新回调
+            onConversationsCreated: () => {}, // 添加会话创建回调
+            onMessageSyncComplete: () => {} // 消息同步完成回调
         }, this.options.callbacks);
         
         // 会话管理
         this.conversations = new Map();
+        
+        // 会话序列号管理 - 用于记录每个会话的序列号
+        this.conversationSequences = new Map();
         
         // 消息缓存
         this.messageCache = new Map();
@@ -1039,6 +1154,9 @@ class IMClient {
         
         // 当前用户ID
         this.currentUserId = null;
+        
+        // 消息同步状态
+        this.isMessageSyncInProgress = false;
         
         // 初始化WebSocket客户端
         this.wsClient = new WebSocketClient({
@@ -1092,6 +1210,8 @@ class IMClient {
      */
     async login(loginInfo) {
         try {
+            console.log('开始登录流程:', loginInfo.userId);
+            
             // 发送登录消息
             const loginResult = this.wsClient.sendLoginMessage({
                 userId: loginInfo.userId,
@@ -1114,13 +1234,82 @@ class IMClient {
             
             this.currentUserId = loginInfo.userId;
             
-            // 同步离线消息、好友列表和群组列表
-            this._syncData();
+            console.log('用户信息已保存，开始同步数据');
+            
+            // 等待同步数据完成
+            try {
+                // 同步离线消息、好友列表和群组列表，强制同步所有会话
+                await this._syncData(true);
+                console.log('数据同步完成，登录流程结束');
+            } catch (syncError) {
+                console.warn('数据同步部分失败，但不影响登录:', syncError);
+                // 同步失败不阻止登录
+            }
             
             return { success: true };
         } catch (error) {
             console.error('登录失败:', error);
             return { success: false, error: error.message };
+        }
+    }
+    
+    /**
+     * 同步数据（离线消息、好友列表、群组列表等）
+     * @param {boolean} [forceSyncMessages=false] 是否强制同步消息，即使没有会话
+     * @returns {Promise<void>}
+     * @private
+     */
+    async _syncData(forceSyncMessages = false) {
+        const userInfo = this.wsClient.getUserInfo();
+        if (!userInfo || !userInfo.userId) {
+            console.error('没有用户信息，无法同步数据');
+            return;
+        }
+        
+        console.log('开始数据同步流程, 强制同步消息:', forceSyncMessages);
+        let syncErrors = [];
+        
+        // 同步离线消息
+        try {
+            await this.apiClient.syncOfflineMessages(userInfo.userId);
+            console.log('同步离线消息成功');
+        } catch (error) {
+            console.error('同步离线消息失败:', error);
+            syncErrors.push('离线消息同步失败');
+        }
+        
+        // 同步好友列表
+        try {
+            await this.apiClient.syncFriendshipList(userInfo.userId);
+            console.log('同步好友列表成功');
+        } catch (error) {
+            console.error('同步好友列表失败:', error);
+            syncErrors.push('好友列表同步失败');
+        }
+        
+        // 同步群组列表
+        try {
+            await this.apiClient.syncJoinedGroupList(userInfo.userId);
+            console.log('同步群组列表成功');
+        } catch (error) {
+            console.error('同步群组列表失败:', error);
+            syncErrors.push('群组列表同步失败');
+        }
+        
+        // 同步会话消息 - 传入强制同步标志
+        try {
+            await this._syncConversationMessages(null, forceSyncMessages);
+            console.log('同步会话消息成功, 强制同步:', forceSyncMessages);
+        } catch (error) {
+            console.error('同步会话消息失败:', error);
+            syncErrors.push('会话消息同步失败');
+        }
+        
+        // 如果有同步错误，记录但不阻止程序继续运行
+        if (syncErrors.length > 0) {
+            console.error('同步数据部分失败:', syncErrors.join(', '));
+        } else {
+            console.log('所有数据同步成功');
         }
     }
     
@@ -1418,101 +1607,384 @@ class IMClient {
     }
     
     /**
-     * 同步数据
+     * 同步当前可见会话的消息
+     * @param {Array} [specificConversations] 指定需要同步的会话，如果为空则同步所有会话
+     * @param {boolean} [forceSync=false] 是否强制同步，即使没有会话
+     * @returns {Promise<void>}
      * @private
      */
-    async _syncData() {
-        const userInfo = this.wsClient.getUserInfo();
-        if (!userInfo || !userInfo.userId) {
-            console.error('没有用户信息，无法同步数据');
-            return;
-        }
+    async _syncConversationMessages(specificConversations, forceSync = false) {
+        // 设置同步状态为进行中
+        this.isMessageSyncInProgress = true;
+        console.log('消息同步开始, 强制同步:', forceSync);
         
-        let syncErrors = [];
-        
-        // 同步离线消息
         try {
-            await this.apiClient.syncOfflineMessages(userInfo.userId);
-            console.log('同步离线消息成功');
-        } catch (error) {
-            console.error('同步离线消息失败:', error);
-            syncErrors.push('离线消息同步失败');
-        }
-        
-        // 同步好友列表
-        try {
-            await this.apiClient.syncFriendshipList(userInfo.userId);
-            console.log('同步好友列表成功');
-        } catch (error) {
-            console.error('同步好友列表失败:', error);
-            syncErrors.push('好友列表同步失败');
-        }
-        
-        // 同步群组列表
-        try {
-            await this.apiClient.syncJoinedGroupList(userInfo.userId);
-            console.log('同步群组列表成功');
-        } catch (error) {
-            console.error('同步群组列表失败:', error);
-            syncErrors.push('群组列表同步失败');
-        }
-        
-        // 同步会话列表
-        try {
-            const convData = await this.apiClient.syncConversationList(userInfo.userId);
-            console.log('同步会话列表成功:', convData);
+            const userInfo = this.wsClient.getUserInfo();
+            if (!userInfo || !userInfo.userId) {
+                console.warn('用户未登录，无法同步会话消息');
+                this.isMessageSyncInProgress = false;
+                this.callbacks.onMessageSyncComplete(false, '用户未登录');
+                return;
+            }
             
-            // 处理并更新会话数据
-            if (convData && convData.data && convData.data.dataList && Array.isArray(convData.data.dataList)) {
-                const conversationList = convData.data.dataList;
-                console.log('收到会话列表数据，开始处理', conversationList.length, '条记录');
+            // 获取需要同步的会话列表
+            let conversationsToSync = [];
+            
+            if (specificConversations && Array.isArray(specificConversations)) {
+                // 使用指定的会话列表
+                conversationsToSync = specificConversations;
+            } else {
+                // 使用当前所有会话
+                conversationsToSync = Array.from(this.conversations.values());
+            }
+            
+            // 如果会话列表为空且不强制同步，直接返回
+            if (conversationsToSync.length === 0 && !forceSync) {
+                console.log('没有会话需要同步，且未设置强制同步');
+                this.isMessageSyncInProgress = false;
+                this.callbacks.onMessageSyncComplete(true, '没有会话需要同步');
+                return;
+            }
+            
+            // 如果强制同步但没有会话，使用空会话列表的同步请求
+            // 这会让服务器返回所有相关会话的最新消息
+            let syncConversations = [];
+            
+            if (conversationsToSync.length === 0 && forceSync) {
+                console.log('没有会话但设置了强制同步，使用默认同步请求');
+                // 在这种情况下，我们发送一个空的同步请求列表
+                // 服务器会根据用户ID自动返回相关的会话和消息
                 
-                // 更新会话列表
-                conversationList.forEach(conv => {
-                    // 根据会话ID解析会话类型和目标ID
-                    // conversationId 格式: conversationType_fromId_toId
-                    const idParts = conv.conversationId.split('_');
-                    if (idParts.length >= 3) {
-                        const conversationType = parseInt(idParts[0]);
-                        // fromId 是当前用户
-                        // toId 是目标用户ID或群组ID
-                        const targetId = conv.toId;
-                        
-                        // 处理会话数据
-                        const conversation = {
-                            id: conv.conversationId,
-                            type: conversationType === 1 ? 'C2C' : 'GROUP',
-                            targetId: targetId,
+                // 调用批量同步API，使用较大的消息数量限制
+                const result = await this.apiClient.batchSyncMessage(
+                    userInfo.userId,
+                    syncConversations,
+                    30  // 每个会话拉取更多消息
+                );
+                
+                // 处理同步结果（与正常流程相同）
+                await this._processSyncMessageResult(result);
+                return;
+            }
+            
+            // 构建同步请求
+            syncConversations = conversationsToSync.map(conv => {
+                // 确定会话ID格式
+                let conversationId = '';
+                if (conv.type === 'C2C') {
+                    conversationId = conv.targetId;
+                } else if (conv.type === 'GROUP') {
+                    conversationId = conv.targetId;
+                } else {
+                    console.warn('未知会话类型:', conv.type);
+                    return null;
+                }
+                
+                // 转换会话类型
+                let conversationType;
+                if (conv.type === 'C2C') {
+                    conversationType = 1; // 单聊
+                } else if (conv.type === 'GROUP') {
+                    conversationType = 2; // 群聊
+                } else {
+                    conversationType = 0; // 未知类型
+                }
+                
+                // 获取会话的当前序列号，如果没有则使用0
+                const sequence = this.conversationSequences.get(conv.id) || 0;
+                
+                return {
+                    conversationId: conversationId,
+                    conversationType: conversationType,
+                    sequence: sequence
+                };
+            }).filter(item => item !== null);  // 过滤掉无效的会话
+            
+            console.log('准备同步以下会话的消息:', syncConversations);
+            
+            // 调用批量同步API
+            const result = await this.apiClient.batchSyncMessage(
+                userInfo.userId,
+                syncConversations,
+                20  // 每个会话默认拉取20条消息，提高初始加载数量
+            );
+            
+            // 处理同步结果
+            await this._processSyncMessageResult(result);
+        } catch (error) {
+            console.error('同步会话消息时出错:', error);
+            this.isMessageSyncInProgress = false;
+            this.callbacks.onMessageSyncComplete(false, error.message);
+            throw error;
+        }
+    }
+    
+    /**
+     * 处理同步消息的结果
+     * @param {Object} result 同步消息的结果
+     * @returns {Promise<void>}
+     * @private
+     */
+    async _processSyncMessageResult(result) {
+        try {
+            if (result && result.conversationList && Array.isArray(result.conversationList)) {
+                console.log('同步会话消息成功，处理消息数据');
+                
+                // 创建新的会话列表（如果有消息返回但没有对应的会话）
+                const newConversations = [];
+                
+                // 处理每个会话的消息
+                result.conversationList.forEach(convResp => {
+                    if (!convResp.conversationId || !convResp.conversationType) {
+                        console.warn('会话响应缺少必要字段:', convResp);
+                        return;
+                    }
+                    
+                    // 确定会话类型
+                    const type = convResp.conversationType === 1 ? 'C2C' : 'GROUP';
+                    
+                    // 根据会话类型和ID构建会话标识
+                    const conversationId = this._getConversationId(type, convResp.conversationId);
+                    
+                    // 获取消息列表
+                    const messages = convResp.dataList || [];
+                    if (messages.length === 0) {
+                        console.log(`会话 ${conversationId} 没有新消息`);
+                        return;
+                    }
+                    
+                    console.log(`会话 ${conversationId} 收到 ${messages.length} 条消息`);
+                    
+                    // 检查会话是否存在，如果不存在则创建
+                    let conversation = this.conversations.get(conversationId);
+                    if (!conversation) {
+                        console.log(`会话 ${conversationId} 不存在，创建新会话`);
+                        // 创建会话对象
+                        conversation = {
+                            id: conversationId,
+                            type: type,
+                            targetId: convResp.conversationId,
+                            name: type === 'C2C' ? `用户 ${convResp.conversationId}` : `群组 ${convResp.conversationId}`,
                             lastMessage: {
-                                content: '会话同步',
-                                timestamp: conv.sequence || Date.now()
-                            },
-                            unreadCount: 0, // 从服务端获取或计算未读数
-                            isTop: conv.isTop === 1,
-                            isMute: conv.isMute === 1,
-                            readSequence: conv.readSequence
+                                content: '新消息',
+                                timestamp: Date.now()
+                            }
                         };
+                        // 保存会话
+                        this.conversations.set(conversationId, conversation);
+                        // 添加到新创建的会话列表
+                        newConversations.push(conversation);
+                    }
+                    
+                    // 处理消息列表
+                    let maxSequence = 0;
+                    messages.forEach(msg => {
+                        // 转换消息格式
+                        const message = this._convertMessageFormat(msg, type);
                         
-                        // 更新到会话存储
-                        this._updateConversation(conversation);
-                    } else {
-                        console.warn('无效的会话ID格式:', conv.conversationId);
+                        // 添加消息到缓存
+                        this._addToMessageCache(message);
+                        
+                        // 记录最大序列号
+                        if (msg.sequence && msg.sequence > maxSequence) {
+                            maxSequence = msg.sequence;
+                        }
+                        
+                        // 不论当前是否选中会话，都触发消息回调
+                        if (type === 'C2C' && this.callbacks.onChatMessage) {
+                            this.callbacks.onChatMessage(message);
+                        } else if (type === 'GROUP' && this.callbacks.onGroupMessage) {
+                            this.callbacks.onGroupMessage(message);
+                        }
+                    });
+                    
+                    // 更新会话序列号
+                    if (maxSequence > 0) {
+                        console.log(`更新会话 ${conversationId} 的序列号为 ${maxSequence}`);
+                        this.conversationSequences.set(conversationId, maxSequence);
+                    }
+                    
+                    // 更新会话的最后一条消息
+                    if (messages.length > 0) {
+                        // 按照序列号排序，获取最新的消息
+                        const lastMsg = messages.sort((a, b) => b.sequence - a.sequence)[0];
+                        const conversation = this.conversations.get(conversationId);
+                        if (conversation) {
+                            conversation.lastMessage = {
+                                content: lastMsg.content,
+                                timestamp: lastMsg.timestamp || Date.now()
+                            };
+                            this.conversations.set(conversationId, conversation);
+                        }
                     }
                 });
+                
+                // 如果有新创建的会话，通知UI更新
+                if (newConversations.length > 0) {
+                    console.log(`创建了 ${newConversations.length} 个新会话`);
+                    if (this.callbacks.onConversationsCreated) {
+                        this.callbacks.onConversationsCreated(newConversations);
+                    }
+                }
+                
+                // 更新UI
+                if (this.callbacks.onConversationsUpdated) {
+                    this.callbacks.onConversationsUpdated(Array.from(this.conversations.values()));
+                }
+
+                // 同步完成，设置状态并触发回调
+                this.isMessageSyncInProgress = false;
+                console.log('消息同步完成');
+                this.callbacks.onMessageSyncComplete(true, '消息同步完成');
             } else {
-                console.warn('会话列表数据格式不正确或为空');
+                console.warn('同步会话消息返回数据格式不正确:', result);
+                this.isMessageSyncInProgress = false;
+                this.callbacks.onMessageSyncComplete(false, '同步返回数据格式不正确');
             }
         } catch (error) {
-            console.error('同步会话列表失败:', error);
-            syncErrors.push('会话列表同步失败');
+            console.error('处理同步消息结果时出错:', error);
+            this.isMessageSyncInProgress = false;
+            this.callbacks.onMessageSyncComplete(false, error.message);
+            throw error;
+        }
+    }
+    
+    /**
+     * 处理滚动加载历史消息
+     * @param {string} conversationId 会话ID
+     * @returns {Promise<boolean>} 是否成功加载更多消息
+     */
+    async handleScrollLoadMessages(conversationId) {
+        try {
+            // 检查是否有有效的会话ID
+            if (!conversationId) {
+                console.warn('滚动加载消息时未提供会话ID');
+                return false;
+            }
+            
+            // 解析会话ID
+            const parts = conversationId.split('_');
+            if (parts.length < 2) {
+                console.warn('无效的会话ID格式:', conversationId);
+                return false;
+            }
+            
+            const type = parts[0];
+            const targetId = parts[1];
+            
+            // 获取会话当前序列号
+            const sequence = this.conversationSequences.get(conversationId) || 0;
+            
+            // 构建同步请求
+            const conversationType = type === 'C2C' ? 1 : (type === 'GROUP' ? 2 : 0);
+            const syncRequest = [{
+                conversationId: targetId,
+                conversationType: conversationType,
+                sequence: sequence
+            }];
+            
+            // 获取用户信息
+            const userInfo = this.wsClient.getUserInfo();
+            if (!userInfo || !userInfo.userId) {
+                console.warn('用户未登录，无法加载更多消息');
+                return false;
+            }
+            
+            console.log(`准备加载会话 ${conversationId} 的更多消息，当前序列号: ${sequence}`);
+            
+            // 调用批量同步API
+            const result = await this.apiClient.batchSyncMessage(
+                userInfo.userId,
+                syncRequest,
+                20  // 滚动加载时拉取更多消息
+            );
+            
+            // 处理同步结果
+            if (result && result.conversationList && Array.isArray(result.conversationList) && result.conversationList.length > 0) {
+                const convResp = result.conversationList[0];
+                
+                // 获取消息列表
+                const messages = convResp.dataList || [];
+                if (messages.length === 0) {
+                    console.log(`会话 ${conversationId} 没有更多历史消息`);
+                    return false;
+                }
+                
+                console.log(`会话 ${conversationId} 加载到 ${messages.length} 条历史消息`);
+                
+                // 处理消息列表
+                let maxSequence = 0;
+                const newMessages = [];
+                
+                messages.forEach(msg => {
+                    // 转换消息格式
+                    const message = this._convertMessageFormat(msg, type);
+                    
+                    // 添加消息到缓存
+                    this._addToMessageCache(message);
+                    
+                    // 记录最大序列号
+                    if (msg.sequence && msg.sequence > maxSequence) {
+                        maxSequence = msg.sequence;
+                    }
+                    
+                    newMessages.push(message);
+                });
+                
+                // 触发历史消息加载回调
+                if (this.callbacks.onHistoryMessagesLoaded) {
+                    this.callbacks.onHistoryMessagesLoaded(conversationId, newMessages);
+                }
+                
+                // 更新会话序列号（如果加载到更早的消息，不更新序列号）
+                if (maxSequence > sequence) {
+                    console.log(`更新会话 ${conversationId} 的序列号为 ${maxSequence}`);
+                    this.conversationSequences.set(conversationId, maxSequence);
+                }
+                
+                return true;
+        } else {
+                console.warn('加载更多消息返回数据格式不正确:', result);
+                return false;
+            }
+        } catch (error) {
+            console.error('滚动加载历史消息时出错:', error);
+            return false;
+        }
+    }
+    
+    /**
+     * 转换消息格式
+     * @param {Object} msg 服务器返回的消息对象
+     * @param {string} type 会话类型
+     * @returns {Object} 转换后的消息对象
+     * @private
+     */
+    _convertMessageFormat(msg, type) {
+        // 基础消息结构
+        const message = {
+            id: msg.messageId || msg.messageKey || `msg_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+            fromId: msg.fromId,
+            content: msg.content || '',
+            timestamp: msg.createTime || msg.timestamp || Date.now(),
+            status: 'sent',
+            type: type === 'C2C' ? 'chat' : 'group'
+        };
+        
+        // 根据会话类型添加其他字段
+        if (type === 'C2C') {
+            message.toId = msg.toId;
+        } else if (type === 'GROUP') {
+            message.groupId = msg.groupId || msg.toId;
+            message.toId = msg.groupId || msg.toId;
         }
         
-        // 如果有同步错误，记录但不阻止程序继续运行
-        if (syncErrors.length > 0) {
-            console.error('同步数据部分失败:', syncErrors.join(', '));
-        } else {
-            console.log('所有数据同步成功');
+        // 判断是否自己发送的消息
+        if (message.fromId === this.currentUserId) {
+            message.isSelf = true;
         }
+        
+        return message;
     }
     
     /**
@@ -1570,6 +2042,8 @@ class IMClient {
     _addToMessageCache(message) {
         let conversationType, targetId;
         
+        console.log('添加消息到缓存:', message.type, message.id);
+        
         if (message.type === 'chat') {
             conversationType = 'C2C';
             
@@ -1584,14 +2058,16 @@ class IMClient {
             targetId = message.groupId;
         } else {
             // 不缓存其他类型的消息
+            console.log('不缓存该类型消息:', message.type);
             return;
         }
         
         const conversationId = this._getConversationId(conversationType, targetId);
+        console.log('使用会话ID:', conversationId);
         
         // 如果消息是由当前用户发送的，更新会话（不删除缓存）
         if (message.fromId === this.currentUserId) {
-            console.log('发送新消息，更新缓存会话:', conversationId);
+            console.log('当前用户发送的消息，更新会话:', conversationId);
             // 获取现有消息列表或创建新列表
             let messageList = this.messageCache.get(conversationId);
             if (!messageList) {
@@ -1625,6 +2101,7 @@ class IMClient {
             } else {
                 // 添加新消息到列表
                 messageList.push(message);
+                console.log(`添加新消息到缓存: ${message.id}, 当前会话消息数: ${messageList.length}`);
                 
                 // 限制缓存大小（每个会话最多保留100条消息）
                 if (messageList.length > 100) {
@@ -1671,6 +2148,10 @@ class IMClient {
                     if (existingConversation) {
                         existingConversation.lastMessage = message;
                         this.conversations.set(conversationId, existingConversation);
+                    } else {
+                        // 会话不存在，创建一个新会话
+                        console.log(`会话 ${conversationId} 不存在，创建新会话`);
+                        this._createNewConversation(conversationType, targetId, message);
                     }
                     
                     return messageList;
@@ -1683,24 +2164,82 @@ class IMClient {
         if (!messageList) {
             messageList = [];
             this.messageCache.set(conversationId, messageList);
+            console.log(`为会话 ${conversationId} 创建消息列表`);
         }
         
         // 添加消息
         messageList.push(message);
+        console.log(`添加新消息到会话 ${conversationId}, 消息ID: ${message.id}, 当前会话消息数: ${messageList.length}`);
         
         // 限制缓存大小（每个会话最多保留100条消息）
         if (messageList.length > 100) {
             messageList.shift();
         }
         
-        // 更新会话
-        this._updateConversation({
-            type: conversationType,
-            targetId,
-            lastMessage: message
-        });
+        // 检查会话是否存在
+        let existingConversation = this.conversations.get(conversationId);
+        if (!existingConversation) {
+            // 会话不存在，创建新会话
+            console.log(`会话 ${conversationId} 不存在，创建新会话`);
+            existingConversation = this._createNewConversation(conversationType, targetId, message);
+        } else {
+            // 更新现有会话
+            existingConversation.lastMessage = {
+                content: message.content,
+                timestamp: message.timestamp
+            };
+            
+            // 消息不是当前用户发送的，增加未读计数
+            if (message.fromId !== this.currentUserId) {
+                existingConversation.unreadCount = (existingConversation.unreadCount || 0) + 1;
+                console.log(`增加会话 ${conversationId} 未读计数: ${existingConversation.unreadCount}`);
+            }
+            
+            this.conversations.set(conversationId, existingConversation);
+        }
+        
+        // 触发会话更新回调
+        if (this.callbacks.onConversationsUpdated) {
+            this.callbacks.onConversationsUpdated(Array.from(this.conversations.values()));
+        }
         
         return messageList;
+    }
+    
+    /**
+     * 创建新会话
+     * @param {string} conversationType 会话类型
+     * @param {string} targetId 目标ID
+     * @param {Object} message 消息对象
+     * @returns {Object} 创建的会话对象
+     * @private
+     */
+    _createNewConversation(conversationType, targetId, message) {
+        const conversationId = this._getConversationId(conversationType, targetId);
+        
+        // 创建会话对象
+        const conversation = {
+            id: conversationId,
+            type: conversationType,
+            targetId: targetId,
+            name: conversationType === 'C2C' ? `用户 ${targetId}` : `群组 ${targetId}`,
+            lastMessage: {
+                content: message.content,
+                timestamp: message.timestamp
+            },
+            unreadCount: message.fromId !== this.currentUserId ? 1 : 0
+        };
+        
+        // 保存会话
+        this.conversations.set(conversationId, conversation);
+        console.log(`创建新会话: ${conversationId}, 类型: ${conversationType}`);
+        
+        // 触发会话创建回调
+        if (this.callbacks.onConversationsCreated) {
+            this.callbacks.onConversationsCreated([conversation]);
+        }
+        
+        return conversation;
     }
     
     /**

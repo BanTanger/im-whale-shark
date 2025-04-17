@@ -12,7 +12,8 @@
         uiController: null,
         conversations: {},
         contacts: {},
-        groups: {}
+        groups: {},
+        pendingConversations: null
     };
     
     // 设置全局状态，方便调试
@@ -79,9 +80,6 @@
             backdrop: document.getElementById('modal-backdrop'),
             container: document.getElementById('modal-container')
         };
-        
-        // 调试
-        console.log('新聊天按钮元素:', elements.sidebar.newChatBtn);
     }
     
     /**
@@ -134,7 +132,7 @@
     }
     
     /**
-     * 处理登录事件
+     * 处理登录
      */
     async function handleLogin() {
         const userId = elements.loginForm.userId.value.trim();
@@ -187,15 +185,42 @@
                 // 显示主应用
                 showMainApp();
                 
-                // 加载用户数据
+                // 加载用户数据 - 但不立即渲染会话列表
+                let userData;
                 try {
-                    await loadUserData();
+                    userData = await loadUserData();
                     console.log('用户数据加载完成');
+                    
+                    // 将会话列表数据保存到全局状态中，等待消息同步完成后再处理
+                    if (userData && userData.conversations) {
+                        state.pendingConversations = userData.conversations;
+                        console.log('暂存会话列表数据，等待消息同步完成后处理');
+                    }
                 } catch (dataError) {
                     console.error('加载用户数据时出错:', dataError);
                 }
                 
-                // 确保从服务器获取的会话列表被显示
+                // 同步会话消息，它会在这里执行，在获取会话列表之后
+                try {
+                    if (state.imClient) {
+                        // 同步用户所有会话消息，使用强制同步模式
+                        console.log('开始同步会话消息');
+                        await state.imClient._syncConversationMessages(null, true);
+                        console.log('会话消息同步API调用完成');
+                        // 注意：实际的消息处理和UI更新会在onMessageSyncComplete回调中完成
+                    }
+                } catch (error) {
+                    console.error('同步数据失败:', error);
+                    
+                    // 如果消息同步调用失败，直接处理会话列表
+                    if (state.pendingConversations) {
+                        console.log('消息同步调用失败，直接处理暂存的会话列表');
+                        processConversationList(state.pendingConversations, true);
+                        state.pendingConversations = null;
+                    }
+                }
+                
+                // 确保从服务器获取的会话列表被显示 - 这部分改为只在没有数据时执行
                 setTimeout(async () => {
                     try {
                         // 检查会话列表是否已有数据
@@ -242,6 +267,10 @@
             console.error('登录过程出错:', error);
             alert(`登录出错: ${error.message}`);
         }
+        
+        // 解除按钮禁用状态
+        elements.loginForm.loginBtn.disabled = false;
+        elements.loginForm.loginBtn.textContent = '登录';
     }
     
     /**
@@ -290,9 +319,67 @@
                 onReadReceipt: handleReadReceipt,
                 onFriendRequest: handleFriendRequest,
                 onFriendStatusChange: handleFriendStatusChange,
-                onGroupStatusChange: handleGroupStatusChange
+                onGroupStatusChange: handleGroupStatusChange,
+                onConversationsUpdated: handleConversationsUpdated,
+                onConversationsCreated: handleConversationsCreated,
+                onMessageSyncComplete: handleMessageSyncComplete
             }
         });
+    }
+    
+    /**
+     * 处理会话列表更新
+     * @param {Array} conversations 会话列表
+     */
+    function handleConversationsUpdated(conversations) {
+        console.log('会话列表已更新，数量:', conversations.length);
+        // 更新UI
+        if (state.uiController) {
+            state.uiController.updateConversationsList(conversations);
+        }
+    }
+    
+    /**
+     * 处理新创建的会话
+     * @param {Array} conversations 新创建的会话列表
+     */
+    function handleConversationsCreated(conversations) {
+        console.log('创建了新会话，数量:', conversations.length);
+        // 转换为应用使用的会话格式
+        conversations.forEach(conv => {
+            const id = conv.id;
+            state.conversations[id] = {
+                id: id,
+                type: conv.type,
+                targetId: conv.targetId,
+                name: conv.name || (conv.type === 'GROUP' ? `群组 ${conv.targetId}` : `用户 ${conv.targetId}`),
+                lastMessage: conv.lastMessage || { content: '新消息', timestamp: Date.now() },
+                unreadCount: 0
+            };
+        });
+        
+        // 更新UI
+        if (state.uiController) {
+            state.uiController.updateConversationsList(Object.values(state.conversations));
+        }
+    }
+    
+    /**
+     * 处理消息同步完成
+     * @param {boolean} success 是否成功
+     * @param {string} message 消息
+     */
+    function handleMessageSyncComplete(success, message) {
+        console.log(`消息同步完成: ${success ? '成功' : '失败'}, ${message}`);
+        
+        // 获取暂存的会话列表数据
+        if (state.pendingConversations) {
+            console.log('消息同步完成后处理暂存的会话列表');
+            processConversationList(state.pendingConversations, true);
+            state.pendingConversations = null;
+        } else {
+            console.log('没有暂存的会话列表数据');
+        }
     }
     
     /**
@@ -317,7 +404,37 @@
             onCreateGroup: handleCreateGroup,
             onAddFriend: handleAddFriend,
             autoSwitchToChat: uiSettings.autoSwitchToChat || false,
-            onAutoSwitchChange: handleAutoSwitchChange
+            onAutoSwitchChange: handleAutoSwitchChange,
+            // 新增：滚动加载更多消息回调
+            onLoadMoreMessages: async (conversationId) => {
+                console.log('UI触发加载更多消息:', conversationId);
+                
+                if (!state.imClient) {
+                    console.warn('IM客户端未初始化，无法加载更多消息');
+                    return { hasMore: false };
+                }
+                
+                try {
+                    // 调用IMClient的滚动加载方法
+                    const hasMore = await state.imClient.handleScrollLoadMessages(conversationId);
+                    
+                    // 获取当前会话的消息列表
+                    let messages = [];
+                    if (state.imClient.messageCache) {
+                        messages = state.imClient.messageCache.get(conversationId) || [];
+                    }
+                    
+                    console.log(`加载更多消息完成，hasMore=${hasMore}, 当前消息缓存数量=${messages.length}`);
+                    
+                    return {
+                        hasMore: hasMore,
+                        messages: messages
+                    };
+                } catch (error) {
+                    console.error('加载更多消息失败:', error);
+                    return { hasMore: false };
+                }
+            }
         });
         
         // 不再添加测试会话数据
@@ -419,15 +536,22 @@
     
     /**
      * 加载用户数据
+     * @returns {Promise<Object>} 包含用户数据的Promise
      */
     async function loadUserData() {
         let errorMessages = [];
+        const userData = {
+            friends: [],
+            groups: [],
+            conversations: null  // 用于暂存会话列表数据，但不立即渲染
+        };
         
         // 加载好友列表
         try {
             const friends = await state.imClient.getFriendList();
             if (friends && Array.isArray(friends)) {
                 processFriendList(friends);
+                userData.friends = friends;
             } else {
                 console.warn('好友列表格式不正确或为空');
             }
@@ -441,6 +565,7 @@
             const groups = await state.imClient.getGroupList();
             if (groups && Array.isArray(groups)) {
                 processGroupList(groups);
+                userData.groups = groups;
             } else {
                 console.warn('群组列表格式不正确或为空');
             }
@@ -449,7 +574,7 @@
             errorMessages.push(`群组列表: ${error.message}`);
         }
 
-        // 同步会话列表
+        // 同步会话列表 - 仅获取数据但不立即渲染
         try {
             // 清空现有会话列表，因为这是首次加载
             state.conversations = {};
@@ -457,9 +582,10 @@
             const conversationResponse = await state.imClient.apiClient.syncConversationList(state.user.userId);
             console.log('同步会话列表响应:', conversationResponse);
 
-            // 处理会话列表
+            // 保存会话列表数据但不立即处理
             if (conversationResponse) {
-                processConversationList(conversationResponse, true); // 使用清空模式
+                userData.conversations = conversationResponse;
+                console.log('会话列表数据已保存，等待消息同步后再渲染');
             } else {
                 console.warn('同步会话列表返回空数据');
             }
@@ -467,12 +593,12 @@
             console.warn('同步会话列表失败:', error);
 
             // 如果同步失败，尝试从IM客户端获取会话列表（兼容处理）
-            let conversations = [];
             if (state.imClient && state.imClient.getConversationList) {
                 try {
-                    conversations = state.imClient.getConversationList();
+                    const conversations = state.imClient.getConversationList();
                     if (conversations && conversations.length > 0) {
-                        processConversationList(conversations, true); // 使用清空模式
+                        userData.conversations = conversations;
+                        console.log('从IM客户端获取的会话列表已保存，等待消息同步后再渲染');
                     } else {
                         console.warn('从IM客户端获取会话列表为空');
                     }
@@ -496,6 +622,8 @@
                 });
             }
         }
+        
+        return userData;
     }
 
     /**
@@ -980,6 +1108,29 @@
         
         // 生成标准会话ID格式
         const standardConversationId = `${conversation.type}_${conversation.targetId}`;
+        console.log('标准会话ID:', standardConversationId, '原始会话ID:', conversation.id);
+        
+        // 确保会话使用标准ID格式
+        if (conversation.id !== standardConversationId) {
+            console.log('会话ID与标准格式不一致，更新为标准格式');
+            conversation.id = standardConversationId;
+        }
+        
+        // 当前时间戳，用于更新会话顺序
+        const currentTimestamp = Date.now();
+        console.log('当前时间戳:', currentTimestamp);
+        
+        // 确保会话有最新的时间戳
+        if (!conversation.lastMessage) {
+            console.log('会话缺少 lastMessage，创建并设置时间戳');
+            conversation.lastMessage = {
+                content: '开始聊天',
+                timestamp: currentTimestamp
+            };
+        } else {
+            console.log('更新会话时间戳，旧值:', conversation.lastMessage.timestamp);
+            conversation.lastMessage.timestamp = currentTimestamp;
+        }
         
         // 获取会话历史消息
         if (state.imClient.messageCache) {
@@ -1050,9 +1201,9 @@
                     getAvatarForGroup(conversation.targetId) : 
                     getAvatarForUser(conversation.targetId)),
                 unreadCount: 0,
-                lastMessage: conversation.lastMessage || {
-                    content: '刚刚选择的会话',
-                    timestamp: Date.now()
+                lastMessage: {
+                    content: conversation.lastMessage?.content || '开始聊天',
+                    timestamp: currentTimestamp // 使用当前时间戳
                 }
             };
         } else {
@@ -1066,6 +1217,19 @@
             if (conversation.avatar) {
                 state.conversations[standardConversationId].avatar = conversation.avatar;
             }
+            
+            // 更新时间戳，确保会话排序在顶部
+            if (state.conversations[standardConversationId].lastMessage) {
+                // 总是使用当前时间戳，确保点击的会话排在最前面
+                state.conversations[standardConversationId].lastMessage.timestamp = currentTimestamp;
+                console.log('已更新现有会话的时间戳:', currentTimestamp);
+            } else {
+                state.conversations[standardConversationId].lastMessage = {
+                    content: '开始聊天',
+                    timestamp: currentTimestamp
+                };
+                console.log('为现有会话添加lastMessage和时间戳:', currentTimestamp);
+            }
         }
         
         // 同步会话到IMClient
@@ -1073,20 +1237,59 @@
         const imClientConversation = {
             type: conversation.type,
             targetId: conversation.targetId,
-            lastMessage: state.conversations[standardConversationId].lastMessage
+            lastMessage: {
+                content: state.conversations[standardConversationId].lastMessage.content,
+                timestamp: currentTimestamp // 使用当前时间戳
+            }
         };
         state.imClient._updateConversation(imClientConversation);
         
-        // 如果同一会话存在多个ID格式，清理非标准格式的条目
-        const originalConversationId = conversation.id || conversation.conversationId;
-        if (originalConversationId && originalConversationId !== standardConversationId && 
-            state.conversations[originalConversationId]) {
-            console.log('删除非标准格式的会话ID:', originalConversationId);
-            delete state.conversations[originalConversationId];
+        // 查找并移除所有可能的重复会话
+        // 策略：保留标准ID的会话，删除所有其他可能是同一会话的条目
+        const allKeys = Object.keys(state.conversations);
+        const targetId = conversation.targetId;
+        
+        // 查找可能的重复会话ID - 任何包含相同targetId的会话，除了标准ID
+        const duplicateIds = allKeys.filter(id => {
+            if (id === standardConversationId) return false; // 排除标准ID
+            
+            // 检查是否包含相同的targetId
+            const conv = state.conversations[id];
+            return conv && conv.targetId === targetId;
+        });
+        
+        // 删除所有重复会话
+        if (duplicateIds.length > 0) {
+            console.log('发现并删除重复会话:', duplicateIds);
+            duplicateIds.forEach(id => delete state.conversations[id]);
+        }
+        
+        // 检查会话列表中当前会话的位置
+        const conversationValues = Object.values(state.conversations);
+        
+        // 排序会话列表
+        conversationValues.sort((a, b) => {
+            const timeA = a.lastMessage && a.lastMessage.timestamp ? a.lastMessage.timestamp : 0;
+            const timeB = b.lastMessage && b.lastMessage.timestamp ? b.lastMessage.timestamp : 0;
+            return timeB - timeA; // 降序排列，最新的在前面
+        });
+        
+        // 找到当前会话的位置
+        const currentConvIndex = conversationValues.findIndex(
+            conv => conv.id === standardConversationId
+        );
+        
+        console.log('排序后当前会话在列表中的位置:', currentConvIndex);
+        
+        // 强制将当前会话移到首位（如果不在首位）
+        if (currentConvIndex > 0) {
+            console.log('当前会话不在首位，强制置顶');
+            const currentConv = conversationValues.splice(currentConvIndex, 1)[0];
+            conversationValues.unshift(currentConv);
         }
         
         // 更新UI展示所有会话
-        state.uiController.updateConversationsList(Object.values(state.conversations));
+        state.uiController.updateConversationsList(conversationValues);
     }
     
     /**
@@ -1169,25 +1372,28 @@
         console.log('确定的目标ID:', targetId);
         
         // 生成标准会话ID格式
-        const conversationId = `${type}_${targetId}`;
-        console.log('生成的会话ID:', conversationId);
+        const standardConversationId = `${type}_${targetId}`;
+        console.log('生成的标准会话ID:', standardConversationId);
+        
+        // 当前时间戳，用于更新会话顺序
+        const currentTimestamp = message.timestamp || Date.now();
         
         // 检查会话是否已存在
-        if (state.conversations[conversationId]) {
-            console.log('更新现有会话:', conversationId);
+        if (state.conversations[standardConversationId]) {
+            console.log('更新现有会话:', standardConversationId);
             // 更新现有会话的最后消息
-            state.conversations[conversationId].lastMessage = {
+            state.conversations[standardConversationId].lastMessage = {
                 content: message.content,
-                timestamp: message.timestamp || Date.now()
+                timestamp: currentTimestamp
             };
             
             // 如果消息不是自己发的，增加未读计数
             if (message.fromId !== state.user.userId) {
-                state.conversations[conversationId].unreadCount = 
-                    (state.conversations[conversationId].unreadCount || 0) + 1;
+                state.conversations[standardConversationId].unreadCount = 
+                    (state.conversations[standardConversationId].unreadCount || 0) + 1;
             }
         } else {
-            console.log('创建新会话:', conversationId);
+            console.log('创建新会话:', standardConversationId);
             // 创建新会话
             let name, avatar;
             if (type === 'C2C') {
@@ -1201,8 +1407,8 @@
             }
             
             // 添加新会话，使用标准ID格式
-            state.conversations[conversationId] = {
-                id: conversationId,  // 使用标准格式的ID
+            state.conversations[standardConversationId] = {
+                id: standardConversationId,  // 使用标准格式的ID
                 type: type,
                 targetId: targetId,
                 name: name,
@@ -1210,27 +1416,35 @@
                 unreadCount: message.fromId !== state.user.userId ? 1 : 0,
                 lastMessage: {
                     content: message.content,
-                    timestamp: message.timestamp || Date.now()
+                    timestamp: currentTimestamp
                 }
             };
         }
         
-        // 检查可能存在的非标准格式ID会话并删除
-        const possibleOldIds = Object.keys(state.conversations).filter(id => 
-            id !== conversationId && (
-                // 可能的旧格式会话ID，如：id_targetId
-                id.endsWith(`_${targetId}`) || 
-                // 或者包含targetId的其他格式
-                (id.includes(targetId) && id.includes(type))
-            )
-        );
+        // 查找并移除所有可能的重复会话
+        // 策略：保留标准ID的会话，删除所有其他可能是同一会话的条目
+        const allKeys = Object.keys(state.conversations);
         
-        if (possibleOldIds.length > 0) {
-            console.log(`发现可能的重复会话ID: ${possibleOldIds.join(', ')}，将删除`);
-            possibleOldIds.forEach(oldId => delete state.conversations[oldId]);
+        // 查找可能的重复会话ID - 任何包含相同targetId的会话，除了标准ID
+        const duplicateIds = allKeys.filter(id => {
+            if (id === standardConversationId) return false; // 排除标准ID
+            
+            // 检查是否包含相同的targetId
+            const conv = state.conversations[id];
+            if (!conv) return false; // 跳过无效会话
+            
+            // 确定是否为重复会话 - 有相同的targetId或会话ID格式与当前标准ID类似
+            return (conv.targetId === targetId) || 
+                   (id.includes(targetId) && id.includes(type));
+        });
+        
+        // 删除所有重复会话
+        if (duplicateIds.length > 0) {
+            console.log('发现并删除重复会话:', duplicateIds);
+            duplicateIds.forEach(id => delete state.conversations[id]);
         }
         
-        console.log(`会话${conversationId}已更新`, state.conversations[conversationId]);
+        console.log(`会话${standardConversationId}已更新`, state.conversations[standardConversationId]);
         
         // 确保消息被添加到IMClient的缓存中
         if (state.imClient) {
@@ -1255,7 +1469,7 @@
                 targetId: targetId,
                 lastMessage: {
                     content: message.content,
-                    timestamp: message.timestamp || Date.now()
+                    timestamp: currentTimestamp
                 }
             });
         }
@@ -1559,15 +1773,68 @@
         try {
             console.log('创建群组:', groupData);
             
-            const result = await state.imClient.createGroup(groupData);
+            // 确保群组数据包含必要字段
+            if (!groupData.groupName) {
+                throw new Error('群组名称不能为空');
+            }
             
-            if (result) {
+            // 将memberIds转换为GroupMemberDto对象集合
+            const members = [];
+            if (groupData.memberIds && Array.isArray(groupData.memberIds)) {
+                groupData.memberIds.forEach(memberId => {
+                    // 创建符合后端需要的GroupMemberDto对象
+                    members.push({
+                        memberId: memberId,
+                        alias: "", // 可选别名
+                        role: 0,   // 普通成员
+                        joinType: "invite", // 邀请加入
+                        joinTime: Date.now() // 当前时间戳
+                    });
+                });
+            }
+            
+            // 构建API调用数据
+            const apiGroupData = {
+                groupName: groupData.groupName,
+                introduction: groupData.introduction || '',
+                member: members // 使用正确的字段名和结构
+            };
+            
+            // 添加日志记录
+            console.log('调用创建群组API:', apiGroupData);
+            
+            const result = await state.imClient.createGroup(apiGroupData);
+            
+            if (result.isOk()) {
                 console.log('创建群组成功:', result);
                 
                 // 刷新群组列表
                 const groups = await state.imClient.getGroupList();
                 if (groups && Array.isArray(groups)) {
                     processGroupList(groups);
+                }
+
+                // 同步加入的群组列表
+                try {
+                    console.log('同步加入的群组列表');
+                    const syncGroupResult = await state.imClient.apiClient.syncJoinedGroupList(state.user.userId);
+                    console.log('同步加入的群组列表结果:', syncGroupResult);
+                } catch (syncError) {
+                    console.error('同步加入的群组列表失败:', syncError);
+                }
+
+                // 同步会话列表
+                try {
+                    console.log('同步会话列表');
+                    const syncConvResult = await state.imClient.apiClient.syncConversationList(state.user.userId);
+                    console.log('同步会话列表结果:', syncConvResult);
+                    
+                    // 处理会话列表数据
+                    if (syncConvResult) {
+                        processConversationList(syncConvResult, false); // 不清空现有会话列表
+                    }
+                } catch (syncError) {
+                    console.error('同步会话列表失败:', syncError);
                 }
                 
                 // 显示成功提示
@@ -1656,6 +1923,29 @@
                 }
             } catch (refreshError) {
                 console.warn('刷新好友列表失败:', refreshError);
+            }
+
+            // 同步好友关系列表
+            try {
+                console.log('同步好友关系列表');
+                const syncFriendshipResult = await state.imClient.apiClient.syncFriendshipList(state.user.userId);
+                console.log('同步好友关系列表结果:', syncFriendshipResult);
+            } catch (syncError) {
+                console.error('同步好友关系列表失败:', syncError);
+            }
+
+            // 同步会话列表
+            try {
+                console.log('同步会话列表');
+                const syncConvResult = await state.imClient.apiClient.syncConversationList(state.user.userId);
+                console.log('同步会话列表结果:', syncConvResult);
+                
+                // 处理会话列表数据
+                if (syncConvResult) {
+                    processConversationList(syncConvResult, false); // 不清空现有会话列表
+                }
+            } catch (syncError) {
+                console.error('同步会话列表失败:', syncError);
             }
             
             // 显示成功提示

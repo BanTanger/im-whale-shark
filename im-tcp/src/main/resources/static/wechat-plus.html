@@ -121,6 +121,17 @@
                         <label for="group-intro">群组介绍</label>
                         <textarea id="group-intro" placeholder="请输入群组介绍"></textarea>
                     </div>
+                    <div class="form-group">
+                        <label for="group-members">群成员</label>
+                        <div class="members-container">
+                            <div class="selected-members" id="selected-members">
+                                <!-- 已选择的成员将显示在这里 -->
+                            </div>
+                            <button id="select-members-btn" class="select-members-btn">
+                                <i class="fa fa-user-plus"></i> 添加群成员
+                            </button>
+                        </div>
+                    </div>
                     <button id="create-group-btn">创建群组</button>
                 </div>
             </div>
@@ -245,62 +256,5 @@
     <script src="js/im-manager.js"></script>
     <script src="js/im-ui.js"></script>
     <script src="js/wechat-plus-app.js"></script>
-    <script>
-        // 开发调试辅助函数
-        window.APP_DEBUG = {
-            // 触发创建群组
-            createGroup: function(groupName, introduction = '') {
-                console.log('手动触发创建群组:', {groupName, introduction});
-                if (window.state && window.state.imClient) {
-                    return window.state.imClient.createGroup({
-                        groupName: groupName,
-                        introduction: introduction
-                    }).then(result => {
-                        console.log('创建群组结果:', result);
-                        return result;
-                    }).catch(err => {
-                        console.error('创建群组失败:', err);
-                        throw err;
-                    });
-                } else {
-                    console.error('IM客户端不可用');
-                }
-            },
-            
-            // 触发添加好友
-            addFriend: function(toId, remark = '') {
-                console.log('手动触发添加好友:', {toId, remark});
-                if (window.state && window.state.imClient) {
-                    return window.state.imClient.addFriend({
-                        toId: toId,
-                        remark: remark,
-                        addSource: '控制台',
-                        addWording: '请求添加您为好友'
-                    }).then(result => {
-                        console.log('添加好友结果:', result);
-                        return result;
-                    }).catch(err => {
-                        console.error('添加好友失败:', err);
-                        throw err;
-                    });
-                } else {
-                    console.error('IM客户端不可用');
-                }
-            },
-            
-            // 显示添加好友模态框
-            showAddFriendModal: function() {
-                console.log('手动触发添加好友模态框');
-                if (window.state && window.state.uiController) {
-                    window.state.uiController._showAddFriendModal();
-                    return true;
-                } else {
-                    console.error('UI控制器不可用');
-                    return false;
-                }
-            }
-        };
-        console.log('调试辅助函数已加载，可使用 APP_DEBUG.createGroup() 和 APP_DEBUG.addFriend() 进行测试');
-    </script>
 </body>
 </html> 

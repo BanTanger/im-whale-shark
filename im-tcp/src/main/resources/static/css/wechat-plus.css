@@ -3,12 +3,14 @@
     /* 基础颜色 - 浅色主题 */
     --bg-primary: #f5f5f5;
     --bg-secondary: #ffffff;
+    --bg-input: #ffffff;
     --text-primary: #333333;
     --text-secondary: #666666;
     --text-muted: #999999;
     --border-color: #e0e0e0;
     --accent-color: #09bb07;
     --accent-hover: #07a906;
+    --accent-color-dark: #07a906;
     --message-sender: #09bb07;
     --message-receiver: #ffffff;
     --sidebar-bg: #2e2e2e;
@@ -25,12 +27,14 @@
 .dark-theme {
     --bg-primary: #1e1e1e;
     --bg-secondary: #2d2d2d;
+    --bg-input: #3a3a3a;
     --text-primary: #e0e0e0;
     --text-secondary: #b0b0b0;
     --text-muted: #808080;
     --border-color: #3a3a3a;
     --accent-color: #09bb07;
     --accent-hover: #07a906;
+    --accent-color-dark: #068305;
     --message-sender: #07a906;
     --message-receiver: #2d2d2d;
     --sidebar-bg: #1a1a1a;
@@ -579,33 +583,225 @@ body {
 .create-group-form .form-group input,
 .create-group-form .form-group textarea {
     width: 100%;
-    padding: 10px;
+    padding: 8px 10px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-input);
     color: var(--text-primary);
     font-size: var(--font-size-base);
 }
 
 .create-group-form .form-group textarea {
+    height: 80px;
     resize: vertical;
-    min-height: 80px;
 }
 
-#create-group-btn {
-    width: 100%;
-    padding: 10px;
+.create-group-form button {
+    padding: 8px 15px;
     background-color: var(--accent-color);
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: var(--font-size-base);
+}
+
+.create-group-form button:hover {
+    background-color: var(--accent-color-dark);
+}
+
+/* 群组成员选择样式 */
+.members-container {
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.selected-members {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+    min-height: 50px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-primary);
+}
+
+.member-tag {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2px 8px 2px 2px;
+    margin: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+}
+
+.member-tag:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.member-tag .member-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 5px;
+    font-size: 12px;
+}
+
+.member-tag .member-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.member-tag .member-name {
+    margin-right: 8px;
+    font-size: var(--font-size-small);
+    color: var(--text-primary);
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.member-tag .remove-member {
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 12px;
+    width: 16px;
+    height: 16px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px;
+    transition: all 0.2s;
+}
+
+.member-tag .remove-member:hover {
+    color: #fff;
+    background-color: var(--accent-color);
+}
+
+.select-members-btn {
+    align-self: flex-start;
+    margin-top: 5px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: var(--font-size-small);
+}
+
+/* 成员选择模态框 */
+.member-selection-modal .modal-body {
+    padding: 0;
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.member-search {
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.member-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-small);
+}
+
+.member-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    border-bottom: 1px solid var(--border-color);
     transition: background-color 0.2s;
 }
 
-#create-group-btn:hover {
-    background-color: var(--accent-hover);
+.member-item:hover {
+    background-color: var(--bg-primary);
+}
+
+.member-item:last-child {
+    border-bottom: none;
+}
+
+.member-item .member-checkbox {
+    margin-right: 10px;
+    position: relative;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.member-item .member-label {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    cursor: pointer;
+    padding: 5px 0;
+}
+
+.member-item .member-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+    font-size: 14px;
+}
+
+.member-item .member-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.member-item .member-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.member-item .member-id {
+    font-size: var(--font-size-small);
+    color: var(--text-secondary);
+}
+
+.no-friends-message {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-secondary);
 }
 
 /* 设置页面 */
@@ -1121,7 +1317,7 @@ input:checked + .toggle-slider:before {
     width: 100%;
     border-radius: 8px;
     overflow: hidden;
-    background-color: var(--bg-primary);
+    background-color: var(--bg-secondary);
     color: var(--text-primary);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
@@ -1176,24 +1372,25 @@ input:checked + .toggle-slider:before {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s;
+    font-size: var(--font-size-base);
 }
 
-#cancel-add-friend {
+.modal-footer button:first-child {
     background-color: var(--bg-primary);
     color: var(--text-primary);
 }
 
-#cancel-add-friend:hover {
+.modal-footer button:first-child:hover {
     background-color: var(--border-color);
 }
 
-#confirm-add-friend {
+.modal-footer button:last-child {
     background-color: var(--accent-color);
     color: white;
 }
 
-#confirm-add-friend:hover {
-    background-color: var(--accent-hover);
+.modal-footer button:last-child:hover {
+    background-color: var(--accent-color-dark);
 }
 
 .message-text {

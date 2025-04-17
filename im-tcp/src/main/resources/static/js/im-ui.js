@@ -22,13 +22,20 @@ class UIController {
             onCreateGroup: () => {},
             onAddFriend: () => {},
             autoSwitchToChat: false, // 新增：点击联系人或群组后是否自动切换到聊天页面
-            onAutoSwitchChange: () => {} // 新增：聊天自动跳转设置变更的回调
+            onAutoSwitchChange: () => {}, // 新增：聊天自动跳转设置变更的回调
+            onLoadMoreMessages: () => {} // 新增：滚动加载更多消息的回调
         }, options);
         
         this.elements = this.options.elements;
         this.currentConversation = null;
         this.messageMap = new Map(); // 用于存储消息ID到DOM元素的映射
         this.userId = null;
+        
+        // 消息滚动加载相关变量
+        this.isLoadingMessages = false; // 是否正在加载消息
+        this.hasMoreMessages = true; // 是否还有更多消息
+        this.scrollThreshold = 100; // 滚动阈值，距离顶部多少像素触发加载
+        
         this._setupEventListeners();
     }
     
@@ -146,22 +153,41 @@ class UIController {
                 });
             });
             
+            // 添加群成员按钮
+            const selectMembersBtn = document.getElementById('select-members-btn');
+            if (selectMembersBtn) {
+                selectMembersBtn.addEventListener('click', () => {
+                    this._showMemberSelectionModal();
+                });
+            }
+            
             // 创建群组按钮
             const createGroupBtn = document.getElementById('create-group-btn');
             if (createGroupBtn) {
                 createGroupBtn.addEventListener('click', () => {
                     const groupName = document.getElementById('group-name');
                     const groupIntro = document.getElementById('group-intro');
+                    const selectedMembers = document.querySelectorAll('#selected-members .member-tag');
                     
                     if (groupName && groupName.value.trim()) {
+                        // 获取所有已选择的成员ID
+                        const memberIds = [];
+                        selectedMembers.forEach(member => {
+                            if (member.dataset.id) {
+                                memberIds.push(member.dataset.id);
+                            }
+                        });
+                        
                         this._handleCreateGroup({
                             groupName: groupName.value.trim(),
-                            introduction: groupIntro ? groupIntro.value.trim() : ''
+                            introduction: groupIntro ? groupIntro.value.trim() : '',
+                            memberIds: memberIds
                         });
                         
                         // 清空表单
                         groupName.value = '';
                         if (groupIntro) groupIntro.value = '';
+                        document.getElementById('selected-members').innerHTML = '';
                     } else {
                         alert('请输入群组名称');
                     }
@@ -240,6 +266,13 @@ class UIController {
                     this._handleLogout();
                 });
             }
+        }
+        
+        // 消息区域滚动事件监听
+        if (this.elements.chat && this.elements.chat.messagesContainer) {
+            this.elements.chat.messagesContainer.addEventListener('scroll', (e) => {
+                this._handleMessageScroll(e);
+            });
         }
     }
     
@@ -371,28 +404,139 @@ class UIController {
                 return;
             }
             
-            // 创建会话ID映射，用于之后检查会话是否存在
-            const existingConversations = new Map();
-            Array.from(conversationsList.querySelectorAll('.list-item')).forEach(element => {
-                if (element.dataset && element.dataset.id) {
-                    existingConversations.set(element.dataset.id, element);
+            // 去重处理 - 按照标准格式处理会话ID
+            const uniqueConversations = [];
+            const uniqueIds = new Set();
+            
+            // 对会话按照标准格式进行去重
+            conversations.forEach(conv => {
+                if (!conv || typeof conv !== 'object') return;
+                
+                // 确保每个会话都有标准格式的ID
+                const standardId = `${conv.type}_${conv.targetId}`;
+                
+                // 如果这个标准ID已经存在，跳过这个会话
+                if (uniqueIds.has(standardId)) {
+                    console.log('跳过重复会话:', standardId, conv.id);
+                    return;
                 }
+                
+                // 确保会话使用标准ID格式
+                conv.id = standardId;
+                
+                // 将标准ID添加到已处理集合
+                uniqueIds.add(standardId);
+                
+                // 将会话添加到去重后的列表
+                uniqueConversations.push(conv);
             });
             
+            console.log('去重后的会话数量:', uniqueConversations.length, '原始会话数量:', conversations.length);
             
-            // 创建文档片段以提高性能
-            const fragment = document.createDocumentFragment();
-            // 跟踪已处理的会话ID
-            const processedIds = new Set();
+            // 如果当前选中的会话没有被包含在去重后的列表中，手动添加
+            if (this.currentConversation) {
+                const currentConvId = this.currentConversation.id;
+                const hasCurrentConv = uniqueIds.has(currentConvId);
+                
+                if (!hasCurrentConv) {
+                    console.log('添加当前选中的会话到列表:', currentConvId);
+                    uniqueConversations.push(this.currentConversation);
+                    uniqueIds.add(currentConvId);
+                }
+            }
+            
+            // 使用去重后的会话列表替代原始列表
+            conversations = uniqueConversations;
+            
+            // 打印排序前的会话列表
+            console.log('排序前的会话列表:', conversations.map(c => ({
+                id: c.id,
+                timestamp: c.lastMessage?.timestamp || 0,
+                content: c.lastMessage?.content || '无消息'
+            })));
+            
+            // 特别检查当前会话
+            if (this.currentConversation) {
+                console.log('当前选中的会话:', {
+                    id: this.currentConversation.id,
+                    type: this.currentConversation.type,
+                    targetId: this.currentConversation.targetId,
+                    timestamp: this.currentConversation.lastMessage?.timestamp || 0,
+                    content: this.currentConversation.lastMessage?.content || '无消息'
+                });
+                
+                // 查找当前会话在会话列表中的位置
+                const currentIndex = conversations.findIndex(c => 
+                    c.id === this.currentConversation.id || 
+                    (c.type === this.currentConversation.type && c.targetId === this.currentConversation.targetId)
+                );
+                
+                console.log('当前会话在列表中的位置:', currentIndex);
+            }
             
             // 排序会话列表，确保按时间顺序显示
             conversations.sort((a, b) => {
                 const timeA = a.lastMessage && a.lastMessage.timestamp ? a.lastMessage.timestamp : 0;
                 const timeB = b.lastMessage && b.lastMessage.timestamp ? b.lastMessage.timestamp : 0;
-                return timeB - timeA; // 降序排列，最新的在前面
+                const result = timeB - timeA; // 降序排列，最新的在前面
+                console.log(`排序比较: ${a.id}(${timeA}) vs ${b.id}(${timeB}) = ${result}`);
+                return result;
             });
             
-            // 处理会话列表
+            console.log('已排序的会话列表:', conversations.map(c => ({
+                id: c.id,
+                timestamp: c.lastMessage?.timestamp || 0,
+                content: c.lastMessage?.content || '无消息'
+            })));
+            
+            // 确保当前会话置顶
+            if (this.currentConversation) {
+                const currentIndex = conversations.findIndex(c => 
+                    c.id === this.currentConversation.id || 
+                    (c.type === this.currentConversation.type && c.targetId === this.currentConversation.targetId)
+                );
+                
+                console.log('排序后当前会话在列表中的位置:', currentIndex);
+                
+                // 如果当前会话不在第一位，将其强制置顶
+                if (currentIndex > 0) {
+                    console.log('当前会话不在第一位，强制置顶');
+                    const currentConv = conversations.splice(currentIndex, 1)[0];
+                    conversations.unshift(currentConv);
+                    
+                    console.log('置顶后的会话列表:', conversations.map(c => ({
+                        id: c.id,
+                        timestamp: c.lastMessage?.timestamp || 0
+                    })));
+                }
+            }
+            
+            // 查找当前会话
+            let currentConversationInList = null;
+            if (this.currentConversation) {
+                currentConversationInList = conversations.find(conv => 
+                    conv.id === this.currentConversation.id || 
+                    (conv.type === this.currentConversation.type && conv.targetId === this.currentConversation.targetId)
+                );
+                console.log('当前选中的会话是否在列表中:', !!currentConversationInList);
+            }
+            
+            // 创建或更新DOM元素
+            // 1. 先保存所有现有的会话项
+            const existingItems = {};
+            Array.from(conversationsList.querySelectorAll('.list-item')).forEach(element => {
+                if (element.dataset && element.dataset.id) {
+                    existingItems[element.dataset.id] = element;
+                    element.remove(); // 从DOM中移除，后面会按照排序后的顺序重新添加
+                }
+            });
+            
+            console.log('现有会话项数量:', Object.keys(existingItems).length);
+            
+            // 2. 清空列表容器
+            conversationsList.innerHTML = '';
+            
+            // 3. 按照排序后的顺序添加会话项
             conversations.forEach(conversation => {
                 try {
                     if (!conversation || !conversation.id) {
@@ -400,38 +544,30 @@ class UIController {
                         return;
                     }
                     
-                    processedIds.add(conversation.id);
+                    // 尝试查找现有元素
+                    let conversationItem = existingItems[conversation.id];
                     
-                    // 检查会话是否已存在
-                    const existingElement = existingConversations.get(conversation.id);
-                    
-                    if (existingElement) {
-                        // 会话已存在，更新内容
-                        this._updateConversationItem(existingElement, conversation);
+                    if (conversationItem) {
+                        this._updateConversationItem(conversationItem, conversation);
                     } else {
-                        // 会话不存在，创建新的会话项
-                        const conversationItem = this._createConversationItem(conversation);
-                        if (conversationItem) {
-                            fragment.appendChild(conversationItem);
+                        conversationItem = this._createConversationItem(conversation);
+                    }
+                    
+                    if (conversationItem) {
+                        conversationsList.appendChild(conversationItem);
+                        
+                        // 如果是当前选中的会话，添加active类
+                        if (this.currentConversation && 
+                            (this.currentConversation.id === conversation.id || 
+                             (this.currentConversation.type === conversation.type && 
+                              this.currentConversation.targetId === conversation.targetId))) {
+                            conversationItem.classList.add('active');
                         }
                     }
                 } catch (itemError) {
                     console.error('处理会话项时出错:', itemError, conversation);
                 }
             });
-            
-            // 移除不在当前会话列表中的元素
-            existingConversations.forEach((element, id) => {
-                if (!processedIds.has(id)) {
-                    element.remove();
-                }
-            });
-            
-            // 添加新创建的元素
-            if (fragment.childNodes.length > 0) {
-                console.log('添加新创建的会话项，数量:', fragment.childNodes.length);
-                conversationsList.appendChild(fragment);
-            }
         } catch (error) {
             console.error('更新会话列表时出错:', error);
             // 尝试使用最简单的方式添加项目
@@ -526,10 +662,10 @@ class UIController {
                 return null;
             }
             
+            // 确保会话有标准格式的ID
             if (!conversation.id) {
-                console.warn('会话缺少ID:', conversation);
-                // 生成临时ID以避免错误
-                conversation.id = 'temp_' + Math.random().toString(36).substring(2, 10);
+                console.warn('会话缺少ID，创建标准格式ID');
+                conversation.id = `${conversation.type}_${conversation.targetId}`;
             }
             
             const conversationEl = document.createElement('div');
@@ -584,7 +720,26 @@ class UIController {
             // 添加点击事件
             try {
                 conversationEl.addEventListener('click', () => {
-                    this.selectConversation(conversation);
+                    console.log('会话项被点击:', conversation.id);
+                    // 不直接传递整个conversation对象，而是使用ID和类型查找
+                    const convId = conversation.id;
+                    const convType = conversation.type;
+                    const convTargetId = conversation.targetId;
+                    
+                    // 查找当前会话 - 如果当前会话ID相同，则不重复触发
+                    if (this.currentConversation && 
+                        this.currentConversation.id === convId) {
+                        console.log('已经选中当前会话，不重复触发选择');
+                        return;
+                    }
+                    
+                    // 只传递必要的信息，而不是整个对象引用
+                    this.selectConversation({
+                        id: convId,
+                        type: convType,
+                        targetId: convTargetId,
+                        name: conversation.name
+                    });
                 });
             } catch (eventError) {
                 console.error('添加会话项点击事件时出错:', eventError);
@@ -608,11 +763,33 @@ class UIController {
      */
     _handleContactClick(contact) {
         // 创建私聊会话
+        const currentTimestamp = Date.now();
+        console.log('联系人点击，创建会话使用时间戳:', currentTimestamp);
+        
+        // 构建标准ID
+        const standardId = `C2C_${contact.id}`;
+        
+        // 检查是否已经选中了该会话
+        if (this.currentConversation && 
+            this.currentConversation.id === standardId) {
+            console.log('已经选中当前联系人会话，不重复触发');
+            
+            // 根据配置决定是否自动切换到聊天页面
+            if (this.options.autoSwitchToChat) {
+                this._switchPage('chats');
+            }
+            return;
+        }
+        
         const conversation = {
-            id: `C2C_${contact.id}`,
+            id: standardId, // 使用标准化格式
             type: 'C2C',
             targetId: contact.id,
-            name: contact.name || `用户 ${contact.id}`
+            name: contact.name || `用户 ${contact.id}`,
+            lastMessage: {
+                content: '开始聊天',
+                timestamp: currentTimestamp // 设置当前时间戳
+            }
         };
         
         this.selectConversation(conversation);
@@ -752,11 +929,33 @@ class UIController {
      */
     _handleGroupClick(group) {
         // 创建群聊会话
+        const currentTimestamp = Date.now();
+        console.log('群组点击，创建会话使用时间戳:', currentTimestamp);
+        
+        // 构建标准ID
+        const standardId = `GROUP_${group.id}`;
+        
+        // 检查是否已经选中了该会话
+        if (this.currentConversation && 
+            this.currentConversation.id === standardId) {
+            console.log('已经选中当前群组会话，不重复触发');
+            
+            // 根据配置决定是否自动切换到聊天页面
+            if (this.options.autoSwitchToChat) {
+                this._switchPage('chats');
+            }
+            return;
+        }
+        
         const conversation = {
-            id: `GROUP_${group.id}`,
+            id: standardId, // 使用标准化格式
             type: 'GROUP',
             targetId: group.id,
-            name: group.name || `群组 ${group.id}`
+            name: group.name || `群组 ${group.id}`,
+            lastMessage: {
+                content: '开始群聊',
+                timestamp: currentTimestamp // 设置当前时间戳
+            }
         };
         
         this.selectConversation(conversation);
@@ -772,6 +971,33 @@ class UIController {
      * @param {Object} conversation 会话对象
      */
     selectConversation(conversation) {
+        // 确保ID格式一致
+        const standardId = `${conversation.type}_${conversation.targetId}`;
+        console.log('选择会话，传入ID:', conversation.id, '标准化ID:', standardId);
+        
+        // 如果已经选中了相同的会话，不再重复处理
+        if (this.currentConversation && this.currentConversation.id === standardId) {
+            console.log('已经选中该会话，不再重复处理');
+            return;
+        }
+        
+        // 保存原始ID，但使用标准化的ID以确保一致性
+        const originalId = conversation.id;
+        conversation.id = standardId;
+        
+        // 确保有 lastMessage 对象和最新的时间戳
+        const currentTimestamp = Date.now();
+        if (!conversation.lastMessage) {
+            console.log('会话缺少 lastMessage，添加并设置时间戳:', currentTimestamp);
+            conversation.lastMessage = {
+                content: '开始聊天',
+                timestamp: currentTimestamp
+            };
+        } else {
+            console.log('更新会话的时间戳:', currentTimestamp, '旧时间戳:', conversation.lastMessage.timestamp);
+            conversation.lastMessage.timestamp = currentTimestamp;
+        }
+        
         // 更新当前会话
         this.currentConversation = conversation;
         
@@ -800,8 +1026,15 @@ class UIController {
         
         // 高亮选中的会话
         const conversationItems = document.querySelectorAll('.list-item');
+        console.log('现有会话项数量:', conversationItems.length);
+        
         conversationItems.forEach(item => {
-            if (item.dataset.id === conversation.id) {
+            // 检查是否匹配标准ID或原始ID
+            const itemId = item.dataset.id;
+            const isMatch = (itemId === standardId) || (itemId === originalId);
+            console.log('会话项ID:', itemId, '是否匹配:', isMatch);
+            
+            if (isMatch) {
                 item.classList.add('active');
             } else {
                 item.classList.remove('active');
@@ -812,6 +1045,9 @@ class UIController {
         if (this.options.onConversationSelect) {
             this.options.onConversationSelect(conversation);
         }
+        
+        // 重置消息加载状态
+        this._resetMessageLoadingState();
     }
     
     /**
@@ -1317,6 +1553,332 @@ class UIController {
         if (this.options.onAddFriend) {
             this.options.onAddFriend(friendData);
         }
+    }
+    
+    /**
+     * 显示成员选择模态框
+     * @private
+     */
+    _showMemberSelectionModal() {
+        try {
+            console.log('显示成员选择模态框');
+            
+            // 获取模态框元素
+            const modalBackdrop = document.getElementById('modal-backdrop');
+            const modalContainer = document.getElementById('modal-container');
+            
+            if (!modalBackdrop || !modalContainer) {
+                console.error('模态框元素不存在');
+                return;
+            }
+            
+            // 获取已选成员
+            const selectedMembersEl = document.getElementById('selected-members');
+            const selectedMemberIds = [];
+            const selectedMemberTags = selectedMembersEl.querySelectorAll('.member-tag');
+            selectedMemberTags.forEach(tag => {
+                if (tag.dataset.id) {
+                    selectedMemberIds.push(tag.dataset.id);
+                }
+            });
+            
+            // 获取联系人列表
+            let contactElements = '';
+            let contactsCount = 0;
+            
+            // 全局状态中的联系人
+            const contacts = window.state ? window.state.contacts : {};
+            
+            if (contacts && Object.keys(contacts).length > 0) {
+                Object.values(contacts).forEach(contact => {
+                    // 不包含自己
+                    if (this.userId && contact.id === this.userId) {
+                        return;
+                    }
+                    
+                    contactsCount++;
+                    const isSelected = selectedMemberIds.includes(contact.id);
+                    const avatarUrl = contact.avatar || `https://i.pravatar.cc/100?u=${contact.id}`;
+                    
+                    contactElements += `
+                        <div class="member-item">
+                            <input type="checkbox" class="member-checkbox" 
+                                id="member-${contact.id}"
+                                data-id="${contact.id}" 
+                                data-name="${contact.name || `用户 ${contact.id}`}"
+                                data-avatar="${avatarUrl}"
+                                ${isSelected ? 'checked' : ''}>
+                            <label for="member-${contact.id}" class="member-label">
+                                <div class="member-avatar">
+                                    <i class="fa fa-user"></i>
+                                </div>
+                                <div class="member-info">
+                                    <div class="member-name">${contact.name || `用户 ${contact.id}`}</div>
+                                    <div class="member-id">ID: ${contact.id}</div>
+                                </div>
+                            </label>
+                        </div>
+                    `;
+                });
+            }
+            
+            // 创建模态框内容
+            modalContainer.innerHTML = `
+                <div class="modal member-selection-modal">
+                    <div class="modal-header">
+                        <h3>选择群成员</h3>
+                        <div class="modal-close"><i class="fa fa-times"></i></div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="member-search">
+                            <input type="text" id="member-search-input" placeholder="搜索联系人..." class="member-search-input">
+                        </div>
+                        <div class="member-list">
+                            ${contactsCount > 0 ? contactElements : '<div class="no-friends-message">暂无联系人，请先添加好友</div>'}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="cancel-select-members">取消</button>
+                        <button id="confirm-select-members">确定</button>
+                    </div>
+                </div>
+            `;
+            
+            // 显示模态框
+            modalBackdrop.classList.remove('hidden');
+            modalContainer.classList.remove('hidden');
+            
+            // 设置关闭模态框的事件
+            const closeModal = () => {
+                modalBackdrop.classList.add('hidden');
+                modalContainer.classList.add('hidden');
+            };
+            
+            // 添加点击背景关闭模态框
+            modalBackdrop.onclick = (e) => {
+                if (e.target === modalBackdrop) {
+                    closeModal();
+                }
+            };
+            
+            // 添加点击关闭按钮关闭模态框
+            const closeBtn = modalContainer.querySelector('.modal-close');
+            if (closeBtn) {
+                closeBtn.onclick = closeModal;
+            }
+            
+            // 添加搜索功能
+            const searchInput = document.getElementById('member-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const searchValue = e.target.value.toLowerCase();
+                    const memberItems = document.querySelectorAll('.member-item');
+                    
+                    memberItems.forEach(item => {
+                        const nameEl = item.querySelector('.member-name');
+                        const idEl = item.querySelector('.member-id');
+                        
+                        if (!nameEl || !idEl) return;
+                        
+                        const name = nameEl.textContent.toLowerCase();
+                        const id = idEl.textContent.toLowerCase();
+                        
+                        if (name.includes(searchValue) || id.includes(searchValue)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+            
+            // 添加点击取消按钮关闭模态框
+            const cancelBtn = document.getElementById('cancel-select-members');
+            if (cancelBtn) {
+                cancelBtn.onclick = closeModal;
+            }
+            
+            // 添加点击确认按钮处理选中的成员
+            const confirmBtn = document.getElementById('confirm-select-members');
+            if (confirmBtn) {
+                confirmBtn.onclick = () => {
+                    // 获取所有选中的成员
+                    const checkedMembers = document.querySelectorAll('.member-checkbox:checked');
+                    const members = [];
+                    
+                    checkedMembers.forEach(checkbox => {
+                        if (checkbox.dataset.id && checkbox.dataset.name) {
+                            members.push({
+                                id: checkbox.dataset.id,
+                                name: checkbox.dataset.name,
+                                avatar: checkbox.dataset.avatar
+                            });
+                        }
+                    });
+                    
+                    // 更新已选成员显示
+                    this._updateSelectedMembers(members);
+                    
+                    // 关闭模态框
+                    closeModal();
+                };
+            }
+        } catch (error) {
+            console.error('显示成员选择模态框时出错:', error);
+        }
+    }
+    
+    /**
+     * 更新已选成员显示
+     * @param {Array} members 成员列表
+     * @private
+     */
+    _updateSelectedMembers(members) {
+        const selectedMembersEl = document.getElementById('selected-members');
+        if (!selectedMembersEl) return;
+        
+        // 清空现有成员
+        selectedMembersEl.innerHTML = '';
+        
+        // 添加新选择的成员
+        members.forEach(member => {
+            const memberTag = document.createElement('div');
+            memberTag.className = 'member-tag';
+            memberTag.dataset.id = member.id;
+            
+            const avatarUrl = member.avatar || `https://i.pravatar.cc/100?u=${member.id}`;
+            
+            memberTag.innerHTML = `
+                <div class="member-avatar">
+                    <i class="fa fa-user"></i>
+                </div>
+                <span class="member-name">${member.name}</span>
+                <span class="remove-member" title="移除"><i class="fa fa-times"></i></span>
+            `;
+            
+            // 添加移除成员的点击事件
+            const removeBtn = memberTag.querySelector('.remove-member');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', () => {
+                    memberTag.remove();
+                });
+            }
+            
+            selectedMembersEl.appendChild(memberTag);
+        });
+    }
+    
+    /**
+     * 处理消息区域滚动事件
+     * @param {Event} e 滚动事件
+     * @private
+     */
+    _handleMessageScroll(e) {
+        // 如果没有当前会话，或者没有设置滚动加载回调，则不处理
+        if (!this.currentConversation || !this.options.onLoadMoreMessages) {
+            return;
+        }
+        
+        const container = e.target;
+        
+        // 如果已经在加载消息或者没有更多消息，则不处理
+        if (this.isLoadingMessages || !this.hasMoreMessages) {
+            return;
+        }
+        
+        // 当滚动到顶部附近时，触发加载更多消息
+        if (container.scrollTop <= this.scrollThreshold) {
+            console.log('触发加载更多消息');
+            this.isLoadingMessages = true;
+            
+            // 添加加载指示器
+            this._showLoadingIndicator();
+            
+            // 记录当前滚动位置和内容高度
+            const oldScrollHeight = container.scrollHeight;
+            const oldScrollTop = container.scrollTop;
+            
+            // 调用加载更多消息回调
+            this.options.onLoadMoreMessages(this.currentConversation.id)
+                .then(result => {
+                    // 根据结果更新状态
+                    this.hasMoreMessages = result.hasMore !== false;
+                    console.log(`加载结果: hasMore=${this.hasMoreMessages}, messagesCount=${result.messages?.length || 0}`);
+                    
+                    // 如果有新消息，可能需要调整滚动位置以保持用户视觉连贯
+                    if (result.messages && result.messages.length > 0) {
+                        // 等待DOM更新后调整滚动位置
+                        setTimeout(() => {
+                            // 计算新旧高度差，并调整滚动位置
+                            const newScrollHeight = container.scrollHeight;
+                            const heightDiff = newScrollHeight - oldScrollHeight;
+                            container.scrollTop = oldScrollTop + heightDiff;
+                        }, 50);
+                    }
+                })
+                .catch(error => {
+                    console.error('加载更多消息失败:', error);
+                    // 失败时也应该允许再次尝试
+                    this.hasMoreMessages = true;
+                })
+                .finally(() => {
+                    // 移除加载指示器
+                    this._hideLoadingIndicator();
+                    this.isLoadingMessages = false;
+                });
+        }
+    }
+    
+    /**
+     * 显示消息加载中指示器
+     * @private
+     */
+    _showLoadingIndicator() {
+        if (!this.elements.chat || !this.elements.chat.messagesContainer) {
+            return;
+        }
+        
+        // 检查是否已经存在加载指示器
+        let loadingIndicator = this.elements.chat.messagesContainer.querySelector('.messages-loading');
+        
+        if (!loadingIndicator) {
+            loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'messages-loading';
+            loadingIndicator.innerHTML = '<div class="loading-spinner"></div><span>加载更多消息...</span>';
+            
+            // 添加到消息容器顶部
+            this.elements.chat.messagesContainer.insertBefore(loadingIndicator, this.elements.chat.messagesContainer.firstChild);
+        } else {
+            // 确保指示器可见
+            loadingIndicator.classList.remove('hidden');
+        }
+    }
+    
+    /**
+     * 隐藏消息加载中指示器
+     * @private
+     */
+    _hideLoadingIndicator() {
+        if (!this.elements.chat || !this.elements.chat.messagesContainer) {
+            return;
+        }
+        
+        const loadingIndicator = this.elements.chat.messagesContainer.querySelector('.messages-loading');
+        
+        if (loadingIndicator) {
+            // 移除指示器
+            loadingIndicator.remove();
+        }
+    }
+    
+    /**
+     * 重置消息加载状态
+     * 当切换会话时调用，以重置滚动加载状态
+     * @private
+     */
+    _resetMessageLoadingState() {
+        this.isLoadingMessages = false;
+        this.hasMoreMessages = true;
     }
 }
 
