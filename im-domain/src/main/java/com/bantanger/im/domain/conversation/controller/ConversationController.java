@@ -24,25 +24,17 @@ public class ConversationController {
     ConversationService conversationServiceImpl;
 
     @RequestMapping("/deleteConversation")
-    public ResponseVO deleteConversation(@RequestBody @Validated DeleteConversationReq req,
-                                         Integer appId, String identifier) {
-        req.setAppId(appId);
-//        req.setOperater(identifier);
+    public ResponseVO deleteConversation(@RequestBody @Validated DeleteConversationReq req) {
         return conversationServiceImpl.deleteConversation(req);
     }
 
     @RequestMapping("/updateConversation")
-    public ResponseVO updateConversation(@RequestBody @Validated UpdateConversationReq req,
-                                         Integer appId, String identifier) {
-        req.setAppId(appId);
-//        req.setOperater(identifier);
+    public ResponseVO updateConversation(@RequestBody @Validated UpdateConversationReq req) {
         return conversationServiceImpl.updateConversation(req);
     }
 
     @RequestMapping("/syncConversationList")
-    public ResponseVO syncConversationList(@RequestBody @Validated SyncReq req,
-                                           Integer appid) {
-        req.setAppId(appid);
+    public ResponseVO syncConversationList(@RequestBody @Validated SyncReq req) {
         return conversationServiceImpl.syncConversationSet(req);
     }
 

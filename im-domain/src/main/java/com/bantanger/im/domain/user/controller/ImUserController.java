@@ -37,20 +37,17 @@ public class ImUserController {
     ZkManager zkManager;
 
     @RequestMapping("importUser")
-    public ResponseVO importUser(@RequestBody ImportUserReq req, Integer appId) {
-        req.setAppId(appId);
+    public ResponseVO importUser(@RequestBody ImportUserReq req) {
         return imUserService.importUser(req);
     }
 
     @RequestMapping("/deleteUser")
-    public ResponseVO deleteUser(@RequestBody @Validated DeleteUserReq req, Integer appId) {
-        req.setAppId(appId);
+    public ResponseVO deleteUser(@RequestBody @Validated DeleteUserReq req) {
         return imUserService.deleteUser(req);
     }
 
     @RequestMapping("/login")
-    public ResponseVO login(@RequestBody @Validated LoginReq req, Integer appId) {
-        req.setAppId(appId);
+    public ResponseVO login(@RequestBody @Validated LoginReq req) {
         ResponseVO login = imUserService.login(req);
         if (login.isOk()) {
             // 从 Zk 获取 im 地址，返回给 sdk
@@ -71,12 +68,10 @@ public class ImUserController {
     /**
      * 客户端向服务端请求该用户各接口需要拉取的数量
      * @param req
-     * @param appId
      * @return
      */
     @RequestMapping("/getUserSequence")
-    public ResponseVO getUserSequence(@RequestBody @Validated GetUserSequenceReq req, Integer appId) {
-        req.setAppId(appId);
+    public ResponseVO getUserSequence(@RequestBody @Validated GetUserSequenceReq req) {
         return imUserService.getUserSequence(req);
     }
 

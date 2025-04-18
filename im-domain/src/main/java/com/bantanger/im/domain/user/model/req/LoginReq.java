@@ -18,4 +18,8 @@ public class LoginReq {
     private Integer appId;
 
     private Integer clientType;
+    
+    private String imei;
+    
+    private String operater;
 }

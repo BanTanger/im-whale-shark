@@ -68,7 +68,7 @@ public class GateWayInterceptor implements HandlerInterceptor {
 
         PrintWriter writer = null;
         response.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html; charset=utf-8");
+        response.setContentType("application/json; charset=utf-8");
         try {
             String resp = JSONObject.toJSONString(respVo);
 

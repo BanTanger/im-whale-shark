@@ -2,7 +2,7 @@ DATABASE: im_core
 USERNAME: root
 PASSWORD: whalesharkim
 #PASSWORD: 123456
-IP: 127.0.0.1:13306
+IP: 127.0.0.1:3306
 
 server:
   port: 18000

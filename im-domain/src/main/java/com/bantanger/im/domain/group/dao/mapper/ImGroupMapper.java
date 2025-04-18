@@ -2,6 +2,7 @@ package com.bantanger.im.domain.group.dao.mapper;
 
 import com.bantanger.im.domain.group.dao.ImGroupEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -18,6 +19,6 @@ public interface ImGroupMapper extends BaseMapper<ImGroupEntity> {
      * @param appId
      * @return
      */
-    Long getJoinGroupMaxSeq(Collection<String> data, Integer appId);
+    Long getJoinGroupMaxSeq(@Param("groupIds") Collection<String> data, @Param("appId") Integer appId);
 
 }

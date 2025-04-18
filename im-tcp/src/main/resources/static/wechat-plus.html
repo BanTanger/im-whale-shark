@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WeChatPlus - 即时通讯系统</title>
+    <title>IM-WhaleShark - 即时通讯系统</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/wechat-plus.css">
 </head>
@@ -12,7 +12,7 @@
     <div id="login-page" class="login-container">
         <div class="login-card">
             <div class="logo-area">
-                <h1>WeChatPlus</h1>
+                <h1>IM-WhaleShark</h1>
                 <p>即时通讯系统</p>
             </div>
             <div class="login-form">
@@ -121,6 +121,17 @@
                         <label for="group-intro">群组介绍</label>
                         <textarea id="group-intro" placeholder="请输入群组介绍"></textarea>
                     </div>
+                    <div class="form-group">
+                        <label for="group-members">群成员</label>
+                        <div class="members-container">
+                            <div class="selected-members" id="selected-members">
+                                <!-- 已选择的成员将显示在这里 -->
+                            </div>
+                            <button id="select-members-btn" class="select-members-btn">
+                                <i class="fa fa-user-plus"></i> 添加群成员
+                            </button>
+                        </div>
+                    </div>
                     <button id="create-group-btn">创建群组</button>
                 </div>
             </div>
@@ -156,6 +167,17 @@
                         <div class="range-container">
                             <input type="range" id="font-size-range" min="12" max="20" value="14">
                             <span id="font-size-value">14px</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <span>聊天自动跳转</span>
+                        <div class="toggle-container">
+                            <span class="toggle-label">关闭</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="auto-switch-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">开启</span>
                         </div>
                     </div>
                 </div>
@@ -230,11 +252,9 @@
     <div id="modal-container" class="modal-container hidden"></div>
     
     <!-- 脚本引入 -->
-    <script src="js/byte-buffer.js"></script>
-    <script src="js/ws-client.js"></script>
-    <script src="js/api-client.js"></script>
-    <script src="js/message-handler.js"></script>
-    <script src="js/ui-controller.js"></script>
-    <script src="js/wechat-plus.js"></script>
+    <script src="js/im-core.js"></script>
+    <script src="js/im-manager.js"></script>
+    <script src="js/im-ui.js"></script>
+    <script src="js/wechat-plus-app.js"></script>
 </body>
 </html> 

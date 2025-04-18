@@ -38,12 +38,10 @@ public class MessageController {
      * 后台消息发送接口
      *
      * @param req
-     * @param appId
      * @return
      */
     @RequestMapping("/send")
     public ResponseVO send(@RequestBody @Validated SendMessageReq req) {
-//        req.setAppId(appId);
         return ResponseVO.successResponse(p2PMessageService.send(req));
     }
 
@@ -70,9 +68,7 @@ public class MessageController {
     }
 
     @RequestMapping("/syncOfflineMessageList")
-    public ResponseVO syncP2POfflineMessageList(@RequestBody @Validated SyncReq req,
-                                             Integer appId) {
-        req.setAppId(appId);
+    public ResponseVO syncP2POfflineMessageList(@RequestBody @Validated SyncReq req) {
         return messageSyncServiceImpl.syncOfflineMessage(req);
     }
 

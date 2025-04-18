@@ -3,8 +3,8 @@
 <mapper namespace="com.bantanger.im.domain.group.dao.mapper.ImGroupMapper">
     <select id="getJoinGroupMaxSeq" parameterType="map" resultType="java.lang.Long">
         select max(sequence) from im_group
-        where app_id = #{appId} and group_id = #{groupId} in
-        <foreach collection="groupId" index="index" item="id"
+        where app_id = #{appId} and group_id in
+        <foreach collection="groupIds" index="index" item="id"
                  separator="," open="(" close=")"> #{id}
         </foreach>
     </select>
