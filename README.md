@@ -12,6 +12,8 @@ IM-WhaleShark（鲸鲨）是基于 Netty 实现的高性能分布式 IM 即时�
 ## 介绍
 IM-WhaleShark（鲸鲨）是基于 Netty 实现的高性能分布式 IM 即时通讯系统，它支持对接用户自定义多端登录方式，它实现了消息的四大特性（实时、有序、可靠、幂等），架构层面吸收业界大牛的技术文章以及成熟产品实现，特别适合新手小白进行 IM 的学习与参考
 
+可借助 Devin 辅助学习: https://deepwiki.com/BanTanger/im-whale-shark/1-overview
+
 ## 技术栈
 使用到 Netty、Redis、Redisson、RabbitMQ、Zookeeper、RPC、Feign 等主流技术栈
 <br>
