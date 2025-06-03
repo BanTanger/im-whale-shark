@@ -1,6 +1,6 @@
 package com.bantanger.im.infrastructure.config;
 
-import com.bantanger.im.domain.interceptor.GateWayInterceptor;
+import com.bantanger.im.infrastructure.interceptor.GateWayInterceptor;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

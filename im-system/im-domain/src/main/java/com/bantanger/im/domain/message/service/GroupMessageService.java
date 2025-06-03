@@ -12,11 +12,11 @@ import com.bantanger.im.common.model.message.content.OfflineMessageContent;
 import com.bantanger.im.domain.group.model.req.SendGroupMessageReq;
 import com.bantanger.im.domain.group.service.ImGroupMemberService;
 import com.bantanger.im.domain.message.model.resp.SendMessageResp;
-import com.bantanger.im.domain.message.seq.RedisSequence;
 import com.bantanger.im.domain.message.service.check.CheckSendMessage;
 import com.bantanger.im.domain.message.service.store.MessageStoreService;
-import com.bantanger.im.service.sendmsg.MessageProducer;
-import com.bantanger.im.service.utils.ThreadPoolUtil;
+import com.bantanger.im.domain.messageddd.domainservice.sendmsg.MessageProducer;
+import com.bantanger.im.infrastructure.support.ids.SequenceIdWorker;
+import com.bantanger.im.infrastructure.utils.ThreadPoolUtil;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 public class GroupMessageService {
 
     private static final String MODULE_NAME = "GROUP";
-    private final RedisSequence redisSequence;
+    private final SequenceIdWorker redisSequence;
     private final MessageProducer messageProducer;
     private final CheckSendMessage checkSendMessageImpl;
     private final ImGroupMemberService imGroupMemberServiceImpl;

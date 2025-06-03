@@ -10,9 +10,9 @@ import com.bantanger.im.common.model.ClientInfo;
 import com.bantanger.im.domain.friendship.dao.ImFriendShipGroupEntity;
 import com.bantanger.im.domain.friendship.dao.mapper.ImFriendShipGroupMapper;
 import com.bantanger.im.domain.friendship.service.ImFriendShipGroupMemberService;
-import com.bantanger.im.domain.message.seq.RedisSequence;
-import com.bantanger.im.service.sendmsg.MessageProducer;
-import com.bantanger.im.service.utils.UserSequenceRepository;
+import com.bantanger.im.domain.messageddd.domainservice.sendmsg.MessageProducer;
+import com.bantanger.im.infrastructure.support.ids.SequenceIdWorker;
+import com.bantanger.im.infrastructure.utils.UserSequenceRepository;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.friend.DelFlagEnum;
@@ -31,22 +31,15 @@ import jakarta.annotation.Resource;
 public class ImFriendShipGroupServiceImpl implements ImFriendShipGroupService {
 
     @Resource
-    ImFriendShipGroupMapper imFriendShipGroupMapper;
-
+    private ImFriendShipGroupMapper imFriendShipGroupMapper;
     @Resource
-    ImFriendShipGroupMemberService imFriendShipGroupMemberService;
-
+    private ImFriendShipGroupMemberService imFriendShipGroupMemberService;
     @Resource
-    ImUserService imUserService;
-
+    private MessageProducer messageProducer;
     @Resource
-    MessageProducer messageProducer;
-
+    private SequenceIdWorker redisSequence;
     @Resource
-    RedisSequence redisSequence;
-
-    @Resource
-    UserSequenceRepository userSequenceRepository;
+    private UserSequenceRepository userSequenceRepository;
 
     @Override
     @Transactional

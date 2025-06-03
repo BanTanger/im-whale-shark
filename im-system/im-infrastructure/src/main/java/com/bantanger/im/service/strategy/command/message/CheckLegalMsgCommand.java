@@ -5,13 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.model.message.CheckSendMessageReq;
+import com.bantanger.im.infrastructure.support.postprocessor.PostContext;
+import com.bantanger.im.infrastructure.support.postprocessor.PostProcessorContainer;
 import com.bantanger.im.service.feign.FeignMessageService;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
 import com.bantanger.im.service.strategy.command.message.extensionpost.CheckLegalMsgPostProcessor;
 import com.bantanger.im.service.strategy.command.message.extensionpost.FeignDataBO;
 import com.bantanger.im.service.strategy.command.model.CommandExecution;
-import com.bantanger.im.service.support.postprocessor.PostContext;
-import com.bantanger.im.service.support.postprocessor.PostProcessorContainer;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.bantanger.im.common.constant.Constants.MsgPackConstants.*;

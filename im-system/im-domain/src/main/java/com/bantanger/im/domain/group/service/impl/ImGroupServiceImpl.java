@@ -10,7 +10,7 @@ import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.GroupEventCommand;
 import com.bantanger.im.common.enums.group.GroupErrorCode;
 import com.bantanger.im.common.enums.group.GroupMemberRoleEnum;
-import com.bantanger.im.common.enums.group.GroupStatusEnum;
+import com.bantanger.im.common.enums.group.GroupStatus;
 import com.bantanger.im.common.enums.group.GroupTypeEnum;
 import com.bantanger.im.common.exception.ApplicationException;
 import com.bantanger.im.common.model.ClientInfo;
@@ -88,7 +88,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         imGroupEntity.setPhoto(req.getPhoto());
         imGroupEntity.setMaxMemberCount(req.getMaxMemberCount());
         imGroupEntity.setExtra(req.getExtra());
-        imGroupEntity.setStatus(GroupStatusEnum.NORMAL.getCode());
+        imGroupEntity.setStatus(GroupStatus.NORMAL.getCode());
 
         int insert = imGroupMapper.insert(imGroupEntity);
 
@@ -148,7 +148,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         imGroupEntity.setMaxMemberCount(req.getMaxMemberCount());
         imGroupEntity.setExtra(req.getExtra());
         imGroupEntity.setCreateTime(System.currentTimeMillis());
-        imGroupEntity.setStatus(GroupStatusEnum.NORMAL.getCode());
+        imGroupEntity.setStatus(GroupStatus.NORMAL.getCode());
 
         int insert = imGroupMapper.insert(imGroupEntity);
 
@@ -211,7 +211,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         Optional.ofNullable(imGroupEntity)
                 .orElseThrow(() -> new ApplicationException(GroupErrorCode.GROUP_IS_NOT_EXIST));
         Optional.ofNullable(imGroupEntity.getStatus())
-                .filter(status -> status.equals(GroupStatusEnum.DESTROY.getCode()))
+                .filter(status -> status.equals(GroupStatus.DESTROY.getCode()))
                 .orElseThrow(() -> new ApplicationException(GroupErrorCode.GROUP_IS_DESTROY));
 
         boolean isAdmin = false;
@@ -339,7 +339,7 @@ public class ImGroupServiceImpl implements ImGroupService {
             throw new ApplicationException(GroupErrorCode.PRIVATE_GROUP_CAN_NOT_DESTORY);
         }
 
-        if (imGroupEntity.getStatus() == GroupStatusEnum.DESTROY.getCode()) {
+        if (imGroupEntity.getStatus() == GroupStatus.DESTROY.getCode()) {
             throw new ApplicationException(GroupErrorCode.GROUP_IS_DESTROY);
         }
 
@@ -352,7 +352,7 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         ImGroupEntity update = new ImGroupEntity();
         update.setSequence(seq);
-        update.setStatus(GroupStatusEnum.DESTROY.getCode());
+        update.setStatus(GroupStatus.DESTROY.getCode());
         int update1 = imGroupMapper.update(update, queryWrapper);
         if (update1 != 1) {
             throw new ApplicationException(GroupErrorCode.UPDATE_GROUP_BASE_INFO_ERROR);
@@ -400,7 +400,7 @@ public class ImGroupServiceImpl implements ImGroupService {
                 .eq(ImGroupEntity::getGroupId, req.getGroupId())
                 .eq(ImGroupEntity::getAppId, req.getAppId());
         ImGroupEntity imGroupEntity = imGroupMapper.selectOne(queryWrapper);
-        if (imGroupEntity.getStatus() == GroupStatusEnum.DESTROY.getCode()) {
+        if (imGroupEntity.getStatus() == GroupStatus.DESTROY.getCode()) {
             throw new ApplicationException(GroupErrorCode.GROUP_IS_DESTROY);
         }
 
@@ -459,7 +459,7 @@ public class ImGroupServiceImpl implements ImGroupService {
             return groupResp;
         }
 
-        if (groupResp.getData().getStatus() == GroupStatusEnum.DESTROY.getCode()) {
+        if (groupResp.getData().getStatus() == GroupStatus.DESTROY.getCode()) {
             throw new ApplicationException(GroupErrorCode.GROUP_IS_DESTROY);
         }
 

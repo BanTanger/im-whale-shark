@@ -11,7 +11,7 @@ import com.bantanger.im.common.model.ClientInfo;
 import com.bantanger.im.domain.group.model.req.GroupMemberDto;
 import com.bantanger.im.domain.group.model.req.GroupMsgReq;
 import com.bantanger.im.domain.group.service.ImGroupMemberService;
-import com.bantanger.im.service.sendmsg.MessageProducer;
+import com.bantanger.im.domain.messageddd.domainservice.sendmsg.MessageProducer;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * TODO 优化
  * 本来这个类应该是写在 im-service 层的 sendmsg 包下的，但引入 groupMemberService 的话会报循环依赖，还是耦合在这里吧
  * 并且这个明显可以沿用 command Strategy 优化，还是那个原因，会报循环依赖，所以还是堆 if - else 吧
  *
@@ -29,10 +30,10 @@ import java.util.Objects;
 public class GroupMessageProducer {
 
     @Resource
-    MessageProducer messageProducer;
+    private MessageProducer messageProducer;
 
     @Resource
-    ImGroupMemberService groupMemberService;
+    private ImGroupMemberService groupMemberService;
 
     public void producer(String userId, Command command, Object data, ClientInfo clientInfo) {
         JSONObject o = (JSONObject) JSONObject.toJSON(data);

@@ -15,9 +15,9 @@ import com.bantanger.im.domain.message.model.resp.SendMessageResp;
 import com.bantanger.im.domain.message.seq.RedisSequence;
 import com.bantanger.im.domain.message.service.check.CheckSendMessage;
 import com.bantanger.im.domain.message.service.store.MessageStoreService;
-import com.bantanger.im.service.sendmsg.MessageProducer;
-import com.bantanger.im.service.support.ids.ConversationIdGenerate;
-import com.bantanger.im.service.utils.ThreadPoolUtil;
+import com.bantanger.im.domain.messageddd.domainservice.sendmsg.MessageProducer;
+import com.bantanger.im.infrastructure.support.ids.ConversationIdWorker;
+import com.bantanger.im.infrastructure.utils.ThreadPoolUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -84,8 +84,8 @@ public class P2PMessageService {
         // 定义单聊消息的 Sequence, 客户端根据 seq 进行排序
         // key: appId + Seq + (from + toId) / groupId
         long seq = redisSequence.doGetSeq(messageContent.getAppId()
-                + Constants.SeqConstants.MessageSeq
-                + ConversationIdGenerate.generateP2PId(
+              + Constants.SeqConstants.MessageSeq
+              + ConversationIdWorker.generateP2PId(
                 messageContent.getFromId(), messageContent.getToId()));
         messageContent.setMessageSequence(seq);
 

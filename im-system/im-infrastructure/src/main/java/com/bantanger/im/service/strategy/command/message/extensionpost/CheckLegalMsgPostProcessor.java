@@ -1,6 +1,6 @@
 package com.bantanger.im.service.strategy.command.message.extensionpost;
 
-import com.bantanger.im.service.support.postprocessor.BasePostProcessor;
+import com.bantanger.im.infrastructure.support.postprocessor.BasePostProcessor;
 
 /**
  * <p> 该接口空实现，仅作为 PostProcessor 具体分支供子类继承 </p>

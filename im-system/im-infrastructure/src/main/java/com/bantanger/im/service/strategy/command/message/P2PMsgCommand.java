@@ -1,5 +1,9 @@
 package com.bantanger.im.service.strategy.command.message;
 
+import static com.bantanger.im.common.constant.Constants.MsgPackConstants.FROM_ID;
+import static com.bantanger.im.common.constant.Constants.MsgPackConstants.MSG_ID;
+import static com.bantanger.im.common.constant.Constants.MsgPackConstants.TO_ID;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.proto.ChatMessageAck;
@@ -8,13 +12,11 @@ import com.bantanger.im.codec.proto.MessagePack;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.command.MessageCommand;
 import com.bantanger.im.common.model.message.CheckSendMessageReq;
+import com.bantanger.im.infrastructure.rabbitmq.publish.MqMessageProducer;
 import com.bantanger.im.service.feign.FeignMessageService;
-import com.bantanger.im.service.rabbitmq.publish.MqMessageProducer;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
 import com.bantanger.im.service.strategy.command.model.CommandExecution;
 import io.netty.channel.ChannelHandlerContext;
-
-import static com.bantanger.im.common.constant.Constants.MsgPackConstants.*;
 
 /**
  * TCP 层校验消息发送方合法性

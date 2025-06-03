@@ -9,9 +9,9 @@ import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.GroupEventCommand;
 import com.bantanger.im.common.enums.group.GroupErrorCode;
-import com.bantanger.im.common.enums.group.GroupMemberRoleEnum;
-import com.bantanger.im.common.enums.group.GroupStatusEnum;
-import com.bantanger.im.common.enums.group.GroupTypeEnum;
+import com.bantanger.im.common.enums.group.GroupMemberRoleType;
+import com.bantanger.im.common.enums.group.GroupStatus;
+import com.bantanger.im.common.enums.group.GroupType;
 import com.bantanger.im.common.exception.ApplicationException;
 import com.bantanger.im.common.model.ClientInfo;
 import com.bantanger.im.domain.conversation.model.CreateConversationReq;
@@ -28,8 +28,8 @@ import com.bantanger.im.domain.group.service.ImGroupMemberService;
 import com.bantanger.im.domain.group.service.ImGroupService;
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.domain.user.service.ImUserService;
-import com.bantanger.im.service.callback.CallbackService;
-import com.bantanger.im.service.config.AppConfig;
+import com.bantanger.im.infrastructure.callback.CallbackService;
+import com.bantanger.im.infrastructure.config.AppConfig;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -112,11 +112,11 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         }
 
         // 查询是否有群主
-        if (dto.getRole() != null && GroupMemberRoleEnum.OWNER.getCode() == dto.getRole()) {
+        if (Objects.equals(GroupMemberRoleType.OWNER.getCode(), dto.getRole())) {
             Integer ownerNum = imGroupMemberMapper.selectCount(new LambdaQueryWrapper<ImGroupMemberEntity>()
                     .eq(ImGroupMemberEntity::getGroupId, groupId)
                     .eq(ImGroupMemberEntity::getAppId, appId)
-                    .eq(ImGroupMemberEntity::getRole, GroupMemberRoleEnum.OWNER.getCode()));
+                    .eq(ImGroupMemberEntity::getRole, GroupMemberRoleType.OWNER.getCode()));
             if (ownerNum > 0) {
                 return ResponseVO.errorResponse(GroupErrorCode.GROUP_IS_HAVE_OWNER);
             }
@@ -139,7 +139,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 return ResponseVO.successResponse();
             }
             return ResponseVO.errorResponse(GroupErrorCode.USER_JOIN_GROUP_ERROR);
-        } else if (GroupMemberRoleEnum.LEAVE.getCode().equals(memberDto.getRole())) {
+        } else if (GroupMemberRoleType.LEAVE.getCode().equals(memberDto.getRole())) {
             //重新进群
             memberDto = buildGroupMemberJoinModel(groupId, appId, dto);
             int update = imGroupMemberMapper.update(memberDto, queryWrapper);
@@ -184,7 +184,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
         GetRoleInGroupResp data = roleInGroupOne.getData();
         ImGroupMemberEntity imGroupMemberEntity = new ImGroupMemberEntity();
-        imGroupMemberEntity.setRole(GroupMemberRoleEnum.LEAVE.getCode());
+        imGroupMemberEntity.setRole(GroupMemberRoleType.LEAVE.getCode());
         imGroupMemberEntity.setLeaveTime(System.currentTimeMillis());
         imGroupMemberEntity.setGroupMemberId(data.getGroupMemberId());
         imGroupMemberMapper.updateById(imGroupMemberEntity);
@@ -202,7 +202,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         queryOwner.eq("member_id", memberId);
 
         ImGroupMemberEntity imGroupMemberEntity = imGroupMemberMapper.selectOne(queryOwner);
-        if (imGroupMemberEntity == null || imGroupMemberEntity.getRole() == GroupMemberRoleEnum.LEAVE.getCode()) {
+        if (imGroupMemberEntity == null || imGroupMemberEntity.getRole() == GroupMemberRoleType.LEAVE.getCode()) {
             return ResponseVO.errorResponse(GroupErrorCode.MEMBER_IS_NOT_JOINED_GROUP);
         }
 
@@ -272,7 +272,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
          * 公开群（Public）	类似 QQ 群，创建后群主可以指定群管理员，需要群主或管理员审批通过才能入群
          * 群类型 1私有群（类似微信） 2公开群(类似qq）
          */
-        if (!isAdmin && GroupTypeEnum.PUBLIC.getCode() == groupBody.getGroupType()) {
+        if (!isAdmin && Objects.equals(GroupType.PUBLIC.getCode(), groupBody.getGroupType())) {
             throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_APPMANAGER_ROLE);
         }
 
@@ -349,7 +349,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         ImGroupEntity group = groupResp.getData();
 
         if (!isAdmin) {
-            if (GroupTypeEnum.PUBLIC.getCode() == group.getGroupType()) {
+            if (Objects.equals(GroupType.PUBLIC.getCode(), group.getGroupType())) {
 
                 //获取操作人的权限 是管理员 or 群主 or 群成员
                 ResponseVO<GetRoleInGroupResp> role = getRoleInGroupOne(req.getGroupId(), req.getOperator(), req.getAppId());
@@ -360,8 +360,8 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 GetRoleInGroupResp data = role.getData();
                 Integer roleInfo = data.getRole();
 
-                boolean isOwner = roleInfo == GroupMemberRoleEnum.OWNER.getCode();
-                boolean isManager = roleInfo == GroupMemberRoleEnum.MANAGER.getCode();
+                boolean isOwner = Objects.equals(roleInfo, GroupMemberRoleType.OWNER.getCode());
+                boolean isManager = Objects.equals(roleInfo, GroupMemberRoleType.MANAGER.getCode());
 
                 // 既不是群主也不是管理员
                 if (!isOwner && !isManager) {
@@ -369,12 +369,12 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 }
 
                 //私有群必须是群主才能踢人
-                if (!isOwner && GroupTypeEnum.PRIVATE.getCode() == group.getGroupType()) {
+                if (!isOwner && Objects.equals(GroupType.PRIVATE.getCode(), group.getGroupType())) {
                     throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
                 }
 
                 // 公开群管理员和群主可踢人，但管理员只能踢普通群成员
-                if (GroupTypeEnum.PUBLIC.getCode() == group.getGroupType()) {
+                if (Objects.equals(GroupType.PUBLIC.getCode(), group.getGroupType())) {
 //                    throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
                     // 获取被踢人的权限
                     ResponseVO<GetRoleInGroupResp> roleInGroupOne = this.getRoleInGroupOne(req.getGroupId(), req.getMemberId(), req.getAppId());
@@ -382,11 +382,11 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                         return roleInGroupOne;
                     }
                     GetRoleInGroupResp memberRole = roleInGroupOne.getData();
-                    if (memberRole.getRole() == GroupMemberRoleEnum.OWNER.getCode()) {
+                    if (Objects.equals(memberRole.getRole(), GroupMemberRoleType.OWNER.getCode())) {
                         throw new ApplicationException(GroupErrorCode.GROUP_OWNER_IS_NOT_REMOVE);
                     }
                     // 是管理员并且被踢人不是群成员，无法操作
-                    if (isManager && memberRole.getRole() != GroupMemberRoleEnum.ORDINARY.getCode()) {
+                    if (isManager && !Objects.equals(memberRole.getRole(), GroupMemberRoleType.MEMBER.getCode())) {
                         throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
                     }
                 }
@@ -441,7 +441,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         }
 
         ImGroupEntity groupData = group.getData();
-        if (groupData.getStatus() == GroupStatusEnum.DESTROY.getCode()) {
+        if (groupData.getStatus() == GroupStatus.DESTROY.getCode()) {
             throw new ApplicationException(GroupErrorCode.GROUP_IS_DESTROY);
         }
 
@@ -457,9 +457,9 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             // 如果要修改权限相关的则走下面的逻辑
             if (req.getRole() != null) {
                 // 私有群不能设置管理员
-                if (groupData.getGroupType() == GroupTypeEnum.PRIVATE.getCode() &&
-                        req.getRole() != null && (req.getRole() == GroupMemberRoleEnum.MANAGER.getCode() ||
-                        req.getRole() == GroupMemberRoleEnum.OWNER.getCode())) {
+                if (Objects.equals(groupData.getGroupType(), GroupType.PRIVATE.getCode())
+                    && (Objects.equals(req.getRole(), GroupMemberRoleType.MANAGER.getCode()) ||
+                        Objects.equals(req.getRole(), GroupMemberRoleType.OWNER.getCode()))) {
                     return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_APPMANAGER_ROLE);
                 }
 
@@ -476,9 +476,8 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 }
 
                 GetRoleInGroupResp data = operateRoleInGroupOne.getData();
-                Integer roleInfo = data.getRole();
-                boolean isOwner = roleInfo == GroupMemberRoleEnum.OWNER.getCode();
-                boolean isManager = roleInfo == GroupMemberRoleEnum.MANAGER.getCode();
+                boolean isOwner = Objects.equals(data.getRole(), GroupMemberRoleType.OWNER.getCode());
+                boolean isManager = Objects.equals(data.getRole(), GroupMemberRoleType.MANAGER.getCode());
 
                 // 不是管理员不能修改权限
                 if (req.getRole() != null && !isOwner && !isManager) {
@@ -486,7 +485,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 }
 
                 // 管理员只有群主能够设置
-                if (req.getRole() != null && req.getRole() == GroupMemberRoleEnum.MANAGER.getCode() && !isOwner) {
+                if (Objects.equals(req.getRole(), GroupMemberRoleType.MANAGER.getCode()) && !isOwner) {
                     return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
                 }
 
@@ -500,7 +499,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         }
 
         //不能直接修改为群主
-        if (req.getRole() != null && req.getRole() != GroupMemberRoleEnum.OWNER.getCode()) {
+        if (req.getRole() != null && req.getRole() != GroupMemberRoleType.OWNER.getCode()) {
             update.setRole(req.getRole());
         }
 
@@ -527,16 +526,16 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
         //更新旧群主
         ImGroupMemberEntity imGroupMemberEntity = new ImGroupMemberEntity();
-        imGroupMemberEntity.setRole(GroupMemberRoleEnum.ORDINARY.getCode());
+        imGroupMemberEntity.setRole(GroupMemberRoleType.MEMBER.getCode());
         UpdateWrapper<ImGroupMemberEntity> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("app_id", appId);
         updateWrapper.eq("group_id", groupId);
-        updateWrapper.eq("role", GroupMemberRoleEnum.OWNER.getCode());
+        updateWrapper.eq("role", GroupMemberRoleType.OWNER.getCode());
         imGroupMemberMapper.update(imGroupMemberEntity, updateWrapper);
 
         //更新新群主
         ImGroupMemberEntity newOwner = new ImGroupMemberEntity();
-        newOwner.setRole(GroupMemberRoleEnum.OWNER.getCode());
+        newOwner.setRole(GroupMemberRoleType.OWNER.getCode());
         UpdateWrapper<ImGroupMemberEntity> ownerWrapper = new UpdateWrapper<>();
         ownerWrapper.eq("app_id", appId);
         ownerWrapper.eq("group_id", groupId);
@@ -570,8 +569,8 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             GetRoleInGroupResp data = role.getData();
             Integer roleInfo = data.getRole();
 
-            isOwner = roleInfo == GroupMemberRoleEnum.OWNER.getCode();
-            isManager = roleInfo == GroupMemberRoleEnum.MANAGER.getCode();
+            isOwner = roleInfo == GroupMemberRoleType.OWNER.getCode();
+            isManager = roleInfo == GroupMemberRoleType.MANAGER.getCode();
 
             if (!isOwner && !isManager) {
                 throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
@@ -584,12 +583,12 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             }
             memberRole = roleInGroupOne.getData();
             //被操作人是群主只能app管理员操作
-            if (memberRole.getRole() == GroupMemberRoleEnum.OWNER.getCode()) {
+            if (memberRole.getRole() == GroupMemberRoleType.OWNER.getCode()) {
                 throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_APPMANAGER_ROLE);
             }
 
             //是管理员并且被操作人不是群成员，无法操作
-            if (isManager && memberRole.getRole() != GroupMemberRoleEnum.ORDINARY.getCode()) {
+            if (isManager && memberRole.getRole() != GroupMemberRoleType.MEMBER.getCode()) {
                 throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
             }
         }
@@ -629,7 +628,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     @Override
     public ResponseVO<Collection<String>> syncMemberJoinedGroup(String operater, Integer appId) {
         // 离开群聊的用户无法获取数据
-        List<String> groupIds = imGroupMemberMapper.syncJoinedGroupId(appId, operater, GroupMemberRoleEnum.LEAVE.getCode());
+        List<String> groupIds = imGroupMemberMapper.syncJoinedGroupId(appId, operater, GroupMemberRoleType.LEAVE.getCode());
         return ResponseVO.successResponse(groupIds);
     }
 }

@@ -31,6 +31,7 @@ import com.bantanger.im.common.enums.conversation.ConversationType;
 import com.bantanger.im.common.enums.conversation.ConversationNoticeType;
 import com.bantanger.jpa.converter.ValidStatusConverter;
 import com.bantanger.jpa.support.BaseJpaAggregate;
+import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -73,11 +74,13 @@ public class ImConversationSet extends BaseJpaAggregate {
     @FieldDesc(name = "会话通知方式")
     @Convert(converter = ConversationNoticeTypeConverter.class)
     @TypeConverter
+    @Column(name = "is_mute")
     private ConversationNoticeType conversationNoticeType;
 
     @FieldDesc(name = "会话显示位置")
     @Convert(converter = ConversationAppearsTypeConverter.class)
     @TypeConverter
+    @Column(name = "is_top")
     private ConversationAppearsType conversationAppearsType;
 
     @FieldDesc(name = "会话最新消息序列号")

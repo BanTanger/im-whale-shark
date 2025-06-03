@@ -3,7 +3,6 @@ package com.bantanger.im.domain.group.model.req;
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.common.enums.command.Command;
 import com.bantanger.im.common.model.ClientInfo;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 

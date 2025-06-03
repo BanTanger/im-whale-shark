@@ -10,7 +10,7 @@ import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.service.route.RouteHandler;
 import com.bantanger.im.service.route.RouteInfo;
 import com.bantanger.im.service.utils.RouteInfoParseUtil;
-import com.bantanger.im.service.zookeeper.ZkManager;
+import com.bantanger.im.infrastructure.zookeeper.ZkManager;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

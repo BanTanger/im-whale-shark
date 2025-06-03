@@ -5,7 +5,6 @@ package com.bantanger.im.common.enums.command;
  * @Date 2023/4/1 15:43
  */
 public interface Command {
-
     Integer getCommand();
 
 }

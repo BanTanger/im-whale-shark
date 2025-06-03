@@ -52,6 +52,9 @@ import lombok.Data;
 @Data
 public class ImUserData extends BaseJpaAggregate {
 
+    @FieldDesc(name = "用户唯一标识")
+    private String userId;
+
     @FieldDesc(name = "用户名称")
     private String nickName;
 
