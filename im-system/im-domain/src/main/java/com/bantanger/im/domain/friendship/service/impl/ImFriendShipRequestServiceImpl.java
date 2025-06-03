@@ -121,7 +121,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
             throw new ApplicationException(FriendShipErrorCode.FRIEND_REQUEST_IS_NOT_EXIST);
         }
 
-        if (!req.getOperater().equals(imFriendShipRequestEntity.getToId())) {
+        if (!req.getOperator().equals(imFriendShipRequestEntity.getToId())) {
             //只能审批发给自己的好友请求
             throw new ApplicationException(FriendShipErrorCode.NOT_APPROVER_OTHER_MAN_REQUEST);
         }
@@ -137,7 +137,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         imFriendShipRequestMapper.updateById(update);
 
         userSequenceRepository.writeUserSeq(req.getAppId(),
-                req.getOperater(), Constants.SeqConstants.FriendShipRequestSeq, seq);
+                req.getOperator(), Constants.SeqConstants.FriendShipRequestSeq, seq);
 
         if (ApproverFriendRequestStatusEnum.AGREE.getCode() == req.getStatus()) {
             //同意 ===> 去执行添加好友逻辑
@@ -178,7 +178,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
                 .eq(ImFriendShipRequestEntity::getToId, req.getFromId()));
 
         userSequenceRepository.writeUserSeq(req.getAppId(),
-                req.getOperater(), Constants.SeqConstants.FriendShipRequestSeq, seq);
+                req.getOperator(), Constants.SeqConstants.FriendShipRequestSeq, seq);
 
         // TCP 通知
         ReadAllFriendRequestPack readAllFriendRequestPack = new ReadAllFriendRequestPack();

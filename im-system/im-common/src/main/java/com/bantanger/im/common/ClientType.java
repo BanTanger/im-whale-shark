@@ -4,31 +4,33 @@ package com.bantanger.im.common;
  * @author BanTanger 半糖
  * @Date 2023/4/1 17:54
  **/
-public enum ClientType {
 
-    WEBAPI(0,"webApi"),
-    WEB(1,"web"),
-    IOS(2,"ios"),
-    ANDROID(3,"android"),
-    WINDOWS(4,"windows"),
-    MAC(5,"mac"),
-            ;
+import com.bantanger.common.enums.BaseEnum;
+import java.util.Optional;
+import lombok.Getter;
 
-    private int code;
-    private String error;
+@Getter
+public enum ClientType implements BaseEnum<ClientType> {
 
-    ClientType(int code, String error){
+    WEBAPI(0, "webApi"),
+    WEB(1, "web"),
+    IOS(2, "ios"),
+    ANDROID(3, "android"),
+    WINDOWS(4, "windows"),
+    MAC(5, "mac"),
+
+    ;
+
+    ClientType(Integer code, String name) {
         this.code = code;
-        this.error = error;
-    }
-    public int getCode() {
-        return this.code;
+        this.name = name;
     }
 
-    public String getError() {
-        return this.error;
+    private final Integer code;
+    private final String name;
+
+    public static Optional<ClientType> of(Integer code) {
+        return Optional.ofNullable(BaseEnum.parseByCode(ClientType.class, code));
     }
-
-
 
 }

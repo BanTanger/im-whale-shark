@@ -1,6 +1,5 @@
 com\bantanger\jpa\support\UpdateHandler.class
 com\bantanger\jpa\converter\InstantLongConverter.class
-com\bantanger\jpa\support\QBaseJpaAggregate.class
 com\bantanger\jpa\support\EntityUpdater.class
 com\bantanger\jpa\support\Executor.class
 com\bantanger\jpa\converter\ValidStatusConverter.class

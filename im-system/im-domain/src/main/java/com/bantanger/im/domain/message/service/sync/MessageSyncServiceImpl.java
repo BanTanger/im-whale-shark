@@ -5,7 +5,6 @@ import com.bantanger.im.codec.pack.message.MessageReadPack;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.Command;
-import com.bantanger.im.common.enums.command.GroupEventCommand;
 import com.bantanger.im.common.enums.command.MessageCommand;
 import com.bantanger.im.common.model.SyncReq;
 import com.bantanger.im.common.model.SyncResp;
@@ -15,7 +14,6 @@ import com.bantanger.im.common.model.message.read.MessageReadContent;
 import com.bantanger.im.domain.conversation.service.ConversationService;
 import com.bantanger.im.service.sendmsg.MessageProducer;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -73,7 +71,7 @@ public class MessageSyncServiceImpl implements MessageSyncService {
 
         SyncResp<OfflineMessageContent> resp = new SyncResp<>();
 
-        String key = req.getAppId() + ":" + Constants.RedisConstants.OfflineMessage + ":" + req.getOperater();
+        String key = req.getAppId() + ":" + Constants.RedisConstants.OfflineMessage + ":" + req.getOperator();
         Long maxSeq = 0L;
         ZSetOperations zSetOperations = redisTemplate.opsForZSet();
         // 获取最大的 seq

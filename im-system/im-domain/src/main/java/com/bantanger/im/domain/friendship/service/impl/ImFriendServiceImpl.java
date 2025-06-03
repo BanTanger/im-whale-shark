@@ -27,8 +27,8 @@ import com.bantanger.im.domain.friendship.model.resp.ImportFriendShipResp;
 import com.bantanger.im.domain.friendship.service.ImFriendService;
 import com.bantanger.im.domain.friendship.service.ImFriendShipRequestService;
 import com.bantanger.im.domain.message.seq.RedisSequence;
-import com.bantanger.im.domain.user3.dao.ImUserDataEntity;
-import com.bantanger.im.domain.user3.service.ImUserService;
+import com.bantanger.im.domain.user.dao.ImUserDataEntity;
+import com.bantanger.im.domain.user.service.ImUserService;
 import com.bantanger.im.service.callback.CallbackService;
 import com.bantanger.im.service.config.AppConfig;
 import com.bantanger.im.service.sendmsg.MessageProducer;
@@ -47,7 +47,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.bantanger.im.common.enums.conversation.ConversationTypeEnum.P2P;
+import static com.bantanger.im.common.enums.conversation.ConversationType.P2P;
 
 /**
  * @author BanTanger 半糖
@@ -635,7 +635,7 @@ public class ImFriendServiceImpl implements ImFriendService {
         SyncResp<ImFriendShipEntity> resp = new SyncResp<>();
         // server_seq > req(client)_seq limit maxLimit;
         QueryWrapper<ImFriendShipEntity> query = new QueryWrapper<>();
-        query.eq("from_id", req.getOperater());
+        query.eq("from_id", req.getOperator());
         query.gt("friend_sequence", req.getLastSequence());
         query.eq("app_id", req.getAppId());
         query.last("limit " + req.getMaxLimit());

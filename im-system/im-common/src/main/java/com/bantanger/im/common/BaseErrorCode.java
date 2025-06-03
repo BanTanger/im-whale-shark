@@ -1,8 +1,5 @@
 package com.bantanger.im.common;
-
-
 import com.bantanger.im.common.exception.ApplicationExceptionEnum;
-
 
 public enum BaseErrorCode implements ApplicationExceptionEnum {
 
@@ -10,8 +7,7 @@ public enum BaseErrorCode implements ApplicationExceptionEnum {
     SYSTEM_ERROR(90000,"服务器内部错误,请联系管理员"),
     PARAMETER_ERROR(90001,"参数校验错误"),
 
-
-            ;
+    ;
 
     private int code;
     private String error;

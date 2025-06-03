@@ -25,7 +25,10 @@ public enum CodeEnum implements BaseEnum<CodeEnum> {
     BusinessError(10008, "业务异常"),
     ParamSetIllegal(10009, "参数设置非法"),
     TransferStatusError(10010, "当前状态不正确，请勿重复提交"),
-    NotGrant(10011, "没有操作该功能的权限，请联系管理员");
+    NotGrant(10011, "没有操作该功能的权限，请联系管理员"),
+
+    ;
+
     private final Integer code;
     private final String msg;
 

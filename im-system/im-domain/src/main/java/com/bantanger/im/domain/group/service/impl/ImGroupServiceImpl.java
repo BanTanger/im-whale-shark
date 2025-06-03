@@ -32,7 +32,6 @@ import com.bantanger.im.service.config.AppConfig;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -121,7 +120,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         boolean isAdmin = false;
 
         if (!isAdmin) {
-            req.setOwnerId(req.getOperater());
+            req.setOwnerId(req.getOperator());
         }
 
         // 1.生成群聊 groupId
@@ -166,7 +165,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         }
 
         // 发送 TCP 通知
-        groupMessageProducer.producer(req.getOperater(),
+        groupMessageProducer.producer(req.getOperator(),
                 GroupEventCommand.CREATED_GROUP, buildCreateGroupPack(imGroupEntity),
                 new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
 
@@ -220,7 +219,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         if (!isAdmin) {
             //不是后台调用需要检查权限
             ResponseVO<GetRoleInGroupResp> role = imGroupMemberService
-                    .getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+                    .getRoleInGroupOne(req.getGroupId(), req.getOperator(), req.getAppId());
 
             if (!role.isOk()) {
                 // 用户不在群内
@@ -271,7 +270,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         pack.setNotification(req.getNotification());
         pack.setPhoto(req.getPhoto());
 
-        groupMessageProducer.producer(req.getOperater(), GroupEventCommand.UPDATED_GROUP,
+        groupMessageProducer.producer(req.getOperator(), GroupEventCommand.UPDATED_GROUP,
                 pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
 
 
@@ -345,7 +344,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         }
 
         if (!isAdmin && imGroupEntity.getGroupType() == GroupTypeEnum.PUBLIC.getCode() &&
-                !imGroupEntity.getOwnerId().equals(req.getOperater())) {
+                !imGroupEntity.getOwnerId().equals(req.getOperator())) {
             throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
         }
 
@@ -363,7 +362,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         DestroyGroupPack pack = new DestroyGroupPack();
         pack.setSequence(seq);
         pack.setGroupId(req.getGroupId());
-        groupMessageProducer.producer(req.getOperater(),
+        groupMessageProducer.producer(req.getOperator(),
                 GroupEventCommand.DESTROY_GROUP, pack,
                 new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
 
@@ -383,7 +382,7 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Transactional
     public ResponseVO transferGroup(TransferGroupReq req) {
 
-        ResponseVO<GetRoleInGroupResp> roleInGroupOne = imGroupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+        ResponseVO<GetRoleInGroupResp> roleInGroupOne = imGroupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOperator(), req.getAppId());
         if (!roleInGroupOne.isOk()) {
             return roleInGroupOne;
         }
@@ -469,7 +468,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         if (!isadmin) {
             //不是后台调用需要检查权限
             ResponseVO<GetRoleInGroupResp> role = imGroupMemberService
-                    .getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+                    .getRoleInGroupOne(req.getGroupId(), req.getOperator(), req.getAppId());
 
             if (!role.isOk()) {
                 return role;
@@ -506,7 +505,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         SyncResp<ImGroupEntity> resp = new SyncResp<>();
 
         ResponseVO<Collection<String>> memberJoinedGroup = imGroupMemberService
-                .syncMemberJoinedGroup(req.getOperater(), req.getAppId());
+                .syncMemberJoinedGroup(req.getOperator(), req.getAppId());
 
         if (memberJoinedGroup.isOk()) {
             Collection<String> data = memberJoinedGroup.getData();

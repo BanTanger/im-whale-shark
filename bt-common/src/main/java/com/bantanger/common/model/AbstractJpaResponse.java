@@ -15,7 +15,6 @@ public abstract class AbstractJpaResponse implements Response {
 
     private Integer version;
 
-
     public Long getId() {
         return id;
     }

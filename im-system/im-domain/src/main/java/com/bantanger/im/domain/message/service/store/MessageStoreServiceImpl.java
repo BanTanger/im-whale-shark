@@ -2,7 +2,7 @@ package com.bantanger.im.domain.message.service.store;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.common.constant.Constants;
-import com.bantanger.im.common.enums.conversation.ConversationTypeEnum;
+import com.bantanger.im.common.enums.conversation.ConversationType;
 import com.bantanger.im.common.enums.error.MessageErrorCode;
 import com.bantanger.im.common.enums.friend.DelFlagEnum;
 import com.bantanger.im.common.model.message.content.OfflineMessageContent;
@@ -12,17 +12,14 @@ import com.bantanger.im.common.model.message.content.GroupChatMessageContent;
 import com.bantanger.im.common.model.message.content.MessageBody;
 import com.bantanger.im.common.model.message.content.MessageContent;
 import com.bantanger.im.domain.conversation.service.ConversationService;
-import com.bantanger.im.domain.conversation.service.ConversationServiceImpl;
 import com.bantanger.im.service.config.AppConfig;
 import com.bantanger.im.service.support.ids.SnowflakeIdWorker;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -100,9 +97,9 @@ public class MessageStoreServiceImpl implements MessageStoreService {
     @Override
     public void storeOfflineMessage(OfflineMessageContent offlineMessage) {
         // 获取 fromId 离线消息队列
-        getOfflineMsgQueue(offlineMessage, offlineMessage.getFromId(), offlineMessage.getToId(), ConversationTypeEnum.P2P);
+        getOfflineMsgQueue(offlineMessage, offlineMessage.getFromId(), offlineMessage.getToId(), ConversationType.P2P);
         // 获取 toId 离线消息队列
-        getOfflineMsgQueue(offlineMessage, offlineMessage.getToId(), offlineMessage.getFromId(), ConversationTypeEnum.P2P);
+        getOfflineMsgQueue(offlineMessage, offlineMessage.getToId(), offlineMessage.getFromId(), ConversationType.P2P);
     }
 
     @Override
@@ -111,7 +108,7 @@ public class MessageStoreServiceImpl implements MessageStoreService {
         memberIds.forEach(memberId -> getOfflineMsgQueue(
                 offlineMessage, memberId,
                 offlineMessage.getToId(),
-                ConversationTypeEnum.GROUP
+                ConversationType.GROUP
         ));
     }
 
@@ -122,7 +119,7 @@ public class MessageStoreServiceImpl implements MessageStoreService {
      * @param toId
      * @param conversationType
      */
-    private void getOfflineMsgQueue(OfflineMessageContent offlineMessage, String fromId, String toId, ConversationTypeEnum conversationType) {
+    private void getOfflineMsgQueue(OfflineMessageContent offlineMessage, String fromId, String toId, ConversationType conversationType) {
         // 获取用户离线消息队列
         String userKey = offlineMessage.getAppId() + Constants.RedisConstants.OfflineMessage + fromId;
 
@@ -149,7 +146,8 @@ public class MessageStoreServiceImpl implements MessageStoreService {
     private MessageBody extractMessageBody(MessageContent messageContent) {
         MessageBody messageBody = new MessageBody();
         messageBody.setAppId(messageContent.getAppId());
-        // TODO 消息唯一 ID 通过雪花算法生成
+        // 消息唯一 ID 通过雪花算法生成
+        // TODO 唯一消息ID的分配逻辑要提前，不应该是存储才分配，而是从客户端抵达就分配，不然没法做重试
         messageBody.setMessageKey(SnowflakeIdWorker.nextId());
         messageBody.setCreateTime(System.currentTimeMillis());
         // TODO 设置消息加密密钥

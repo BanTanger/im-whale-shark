@@ -3,6 +3,7 @@ package com.bantanger.im.codec.utils;
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.codec.proto.MessageHeader;
+import com.bantanger.im.common.enums.MessageCodecType;
 import io.netty.buffer.ByteBuf;
 
 /**
@@ -35,8 +36,8 @@ public class ByteBufToMessageUtils {
         /** 获取clientType*/
         int clientType = in.readInt();
 
-        /** 获取messageType*/
-        int messageType = in.readInt();
+        /** 获取messageCodecType*/
+        int messageCodecType = in.readInt();
 
         /** 获取appId*/
         int appId = in.readInt();
@@ -66,14 +67,14 @@ public class ByteBufToMessageUtils {
         messageHeader.setCommand(command);
         messageHeader.setLength(bodyLen);
         messageHeader.setVersion(version);
-        messageHeader.setMessageType(messageType);
+        messageHeader.setMessageCodecType(messageCodecType);
         messageHeader.setImei(imei);
         messageHeader.setImeiLength(imeiLength);
 
         Message message = new Message();
         message.setMessageHeader(messageHeader);
 
-        if(messageType == 0x0){
+        if(messageCodecType == MessageCodecType.DATA_TYPE_JSON.getCode()){
             String body = new String(bodyData);
             JSONObject parse = (JSONObject) JSONObject.parse(body);
             message.setMessagePack(parse);

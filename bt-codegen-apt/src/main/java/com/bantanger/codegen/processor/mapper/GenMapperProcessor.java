@@ -1,5 +1,6 @@
 package com.bantanger.codegen.processor.mapper;
 
+import com.bantanger.im.common.CustomMapper;
 import com.google.auto.service.AutoService;
 import com.bantanger.codegen.processor.BaseCodeGenProcessor;
 import com.bantanger.codegen.processor.DefaultNameContext;
@@ -38,6 +39,7 @@ public class GenMapperProcessor extends BaseCodeGenProcessor {
         AnnotationSpec mapperAnnotation = AnnotationSpec.builder(Mapper.class)
                 .addMember("uses", "$T.class", GenericEnumMapper.class)
                 .addMember("uses", "$T.class", DateMapper.class)
+                .addMember("uses", "$T.class", CustomMapper.class)
                 .build();
         TypeSpec.Builder typeSpecBuilder = TypeSpec.interfaceBuilder(className)
                 .addAnnotation(mapperAnnotation)

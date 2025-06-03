@@ -5,9 +5,7 @@ import com.bantanger.im.domain.group.model.req.*;
 import com.bantanger.im.domain.group.service.ImGroupService;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.domain.message.service.GroupMessageService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -63,7 +61,7 @@ public class ImGroupController {
     @RequestMapping("/importGroup")
     public ResponseVO importGroup(@RequestBody @Validated ImportGroupReq req, Integer appId, String identifier)  {
         req.setAppId(appId);
-        req.setOperater(identifier);
+        req.setOperator(identifier);
         return groupService.importGroup(req);
     }
 
@@ -77,7 +75,7 @@ public class ImGroupController {
     @RequestMapping("/createGroup")
     public ResponseVO createGroup(@RequestBody @Validated CreateGroupReq req, Integer appId, String identifier)  {
         req.setAppId(appId);
-        req.setOperater(identifier);
+        req.setOperator(identifier);
         return groupService.createGroup(req);
     }
 
@@ -103,7 +101,7 @@ public class ImGroupController {
     @RequestMapping("/update")
     public ResponseVO update(@RequestBody @Validated UpdateGroupReq req, Integer appId, String identifier)  {
         req.setAppId(appId);
-        req.setOperater(identifier);
+        req.setOperator(identifier);
         return groupService.updateBaseGroupInfo(req);
     }
 
@@ -117,7 +115,7 @@ public class ImGroupController {
     @RequestMapping("/getJoinedGroup")
     public ResponseVO getJoinedGroup(@RequestBody @Validated GetJoinedGroupReq req, Integer appId, String identifier)  {
         req.setAppId(appId);
-        req.setOperater(identifier);
+        req.setOperator(identifier);
         return groupService.getJoinedGroup(req);
     }
 
@@ -131,7 +129,7 @@ public class ImGroupController {
     @RequestMapping("/destroyGroup")
     public ResponseVO destroyGroup(@RequestBody @Validated DestroyGroupReq req, Integer appId, String identifier)  {
         req.setAppId(appId);
-        req.setOperater(identifier);
+        req.setOperator(identifier);
         return groupService.destroyGroup(req);
     }
 
@@ -145,14 +143,14 @@ public class ImGroupController {
     @RequestMapping("/transferGroup")
     public ResponseVO transferGroup(@RequestBody @Validated TransferGroupReq req, Integer appId, String identifier)  {
         req.setAppId(appId);
-        req.setOperater(identifier);
+        req.setOperator(identifier);
         return groupService.transferGroup(req);
     }
 
     @RequestMapping("/forbidSendMessage")
     public ResponseVO forbidSendMessage(@RequestBody @Validated MuteGroupReq req, Integer appId, String identifier)  {
         req.setAppId(appId);
-        req.setOperater(identifier);
+        req.setOperator(identifier);
         return groupService.muteGroup(req);
     }
 
@@ -161,7 +159,7 @@ public class ImGroupController {
                                           req, Integer appId,
                                   String identifier)  {
         req.setAppId(appId);
-        req.setOperater(identifier);
+        req.setOperator(identifier);
         return ResponseVO.successResponse(groupMessageService.send(req));
     }
 

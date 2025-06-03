@@ -16,8 +16,8 @@ import com.bantanger.im.domain.group.dao.ImGroupEntity;
 import com.bantanger.im.domain.group.model.resp.GetRoleInGroupResp;
 import com.bantanger.im.domain.group.service.ImGroupMemberService;
 import com.bantanger.im.domain.group.service.ImGroupService;
-import com.bantanger.im.domain.user3.dao.ImUserDataEntity;
-import com.bantanger.im.domain.user3.service.ImUserService;
+import com.bantanger.im.domain.user.dao.ImUserDataEntity;
+import com.bantanger.im.domain.user.service.ImUserService;
 import com.bantanger.im.service.config.AppConfig;
 import org.springframework.stereotype.Service;
 

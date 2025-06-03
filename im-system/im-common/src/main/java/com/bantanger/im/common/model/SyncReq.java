@@ -1,5 +1,6 @@
 package com.bantanger.im.common.model;
 
+import com.bantanger.common.model.AbstractImRequest;
 import lombok.Data;
 
 /**
@@ -7,7 +8,7 @@ import lombok.Data;
  * @Date 2023/4/13 23:33
  */
 @Data
-public class SyncReq extends RequestBase {
+public class SyncReq extends AbstractImRequest {
 
     /** 客户端最大 Seq */
     private Long lastSequence;

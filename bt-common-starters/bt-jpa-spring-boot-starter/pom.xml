@@ -44,5 +44,9 @@
             <version>8.0.1.Final</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+        </dependency>
     </dependencies>
 </project>

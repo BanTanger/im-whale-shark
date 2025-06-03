@@ -20,7 +20,7 @@ import com.bantanger.im.domain.friendship.model.req.group.member.AddFriendShipGr
 import com.bantanger.im.domain.friendship.model.req.group.AddFriendShipGroupReq;
 import com.bantanger.im.domain.friendship.model.req.group.DeleteFriendShipGroupReq;
 import com.bantanger.im.domain.friendship.service.ImFriendShipGroupService;
-import com.bantanger.im.domain.user3.service.ImUserService;
+import com.bantanger.im.domain.user.service.ImUserService;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

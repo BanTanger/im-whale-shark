@@ -17,20 +17,12 @@ import com.bantanger.im.domain.message.service.check.CheckSendMessage;
 import com.bantanger.im.domain.message.service.store.MessageStoreService;
 import com.bantanger.im.service.sendmsg.MessageProducer;
 import com.bantanger.im.service.utils.ThreadPoolUtil;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.types.RedisClientInfo;
-import org.springframework.stereotype.Service;
-
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 /**
  * 群聊逻辑

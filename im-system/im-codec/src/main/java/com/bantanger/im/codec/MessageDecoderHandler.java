@@ -3,7 +3,7 @@ package com.bantanger.im.codec;
 import com.alibaba.fastjson.JSONObject;
 import com.bantanger.im.codec.proto.Message;
 import com.bantanger.im.codec.proto.MessageHeader;
-import com.bantanger.im.common.enums.MessageType;
+import com.bantanger.im.common.enums.MessageCodecType;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -36,7 +36,7 @@ public class MessageDecoderHandler extends ByteToMessageDecoder {
         // 设备类型
         int clientType = in.readInt();
         // 消息解析类型
-        int messageType = in.readInt();
+        int messageCodecType = in.readInt();
         // appId 平台ID
         int appId = in.readInt();
         // imei 长度
@@ -61,7 +61,7 @@ public class MessageDecoderHandler extends ByteToMessageDecoder {
         MessageHeader messageHeader = new MessageHeader();
         messageHeader.setCommand(command);
         messageHeader.setVersion(version);
-        messageHeader.setMessageType(messageType);
+        messageHeader.setMessageType(messageCodecType);
         messageHeader.setClientType(clientType);
         messageHeader.setAppId(appId);
         messageHeader.setImei(imei);
@@ -71,7 +71,7 @@ public class MessageDecoderHandler extends ByteToMessageDecoder {
         Message message = new Message();
         message.setMessageHeader(messageHeader);
 
-        if (messageType == MessageType.DATA_TYPE_JSON.getCode()) {
+        if (messageCodecType == MessageCodecType.DATA_TYPE_JSON.getCode()) {
             String body = new String(bodyData);
             JSONObject parse = (JSONObject) JSONObject.parse(body);
             message.setMessagePack(parse);

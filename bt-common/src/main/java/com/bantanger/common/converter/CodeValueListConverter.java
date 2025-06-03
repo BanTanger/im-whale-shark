@@ -19,7 +19,7 @@ public class CodeValueListConverter implements AttributeConverter<List<CodeValue
     @Override
     public String convertToDatabaseColumn(List<CodeValue> codeValueList) {
         return Try.of(() -> new ObjectMapper().writeValueAsString(codeValueList))
-                .onFailure(e -> log.error("convertToDatabaseColumn json writing error"))
+                .onFailure(e -> log.error("convertToDatabaseColumn json writing error", e))
                 .getOrNull();
     }
 
@@ -27,7 +27,7 @@ public class CodeValueListConverter implements AttributeConverter<List<CodeValue
     public List<CodeValue> convertToEntityAttribute(String o) {
         return Try.of(() -> new ObjectMapper().readValue(o,
                 new TypeReference<List<CodeValue>>() {}))
-                .onFailure(e -> log.error("convertToEntityAttribute json reading error"))
+                .onFailure(e -> log.error("convertToEntityAttribute json reading error", e))
                 .getOrNull();
     }
 }

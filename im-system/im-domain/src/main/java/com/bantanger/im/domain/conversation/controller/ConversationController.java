@@ -27,7 +27,7 @@ public class ConversationController {
     public ResponseVO deleteConversation(@RequestBody @Validated DeleteConversationReq req,
                                          Integer appId, String identifier) {
         req.setAppId(appId);
-//        req.setOperater(identifier);
+//        req.setOperator(identifier);
         return conversationServiceImpl.deleteConversation(req);
     }
 
@@ -35,7 +35,7 @@ public class ConversationController {
     public ResponseVO updateConversation(@RequestBody @Validated UpdateConversationReq req,
                                          Integer appId, String identifier) {
         req.setAppId(appId);
-//        req.setOperater(identifier);
+//        req.setOperator(identifier);
         return conversationServiceImpl.updateConversation(req);
     }
 

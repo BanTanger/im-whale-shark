@@ -6,11 +6,12 @@ import com.bantanger.im.common.BaseErrorCode;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.error.GateWayErrorCode;
-import com.bantanger.im.common.enums.user.UserTypeEnum;
+import com.bantanger.im.common.enums.user.UserType;
 import com.bantanger.im.common.exception.ApplicationExceptionEnum;
-import com.bantanger.im.domain.user3.dao.ImUserDataEntity;
-import com.bantanger.im.domain.user3.service.ImUserService;
+import com.bantanger.im.domain.user.dao.ImUserDataEntity;
+import com.bantanger.im.domain.user.service.ImUserService;
 import com.bantanger.im.service.config.AppConfig;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -117,7 +118,7 @@ public class IdentityCheck {
         //去DB或Redis中查找, 后面写
         ResponseVO<ImUserDataEntity> singleUserInfo = userService.getSingleUserInfo(identifier, appId);
         if(singleUserInfo.isOk()){
-            RequestHolder.set(singleUserInfo.getData().getUserType() == UserTypeEnum.APP_ADMIN.getCode());
+            RequestHolder.set(Objects.equals(singleUserInfo.getData().getUserType(), UserType.APP_ADMIN.getCode()));
         }else{
             RequestHolder.set(false);
         }

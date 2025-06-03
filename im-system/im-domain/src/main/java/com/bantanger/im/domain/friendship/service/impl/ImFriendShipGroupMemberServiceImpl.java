@@ -9,14 +9,14 @@ import com.bantanger.im.domain.friendship.dao.ImFriendShipGroupMemberEntity;
 import com.bantanger.im.domain.friendship.dao.mapper.ImFriendShipGroupMemberMapper;
 import com.bantanger.im.domain.friendship.model.resp.AddGroupMemberResp;
 import com.bantanger.im.domain.friendship.service.ImFriendShipGroupMemberService;
-import com.bantanger.im.domain.user3.dao.ImUserDataEntity;
+import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.service.sendmsg.MessageProducer;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.domain.friendship.model.req.group.member.AddFriendShipGroupMemberReq;
 import com.bantanger.im.domain.friendship.model.req.group.member.DeleteFriendShipGroupMemberReq;
 import com.bantanger.im.domain.friendship.service.ImFriendShipGroupService;
-import com.bantanger.im.domain.user3.service.ImUserService;
+import com.bantanger.im.domain.user.service.ImUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

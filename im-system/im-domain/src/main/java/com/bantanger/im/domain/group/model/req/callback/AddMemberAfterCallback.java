@@ -14,6 +14,6 @@ import java.util.List;
 public class AddMemberAfterCallback {
     private String groupId;
     private Integer groupType;
-    private String operater;
+    private String operator;
     private List<AddMemberResp> memberId;
 }

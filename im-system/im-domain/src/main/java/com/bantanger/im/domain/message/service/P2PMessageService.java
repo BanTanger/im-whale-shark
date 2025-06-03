@@ -14,23 +14,16 @@ import com.bantanger.im.domain.message.model.req.SendMessageReq;
 import com.bantanger.im.domain.message.model.resp.SendMessageResp;
 import com.bantanger.im.domain.message.seq.RedisSequence;
 import com.bantanger.im.domain.message.service.check.CheckSendMessage;
-import com.bantanger.im.domain.message.service.check.CheckSendMessageImpl;
 import com.bantanger.im.domain.message.service.store.MessageStoreService;
-import com.bantanger.im.domain.message.service.store.MessageStoreServiceImpl;
 import com.bantanger.im.service.sendmsg.MessageProducer;
 import com.bantanger.im.service.support.ids.ConversationIdGenerate;
 import com.bantanger.im.service.utils.ThreadPoolUtil;
-import jodd.util.ThreadUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 单聊逻辑

@@ -5,7 +5,7 @@ import com.bantanger.im.codec.pack.conversation.UpdateConversationPack;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.ConversationEventCommand;
-import com.bantanger.im.common.enums.conversation.ConversationTypeEnum;
+import com.bantanger.im.common.enums.conversation.ConversationType;
 import com.bantanger.im.common.enums.error.ConversationErrorCode;
 import com.bantanger.im.common.model.ClientInfo;
 import com.bantanger.im.common.model.SyncReq;
@@ -146,7 +146,7 @@ public class ConversationServiceImpl implements ConversationService {
         SyncResp<ImConversationSetEntity> resp = new SyncResp<>();
 
         QueryWrapper<ImConversationSetEntity> query = new QueryWrapper<>();
-        query.eq("from_id", req.getOperater());
+        query.eq("from_id", req.getOperator());
         query.gt("sequence", req.getLastSequence());
         query.eq("app_id", req.getAppId());
         query.last("limit " + req.getMaxLimit());
@@ -180,7 +180,7 @@ public class ConversationServiceImpl implements ConversationService {
     private static String getToIdOrGroupId(MessageReadContent messageReadContent) {
         // 会话类型为单聊，toId 赋值为目标用户
         String toId = messageReadContent.getToId();
-        if (ConversationTypeEnum.GROUP.getCode().equals(messageReadContent.getConversationType())) {
+        if (ConversationType.GROUP.getCode().equals(messageReadContent.getConversationType())) {
             // 会话类型为群聊，toId 赋值为 groupId
             toId = messageReadContent.getGroupId();
         }

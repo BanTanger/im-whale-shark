@@ -3,9 +3,8 @@ package com.bantanger.im.common.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-
 import java.io.Serializable;
+import lombok.Data;
 
 /**
  * @description:
@@ -28,7 +27,7 @@ public class RequestBase implements Serializable {
      * 操作人，谁在调用接口
      */
     @NotBlank(message = "操作人 Id 不能为空")
-    private String operater;
+    private String operator;
 
     private Integer clientType;
 

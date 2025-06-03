@@ -27,7 +27,7 @@ public class GenServiceProcessor extends BaseCodeGenProcessor {
 
     public static final String SERVICE_SUFFIX = "Service";
 
-    public static final String SERVICE_PREFIX = "I";
+    public static final String SERVICE_PREFIX = "";
 
     @Override
     protected void generateClass(TypeElement typeElement, RoundEnvironment roundEnvironment) {
