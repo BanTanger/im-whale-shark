@@ -5,8 +5,8 @@ import com.bantanger.im.common.enums.error.MessageErrorCode;
 import com.bantanger.im.common.enums.friend.FriendShipErrorCode;
 import com.bantanger.im.common.enums.friend.FriendShipStatusEnum;
 import com.bantanger.im.common.enums.group.GroupErrorCode;
-import com.bantanger.im.common.enums.group.GroupMemberRoleEnum;
-import com.bantanger.im.common.enums.group.GroupMuteTypeEnum;
+import com.bantanger.im.common.enums.group.GroupMemberRoleType;
+import com.bantanger.im.common.enums.group.GroupMuteType;
 import com.bantanger.im.common.enums.user.UserForbiddenFlagEnum;
 import com.bantanger.im.common.enums.user.UserSilentFlagEnum;
 import com.bantanger.im.domain.friendship.dao.ImFriendShipEntity;
@@ -18,7 +18,7 @@ import com.bantanger.im.domain.group.service.ImGroupMemberService;
 import com.bantanger.im.domain.group.service.ImGroupService;
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.domain.user.service.ImUserService;
-import com.bantanger.im.service.config.AppConfig;
+import com.bantanger.im.infrastructure.config.AppConfig;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
@@ -134,9 +134,9 @@ public class CheckSendMessageImpl implements CheckSendMessage {
         // 查询群内是否禁言
         // 如果禁言，只有群主和管理员才有权说话
         ImGroupEntity groupData = group.getData();
-        boolean isGroupMute = GroupMuteTypeEnum.MUTE.getCode().equals(groupData.getMute());
-        boolean isManager = GroupMemberRoleEnum.MANAGER.getCode().equals(data.getRole());
-        boolean isOwner = GroupMemberRoleEnum.OWNER.getCode().equals(data.getRole());
+        boolean isGroupMute = GroupMuteType.MEMBER_MUTE.getCode().equals(groupData.getMute());
+        boolean isManager = GroupMemberRoleType.MANAGER.getCode().equals(data.getRole());
+        boolean isOwner = GroupMemberRoleType.OWNER.getCode().equals(data.getRole());
         if (isGroupMute) {
             if (!(isManager || isOwner)) {
                 return ResponseVO.errorResponse(GroupErrorCode.THIS_GROUP_IS_MUTE);

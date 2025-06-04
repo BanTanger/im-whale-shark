@@ -1,6 +1,6 @@
 package com.bantanger.im.infrastructure.utils;
 
-import com.bantanger.im.service.support.postprocessor.BasePostProcessor;
+import com.bantanger.im.infrastructure.support.postprocessor.BasePostProcessor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

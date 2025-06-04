@@ -10,7 +10,7 @@ import com.bantanger.im.common.constant.Constants;
 import com.bantanger.im.common.enums.command.GroupEventCommand;
 import com.bantanger.im.common.enums.group.GroupErrorCode;
 import com.bantanger.im.common.enums.group.GroupMemberRoleType;
-import com.bantanger.im.common.enums.group.GroupStatus;
+import com.bantanger.im.common.enums.group.GroupStatusType;
 import com.bantanger.im.common.enums.group.GroupType;
 import com.bantanger.im.common.exception.ApplicationException;
 import com.bantanger.im.common.model.ClientInfo;
@@ -441,7 +441,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         }
 
         ImGroupEntity groupData = group.getData();
-        if (groupData.getStatus() == GroupStatus.DESTROY.getCode()) {
+        if (Objects.equals(groupData.getStatus(), GroupStatusType.DESTROY.getCode())) {
             throw new ApplicationException(GroupErrorCode.GROUP_IS_DESTROY);
         }
 

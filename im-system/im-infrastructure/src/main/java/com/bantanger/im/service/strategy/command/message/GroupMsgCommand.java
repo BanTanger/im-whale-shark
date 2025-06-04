@@ -8,7 +8,7 @@ import com.bantanger.im.codec.proto.MessagePack;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.command.GroupEventCommand;
 import com.bantanger.im.common.model.message.CheckSendMessageReq;
-import com.bantanger.im.infrastructure.rabbitmq.publish.MqMessageProducer;
+import com.bantanger.im.common.rabbitmq.publish.MqMessageProducer;
 import com.bantanger.im.service.feign.FeignMessageService;
 import com.bantanger.im.service.strategy.command.BaseCommandStrategy;
 import com.bantanger.im.service.strategy.command.model.CommandExecution;

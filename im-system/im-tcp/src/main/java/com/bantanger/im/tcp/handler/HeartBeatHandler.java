@@ -1,7 +1,6 @@
 package com.bantanger.im.tcp.handler;
 
 import com.bantanger.im.common.constant.Constants;
-import com.bantanger.im.service.utils.UserChannelRepository;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
@@ -39,7 +38,7 @@ public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
 
                 if (lastReadTime != null && nowReadTime - lastReadTime > heartBeatTime) {
                     // 用户退后台
-                    UserChannelRepository.forceOffLine(ctx.channel());
+                    UserChannelManager.forceOffLine(ctx.channel());
                 }
             }
         }

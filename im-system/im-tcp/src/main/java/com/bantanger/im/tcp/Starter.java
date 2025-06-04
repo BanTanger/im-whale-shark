@@ -1,14 +1,14 @@
 package com.bantanger.im.tcp;
 
 import com.bantanger.im.codec.config.ImBootstrapConfig;
-import com.bantanger.im.service.rabbitmq.MqFactory;
-import com.bantanger.im.service.rabbitmq.listener.MqMessageListener;
-import com.bantanger.im.service.redis.RedissonManager;
+import com.bantanger.im.common.rabbitmq.MqFactory;
+import com.bantanger.im.common.rabbitmq.listener.MqMessageListener;
+import com.bantanger.im.common.redis.RedissonManager;
+import com.bantanger.im.common.zookeeper.CuratorZkClient;
+import com.bantanger.im.common.zookeeper.ZkManager;
+import com.bantanger.im.common.zookeeper.ZkRegistry;
 import com.bantanger.im.service.strategy.command.CommandFactoryConfig;
 import com.bantanger.im.service.strategy.login.factory.LoginStatusFactoryConfig;
-import com.bantanger.im.service.zookeeper.CuratorZkClient;
-import com.bantanger.im.service.zookeeper.ZkManager;
-import com.bantanger.im.service.zookeeper.ZkRegistry;
 import com.bantanger.im.tcp.server.ImServer;
 import com.bantanger.im.tcp.server.ImWebSocketServer;
 import org.yaml.snakeyaml.Yaml;

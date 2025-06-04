@@ -15,9 +15,9 @@ import com.bantanger.im.domain.friendship.model.req.friend.FriendDto;
 import com.bantanger.im.domain.friendship.model.req.friend.ReadFriendShipRequestReq;
 import com.bantanger.im.domain.friendship.service.ImFriendService;
 import com.bantanger.im.domain.friendship.service.ImFriendShipRequestService;
-import com.bantanger.im.domain.message.seq.RedisSequence;
-import com.bantanger.im.service.sendmsg.MessageProducer;
-import com.bantanger.im.service.utils.UserSequenceRepository;
+import com.bantanger.im.domain.messageddd.domainservice.sendmsg.MessageProducer;
+import com.bantanger.im.infrastructure.support.ids.SequenceIdWorker;
+import com.bantanger.im.infrastructure.utils.UserSequenceRepository;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.commons.lang3.StringUtils;
@@ -31,19 +31,15 @@ import java.util.List;
 public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestService {
 
     @Resource
-    ImFriendShipRequestMapper imFriendShipRequestMapper;
-
+    private ImFriendShipRequestMapper imFriendShipRequestMapper;
     @Resource
-    ImFriendService imFriendShipService;
-
+    private ImFriendService imFriendShipService;
     @Resource
-    MessageProducer messageProducer;
-
+    private MessageProducer messageProducer;
     @Resource
-    RedisSequence redisSequence;
-
+    private SequenceIdWorker sequenceIdWorker;
     @Resource
-    UserSequenceRepository userSequenceRepository;
+    private UserSequenceRepository userSequenceRepository;
 
     @Override
     public ResponseVO getFriendRequest(String fromId, Integer appId) {
@@ -66,7 +62,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
                         .eq(ImFriendShipRequestEntity::getFromId, fromId)
                         .eq(ImFriendShipRequestEntity::getToId, dto.getToId()));
 
-        long seq = redisSequence.doGetSeq(appId + ":" +
+        long seq = sequenceIdWorker.doGetSeq(appId + ":" +
                 Constants.SeqConstants.FriendShipRequestSeq);
 
         if (request == null) {
@@ -126,7 +122,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
             throw new ApplicationException(FriendShipErrorCode.NOT_APPROVER_OTHER_MAN_REQUEST);
         }
 
-        long seq = redisSequence.doGetSeq(req.getAppId() +
+        long seq = sequenceIdWorker.doGetSeq(req.getAppId() +
                 ":" + Constants.SeqConstants.FriendShipRequestSeq);
 
         ImFriendShipRequestEntity update = new ImFriendShipRequestEntity();
@@ -167,7 +163,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
     @Override
     public ResponseVO readFriendShipRequestReq(ReadFriendShipRequestReq req) {
 
-        long seq = redisSequence.doGetSeq(req.getAppId() + ":" +
+        long seq = sequenceIdWorker.doGetSeq(req.getAppId() + ":" +
                 Constants.SeqConstants.FriendShipRequestSeq);
 
         ImFriendShipRequestEntity update = new ImFriendShipRequestEntity();

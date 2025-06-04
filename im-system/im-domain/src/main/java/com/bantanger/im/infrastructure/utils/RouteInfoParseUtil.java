@@ -2,7 +2,7 @@ package com.bantanger.im.infrastructure.utils;
 
 import com.bantanger.im.common.BaseErrorCode;
 import com.bantanger.im.common.exception.ApplicationException;
-import com.bantanger.im.service.route.RouteInfo;
+import com.bantanger.im.infrastructure.route.RouteInfo;
 
 /**
  * @author BanTanger 半糖

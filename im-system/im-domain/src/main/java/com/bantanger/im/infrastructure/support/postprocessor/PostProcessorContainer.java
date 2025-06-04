@@ -1,6 +1,6 @@
 package com.bantanger.im.infrastructure.support.postprocessor;
 
-import com.bantanger.im.service.utils.BeanPostProcessorUtil;
+import com.bantanger.im.infrastructure.utils.BeanPostProcessorUtil;
 import java.util.Comparator;
 import java.util.List;
 import org.springframework.util.CollectionUtils;

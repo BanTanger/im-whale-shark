@@ -16,10 +16,10 @@ import com.bantanger.im.domain.conversation.dao.mapper.ImConversationSetMapper;
 import com.bantanger.im.domain.conversation.model.CreateConversationReq;
 import com.bantanger.im.domain.conversation.model.DeleteConversationReq;
 import com.bantanger.im.domain.conversation.model.UpdateConversationReq;
-import com.bantanger.im.domain.message.seq.RedisSequence;
-import com.bantanger.im.service.config.AppConfig;
-import com.bantanger.im.service.sendmsg.MessageProducer;
-import com.bantanger.im.service.utils.UserSequenceRepository;
+import com.bantanger.im.domain.messageddd.domainservice.sendmsg.MessageProducer;
+import com.bantanger.im.infrastructure.config.AppConfig;
+import com.bantanger.im.infrastructure.support.ids.SequenceIdWorker;
+import com.bantanger.im.infrastructure.utils.UserSequenceRepository;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ import java.util.List;
 public class ConversationServiceImpl implements ConversationService {
 
     private final AppConfig appConfig;
-    private final RedisSequence redisSequence;
+    private final SequenceIdWorker sequenceIdWorker;
     private final MessageProducer messageProducer;
     private final UserSequenceRepository userSequenceRepository;
     private final ImConversationSetMapper imConversationSetMapper;
@@ -76,7 +76,7 @@ public class ConversationServiceImpl implements ConversationService {
          * 即客户端看到的消息从高到低是按照会话里的最新消息进行排序（置顶另外讨论）最新会话在最前
          * 而 p2p，group 的 seq 是为了对一个会话里的消息进行排序
          */
-        long seq = redisSequence.doGetSeq(
+        long seq = sequenceIdWorker.doGetSeq(
                 messageReadContent.getAppId() + Constants.SeqConstants.ConversationSeq);
 
         imConversationSetMapper.readMark(buildReadMarkModel(messageReadContent, conversationId, seq));
@@ -109,7 +109,7 @@ public class ConversationServiceImpl implements ConversationService {
         query.eq("app_id", req.getAppId());
         ImConversationSetEntity imConversationSetEntity = imConversationSetMapper.selectOne(query);
         if (imConversationSetEntity != null) {
-            long seq = redisSequence.doGetSeq(req.getAppId() + Constants.SeqConstants.ConversationSeq);
+            long seq = sequenceIdWorker.doGetSeq(req.getAppId() + Constants.SeqConstants.ConversationSeq);
             if (req.getIsMute() != null) {
                 // 更新禁言状态
                 imConversationSetEntity.setIsMute(req.getIsMute());

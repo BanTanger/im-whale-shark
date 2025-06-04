@@ -8,11 +8,11 @@ import com.bantanger.im.codec.proto.ChatMessageAck;
 import com.bantanger.im.codec.proto.MessagePack;
 import com.bantanger.im.common.ResponseVO;
 import com.bantanger.im.common.enums.command.MessageCommand;
+import com.bantanger.im.common.rabbitmq.publish.MqMessageProducer;
 import com.bantanger.im.infrastructure.support.postprocessor.PostContext;
 import com.bantanger.im.infrastructure.support.postprocessor.extensionpost.CheckLegalMsgPostProcessor;
 import com.bantanger.im.infrastructure.support.postprocessor.extensionpost.FeignDataBO;
-import com.bantanger.im.service.rabbitmq.publish.MqMessageProducer;
-import com.bantanger.im.service.utils.BeanPostProcessorUtil;
+import com.bantanger.im.infrastructure.utils.BeanPostProcessorUtil;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 

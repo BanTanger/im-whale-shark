@@ -2,9 +2,9 @@ package com.bantanger.im.infrastructure.config;
 
 import com.bantanger.im.common.enums.route.RouteHashMethodEnum;
 import com.bantanger.im.common.enums.route.UrlRouteModelEnum;
-import com.bantanger.im.service.route.RouteHandler;
-import com.bantanger.im.service.route.algroithm.hash.AbstractConsistentHash;
-import com.bantanger.im.service.support.ids.SnowflakeIdWorker;
+import com.bantanger.im.infrastructure.route.RouteHandler;
+import com.bantanger.im.infrastructure.route.algroithm.hash.AbstractConsistentHash;
+import com.bantanger.im.infrastructure.support.ids.SnowflakeIdWorker;
 import jakarta.annotation.Resource;
 import java.lang.reflect.Method;
 import org.springframework.context.annotation.Bean;

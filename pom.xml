@@ -40,6 +40,8 @@
         <feign.version>8.18.0</feign.version>
         <zookeeper.version>3.5.10</zookeeper.version>
         <amqp.version>5.7.2</amqp.version>
+        <redisson.version>3.15.6</redisson.version>
+        <curator.version>2.12.0</curator.version>
     </properties>
 
     <dependencyManagement>
@@ -128,6 +130,23 @@
                 <groupId>com.netflix.feign</groupId>
                 <artifactId>feign-jackson</artifactId>
                 <version>${feign.version}</version>
+            </dependency>
+            <!-- redisson -->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-framework</artifactId>
+                <version>${curator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.zookeeper</groupId>
+                        <artifactId>zookeeper</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>

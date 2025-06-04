@@ -26,13 +26,13 @@ import com.bantanger.im.domain.friendship.model.resp.CheckFriendShipResp;
 import com.bantanger.im.domain.friendship.model.resp.ImportFriendShipResp;
 import com.bantanger.im.domain.friendship.service.ImFriendService;
 import com.bantanger.im.domain.friendship.service.ImFriendShipRequestService;
-import com.bantanger.im.domain.message.seq.RedisSequence;
+import com.bantanger.im.domain.messageddd.domainservice.sendmsg.MessageProducer;
 import com.bantanger.im.domain.user.dao.ImUserDataEntity;
 import com.bantanger.im.domain.user.service.ImUserService;
-import com.bantanger.im.service.callback.CallbackService;
-import com.bantanger.im.service.config.AppConfig;
-import com.bantanger.im.service.sendmsg.MessageProducer;
-import com.bantanger.im.service.utils.UserSequenceRepository;
+import com.bantanger.im.infrastructure.callback.CallbackService;
+import com.bantanger.im.infrastructure.config.AppConfig;
+import com.bantanger.im.infrastructure.support.ids.SequenceIdWorker;
+import com.bantanger.im.infrastructure.utils.UserSequenceRepository;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -62,7 +62,7 @@ public class ImFriendServiceImpl implements ImFriendService {
     private final ConversationService conversationServiceImpl;
     private final ImUserService imUserServiceImpl;
     private final CallbackService callbackServiceImpl;
-    private final RedisSequence redisSequence;
+    private final SequenceIdWorker sequenceIdWorker;
     private final MessageProducer messageProducer;
     private final UserSequenceRepository userSequenceRepository;
     /**
@@ -195,7 +195,7 @@ public class ImFriendServiceImpl implements ImFriendService {
 
     @Transactional
     public ResponseVO doUpdate(String fromId, FriendDto dto, Integer appId) {
-        long seq = redisSequence.doGetSeq(appId + ":" + Constants.SeqConstants.FriendShipSeq);
+        long seq = sequenceIdWorker.doGetSeq(appId + ":" + Constants.SeqConstants.FriendShipSeq);
         UpdateWrapper<ImFriendShipEntity> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().set(ImFriendShipEntity::getAddSource, dto.getAddSource())
                 .set(ImFriendShipEntity::getExtra, dto.getExtra())
@@ -220,7 +220,7 @@ public class ImFriendServiceImpl implements ImFriendService {
         //Friend 表插入 A 和 B 两条记录
         //查询是否有记录存在，如果存在则判断状态，如果是已添加，则提示已添加，如果是未添加，则修改状态
 
-        long seq = redisSequence.doGetSeq(appId + ":" + Constants.SeqConstants.FriendShipSeq);
+        long seq = sequenceIdWorker.doGetSeq(appId + ":" + Constants.SeqConstants.FriendShipSeq);
         String toId = dto.getToId();
 
         // Friend 表插入 A 记录
@@ -368,7 +368,7 @@ public class ImFriendServiceImpl implements ImFriendService {
                             FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode())) {
 
                 ImFriendShipEntity update = new ImFriendShipEntity();
-                long seq = redisSequence.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.FriendShipSeq);
+                long seq = sequenceIdWorker.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.FriendShipSeq);
                 update.setFriendSequence(seq);
                 update.setStatus(FriendShipStatusEnum.FRIEND_STATUS_DELETE.getCode());
                 imFriendShipMapper.update(update, query);
@@ -493,7 +493,7 @@ public class ImFriendServiceImpl implements ImFriendService {
         ImFriendShipEntity fromItem = imFriendShipMapper.selectOne(query);
         if (fromItem == null) {
             //走添加逻辑。
-            seq = redisSequence.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.FriendShipSeq);
+            seq = sequenceIdWorker.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.FriendShipSeq);
 
             fromItem = new ImFriendShipEntity();
             fromItem.setFromId(req.getFromId());
@@ -512,7 +512,7 @@ public class ImFriendServiceImpl implements ImFriendService {
             if (fromItem.getBlack() != null && fromItem.getBlack() == FriendShipStatusEnum.BLACK_STATUS_BLACKED.getCode()) {
                 return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_IS_BLACK);
             } else {
-                seq = redisSequence.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.FriendShipSeq);
+                seq = sequenceIdWorker.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.FriendShipSeq);
 
                 ImFriendShipEntity update = new ImFriendShipEntity();
                 update.setBlack(FriendShipStatusEnum.BLACK_STATUS_BLACKED.getCode());
@@ -556,7 +556,7 @@ public class ImFriendServiceImpl implements ImFriendService {
             throw new ApplicationException(FriendShipErrorCode.FRIEND_IS_NOT_YOUR_BLACK);
         }
 
-        long seq = redisSequence.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.FriendShipSeq);
+        long seq = sequenceIdWorker.doGetSeq(req.getAppId() + ":" + Constants.SeqConstants.FriendShipSeq);
 
         ImFriendShipEntity update = new ImFriendShipEntity();
         update.setBlack(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode());

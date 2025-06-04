@@ -1,11 +1,10 @@
 package com.bantanger.im.tcp.handler;
 
 import com.bantanger.im.codec.proto.Message;
-import com.bantanger.im.service.rabbitmq.publish.MqMessageProducer;
+import com.bantanger.im.common.rabbitmq.publish.MqMessageProducer;
 import com.bantanger.im.service.strategy.command.CommandStrategy;
 import com.bantanger.im.service.strategy.command.factory.CommandFactory;
 import com.bantanger.im.service.strategy.command.model.CommandExecution;
-import com.bantanger.im.service.utils.UserChannelRepository;
 import com.bantanger.im.service.feign.FeignMessageService;
 import feign.Feign;
 import feign.Request;
@@ -111,20 +110,20 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        UserChannelRepository.add(ctx.channel());
+        UserChannelManager.add(ctx.channel());
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        UserChannelRepository.forceOffLine(ctx.channel());
+        UserChannelManager.forceOffLine(ctx.channel());
         ctx.close();
-//        logger.info("剩余通道个数：{}", UserChannelRepository.CHANNEL_GROUP.size());
+//        logger.info("剩余通道个数：{}", UserChannelManager.CHANNEL_GROUP.size());
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
-        UserChannelRepository.remove(ctx.channel());
+        UserChannelManager.remove(ctx.channel());
     }
 
 }

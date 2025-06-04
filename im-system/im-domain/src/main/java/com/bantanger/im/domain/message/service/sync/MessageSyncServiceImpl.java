@@ -12,7 +12,7 @@ import com.bantanger.im.common.model.message.MessageReceiveAckContent;
 import com.bantanger.im.common.model.message.content.OfflineMessageContent;
 import com.bantanger.im.common.model.message.read.MessageReadContent;
 import com.bantanger.im.domain.conversation.service.ConversationService;
-import com.bantanger.im.service.sendmsg.MessageProducer;
+import com.bantanger.im.domain.messageddd.domainservice.sendmsg.MessageProducer;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;

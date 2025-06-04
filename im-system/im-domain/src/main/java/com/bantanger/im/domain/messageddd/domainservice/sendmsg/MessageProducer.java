@@ -3,7 +3,7 @@ package com.bantanger.im.domain.messageddd.domainservice.sendmsg;
 import com.bantanger.im.common.enums.command.Command;
 import com.bantanger.im.common.model.ClientInfo;
 import com.bantanger.im.common.model.UserSession;
-import com.bantanger.im.infrastructure.session.UserSessionService;
+import com.bantanger.im.infrastructure.session.IUserSessionManager;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class MessageProducer extends AbstractMessageSend {
 
     @Resource
-    private UserSessionService userSessionService;
+    private IUserSessionManager userSessionManager;
 
     /**
      * 消息发送【兼容管理员和普通用户】
@@ -47,7 +47,7 @@ public class MessageProducer extends AbstractMessageSend {
     @Override
     public List<ClientInfo> sendToUserAllClient(String toId, Command command, Object data, Integer appId) {
         // 获取当前用户所有在线端的 Session
-        List<UserSession> userSessions = userSessionService.getUserSession(appId, toId);
+        List<UserSession> userSessions = userSessionManager.getUserSession(appId, toId);
         return userSessions.stream()
                 // 筛出非空对象
                 .filter(Objects::nonNull)
@@ -61,14 +61,14 @@ public class MessageProducer extends AbstractMessageSend {
 
     @Override
     public void sendToUserOneClient(String toId, Command command, Object data, ClientInfo clientInfo) {
-        UserSession userSession = userSessionService.getUserSession(
+        UserSession userSession = userSessionManager.getUserSession(
                 clientInfo.getAppId(), toId, clientInfo.getClientType(), clientInfo.getImei());
         sendMessage(toId, command, data, userSession);
     }
 
     @Override
     public void sendToUserExceptClient(String toId, Command command, Object data, ClientInfo clientInfo) {
-        List<UserSession> userSession = userSessionService.getUserSession(clientInfo.getAppId(), toId);
+        List<UserSession> userSession = userSessionManager.getUserSession(clientInfo.getAppId(), toId);
         userSession.stream()
                 .filter(session -> !isMatch(session, clientInfo))
                 .forEach(session -> sendMessage(toId, command, data, session));
