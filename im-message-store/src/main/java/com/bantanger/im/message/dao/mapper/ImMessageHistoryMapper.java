@@ -2,6 +2,8 @@ package com.bantanger.im.message.dao.mapper;
 
 import com.bantanger.im.message.dao.ImMessageHistoryEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
