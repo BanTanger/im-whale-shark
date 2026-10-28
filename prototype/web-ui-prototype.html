@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<!--
+  THROWAWAY PROTOTYPE — 不实现、不测试、不入主分支。
+  问题：「im-whale-shark 的 Web 前端长什么样？」
+  三个结构上不同的变体，同一路由，?variant=A|B|C 切换，底部浮条或 ←/→ 键。
+  参考系：IM 侧 = 微信桌面端；客服侧 = baize D 方案；强调色 = 品牌绿阶 #71D49D / #0B7F56 / #096A49。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IM-WhaleShark · Web 前端原型（PROTOTYPE）</title>
+<style>
+:root{
+  --ink-900:#0F1720; --ink-700:#39424F; --ink-500:#6B7684; --ink-300:#9AA4B2;
+  --line:#E6EAF0; --line-2:#EFF3F7;
+  --bg:#FFFFFF; --bg-2:#F7F9FB; --bg-3:#EFF3F7;
+  --brand-50:#EAFBF2; --brand-100:#D8F7E8; --brand-500:#71D49D; --brand-600:#0B7F56; --brand-700:#096A49;
+  --danger:#D24B4B; --warn:#C8842A;
+  --r:10px;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:var(--sans);color:var(--ink-900);background:var(--bg-2);-webkit-font-smoothing:antialiased;font-size:13px}
+#app{height:100%;display:flex;flex-direction:column;min-height:0}
+button{font-family:inherit;font-size:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea{font-family:inherit;font-size:inherit;color:inherit}
+.mono{font-family:var(--mono)}
+.muted{color:var(--ink-500)}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 7px;border-radius:999px;background:var(--bg-3);color:var(--ink-500);white-space:nowrap}
+.tag.ok{background:var(--brand-50);color:var(--brand-600)}
+.tag.bot{background:var(--brand-50);color:var(--brand-700);border:1px solid var(--brand-100)}
+.tag.warn{background:#FBF3E6;color:var(--warn)}
+.tag.bad{background:#FBEAEA;color:var(--danger)}
+.tag.blue{background:#EEF3FF;color:#3355AA}
+.avatar{flex:0 0 auto;border-radius:8px;display:grid;place-items:center;color:#fff;font-weight:600;font-size:13px;background:var(--ink-300)}
+.avatar.sm{width:30px;height:30px;font-size:12px;border-radius:7px}
+.avatar.md{width:38px;height:38px;border-radius:9px}
+.avatar.lg{width:56px;height:56px;font-size:19px;border-radius:12px}
+
+/* ---------- shared pieces ---------- */
+.hd{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line);flex:0 0 auto;background:var(--bg);min-height:52px}
+.hd .t{font-size:14.5px;font-weight:600;letter-spacing:-.01em}
+.spacer{flex:1}
+.search{margin:10px 12px;display:flex;align-items:center;gap:7px;background:var(--bg-3);border-radius:8px;padding:7px 10px;color:var(--ink-300)}
+.search input{border:0;background:none;outline:none;width:100%;color:var(--ink-900);font-size:12.5px}
+.btn{border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:12.5px;background:var(--bg);color:var(--ink-700)}
+.btn:hover{border-color:#D5DBE4}
+.btn.primary{background:var(--brand-600);border-color:var(--brand-600);color:#fff;font-weight:600}
+.btn.primary:hover{background:var(--brand-700);border-color:var(--brand-700)}
+.btn.ghost{border-color:transparent;color:var(--ink-500)}
+
+.crow{display:flex;gap:10px;padding:9px 12px;cursor:pointer;border-radius:8px;margin:1px 6px;align-items:center}
+.crow:hover{background:var(--bg-2)}
+.crow[data-sel="true"]{background:var(--brand-50)}
+.crow .body{flex:1;min-width:0}
+.crow .l1{display:flex;align-items:center;gap:6px}
+.crow .l1 b{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow .l2{display:flex;align-items:center;gap:6px;margin-top:3px;font-size:12px;color:var(--ink-500);min-width:0}
+.crow .l2 span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow .meta{text-align:right;flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.crow .meta .tm{font-size:11px;color:var(--ink-300)}
+.dot{min-width:17px;height:17px;border-radius:9px;background:var(--danger);color:#fff;font-size:10.5px;display:grid;place-items:center;padding:0 5px;font-weight:600}
+.dot.quiet{background:var(--line);color:var(--ink-500)}
+
+.thread{flex:1;min-height:0;overflow:auto;padding:14px 0;background:var(--bg-2)}
+.tsep{text-align:center;margin:12px 0;font-size:11px;color:var(--ink-300)}
+.msg{display:flex;gap:9px;padding:5px 18px;align-items:flex-start}
+.msg.cont{padding-top:0}
+.msg .who{font-size:11px;color:var(--ink-300);margin:0 0 3px 2px}
+.bubble{max-width:min(520px,74%);background:var(--bg);border-radius:10px;padding:8px 11px;font-size:13.5px;line-height:1.6;box-shadow:0 1px 1px rgba(15,23,32,.04)}
+.msg.me{flex-direction:row-reverse}
+.msg.me .bubble{background:var(--brand-500);color:#0A2A1E}
+.msg.me .who{text-align:right;margin-right:2px}
+.msg .stack{display:flex;flex-direction:column;gap:6px;max-width:min(560px,80%)}
+.receipt{font-size:10.5px;color:var(--ink-300);text-align:right;padding:0 20px 4px 0}
+.cite{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--brand-700);background:var(--brand-50);border-radius:6px;padding:3px 7px;margin-top:5px}
+.toolcall{border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--bg);max-width:520px}
+.toolcall .th{display:flex;gap:8px;align-items:center;padding:6px 10px;background:var(--bg-3);font-family:var(--mono);font-size:11px;color:var(--ink-500)}
+.toolcall .tb{display:grid;grid-template-columns:1fr 1fr;font-family:var(--mono);font-size:10.5px;color:var(--ink-700)}
+.toolcall .tb>div{padding:7px 10px;border-top:1px solid var(--line);white-space:pre-wrap;line-height:1.55}
+.toolcall .tb>div+div{border-left:1px solid var(--line)}
+.handoff{display:flex;align-items:center;gap:8px;border:1px dashed var(--brand-500);background:var(--brand-50);border-radius:9px;padding:8px 11px;font-size:12px;color:var(--brand-700);max-width:520px}
+.composer{border-top:1px solid var(--line);padding:9px 14px;display:flex;gap:8px;align-items:flex-end;background:var(--bg);flex:0 0 auto}
+.composer .tools{display:flex;gap:2px;color:var(--ink-500)}
+.composer .tools button{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;font-size:14px}
+.composer .tools button:hover{background:var(--bg-3)}
+.composer .field{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:36px;color:var(--ink-300);font-size:13px;display:flex;align-items:center}
+.composer .hint{font-size:10.5px;color:var(--ink-300);padding-bottom:2px;white-space:nowrap}
+
+.rail{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0;border-right:1px solid var(--line);background:var(--bg);flex:0 0 auto}
+.rail .me{width:34px;height:34px;border-radius:9px;background:var(--brand-600);color:#fff;display:grid;place-items:center;font-weight:600;font-size:12px;margin-bottom:8px}
+.rail button{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;font-size:16px;color:var(--ink-500);position:relative}
+.rail button[aria-current="true"]{background:var(--brand-50);color:var(--brand-700)}
+.rail .badge{position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:4px;background:var(--danger)}
+.list{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line);background:var(--bg)}
+.list .items{flex:1;overflow:auto;padding-bottom:8px}
+.main{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--bg-2)}
+.insp{display:flex;flex-direction:column;min-height:0;background:var(--bg);border-left:1px solid var(--line)}
+.insp .pane{overflow:auto;padding:12px 14px}
+.sect{font-size:11px;font-weight:600;color:var(--ink-300);letter-spacing:.04em;margin:14px 0 8px;text-transform:uppercase}
+.sect:first-child{margin-top:2px}
+.kv{display:grid;grid-template-columns:86px 1fr;gap:6px 10px;font-size:12px}
+.kv .k{color:var(--ink-500)}
+.membergrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.membergrid .m{text-align:center;font-size:11px;color:var(--ink-500)}
+.membergrid .m .avatar{margin:0 auto 4px}
+.spanrow{display:grid;grid-template-columns:104px 1fr 52px;gap:8px;align-items:center;margin-bottom:5px}
+.spanrow .nm{font-family:var(--mono);font-size:10.5px;color:var(--ink-500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spanrow .bar{height:11px;border-radius:4px;background:var(--bg-3);position:relative;overflow:hidden}
+.spanrow .bar i{position:absolute;top:0;bottom:0;border-radius:4px;background:var(--brand-500)}
+.spanrow .bar i.warn{background:#E3B062}
+.spanrow .bar i.bad{background:#E08585}
+.spanrow .ms{text-align:right;font-family:var(--mono);font-size:10px;color:var(--ink-300)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:12px}
+.kpi{border:1px solid var(--line);border-radius:var(--r);padding:9px 11px;background:var(--bg)}
+.kpi .k{font-size:10.5px;color:var(--ink-300)}
+.kpi .v{font-size:18px;font-weight:650;letter-spacing:-.02em;margin-top:1px}
+.grouphd{display:flex;align-items:center;gap:6px;padding:10px 14px 6px;font-size:11.5px;color:var(--ink-300);font-weight:600}
+.frow{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer}
+.frow:hover{background:var(--bg-2)}
+.frow[data-sel="true"]{background:var(--brand-50)}
+.frow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frow .sub{font-size:11px;color:var(--ink-300)}
+
+/* ---------- switcher ---------- */
+#switcher{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:2px;
+  background:#0F1720;color:#fff;border-radius:999px;padding:5px 6px;box-shadow:0 6px 24px rgba(15,23,32,.28);z-index:99;font-size:12.5px}
+#switcher button{color:#fff;width:26px;height:26px;border-radius:999px;display:grid;place-items:center;opacity:.75}
+#switcher button:hover{background:rgba(255,255,255,.12);opacity:1}
+#switcher .lbl{padding:0 8px;white-space:nowrap}
+#switcher .lbl b{color:var(--brand-500);font-weight:600}
+#switcher .st{font-size:10.5px;color:#8B97A8;font-family:var(--mono);border-left:1px solid #2A3441;margin-left:4px;padding-left:9px;white-space:nowrap;padding-right:6px}
+
+/* ================= variant A · 微信三段（信息栏为抽屉） ================= */
+body[data-variant="A"] .shell{display:grid;grid-template-columns:60px 300px 1fr;flex:1;min-height:0;position:relative;overflow:hidden}
+body[data-variant="A"] .main{position:relative}
+body[data-variant="A"] .insp{position:absolute;top:0;right:0;bottom:0;width:330px;box-shadow:-12px 0 28px rgba(15,23,32,.10);
+  transform:translateX(352px);transition:transform .18s ease;z-index:3}
+body[data-variant="A"][data-info="open"] .insp{transform:none}
+
+/* ================= variant B · 四栏常驻（D 方案同构） ================= */
+body[data-variant="B"] .shell{display:grid;grid-template-columns:60px 272px 1fr 344px;flex:1;min-height:0;overflow:hidden}
+body[data-variant="B"] .insp{position:relative;transform:none}
+
+/* ================= variant C · 单列优先（列表可折叠 + 覆盖面板） ================= */
+body[data-variant="C"] .shell{display:grid;grid-template-columns:var(--listw,272px) 1fr;flex:1;min-height:0;overflow:hidden;position:relative}
+body[data-variant="C"] .topbar{display:flex;align-items:center;gap:10px;padding:0 16px;height:48px;border-bottom:1px solid var(--line);background:var(--bg);flex:0 0 auto}
+body[data-variant="C"] .topbar .brand{display:flex;align-items:center;gap:8px;font-weight:650;letter-spacing:-.01em}
+body[data-variant="C"] .topbar .mark{width:22px;height:22px;border-radius:6px;background:#0F1720;color:var(--brand-500);display:grid;place-items:center;font-size:11px;font-weight:700}
+body[data-variant="C"] .topbar nav{display:flex;gap:2px;margin-left:6px}
+body[data-variant="C"] .topbar nav button{padding:5px 10px;border-radius:7px;font-size:12.5px;color:var(--ink-500)}
+body[data-variant="C"] .topbar nav button[aria-current="true"]{background:var(--bg-3);color:var(--ink-900);font-weight:600}
+body[data-variant="C"] .topbar .search{flex:1;max-width:320px;margin:0}
+body[data-variant="C"] .list{border-right:1px solid var(--line)}
+body[data-variant="C"][data-list="closed"] .shell{--listw:0px}
+body[data-variant="C"][data-list="closed"] .list{display:none}
+body[data-variant="C"] .main{align-items:center}
+body[data-variant="C"] .main>.hd,body[data-variant="C"] .main>.composer{width:100%}
+body[data-variant="C"] .main>.thread{width:100%;max-width:880px;margin:0 auto;padding-left:0;padding-right:0}
+body[data-variant="C"] .thread>.msg,body[data-variant="C"] .thread>.receipt,body[data-variant="C"] .thread>.tsep{max-width:744px;margin-left:auto;margin-right:auto;width:100%}
+body[data-variant="C"] .insp{position:absolute;top:0;right:0;bottom:0;width:340px;z-index:4;box-shadow:-12px 0 28px rgba(15,23,32,.12);
+  transform:translateX(362px);transition:transform .18s ease}
+body[data-variant="C"][data-info="open"] .insp{transform:none}
+</style>
+</head>
+<body data-variant="A" data-view="chat" data-conv="c1" data-info="closed" data-list="open">
+<div id="app"></div>
+<div id="switcher"></div>
+
+<script>
+/* ------------------------------------------------------------------ 数据（mock，内存态，无持久化） */
+const PEOPLE = {
+  u1:{n:'李航', c:'#3D7BD9'},
+  u2:{n:'周敏', c:'#B4693F'},
+  u3:{n:'陈松民', c:'#0B7F56'},
+  u4:{n:'王雪', c:'#8A5CD1'},
+  u5:{n:'赵鹏', c:'#C25B84'},
+  u6:{n:'孙一鸣', c:'#4E8F92'},
+  bot:{n:'白泽', c:'#0F1720'}
+};
+const CONVS = [
+  {id:'c1', kind:'p2p', name:'李航', sub:'文件传上去了，晚点看', time:'14:32', unread:0, avatar:'李', color:'#3D7BD9'},
+  {id:'c2', kind:'group', name:'鲸鲨 · 前端联调', sub:'周敏: 网关 19001 连上了', time:'14:08', unread:3, avatar:'鲸', color:'#4E8F92', count:5},
+  {id:'c3', kind:'bot', name:'白泽', sub:'已为你查询到退款进度', time:'13:51', unread:1, avatar:'泽', color:'#0F1720'},
+  {id:'c4', kind:'p2p', name:'周敏', sub:'[草稿] 好的', time:'周二', unread:0, avatar:'周', color:'#B4693F', quiet:true},
+  {id:'c5', kind:'group', name:'售后坐席 · 二组', sub:'系统: 张女士已转人工', time:'周二', unread:0, avatar:'售', color:'#8A5CD1', count:12},
+  {id:'c6', kind:'p2p', name:'赵鹏', sub:'收到，明天同步', time:'周一', unread:0, avatar:'赵', color:'#C25B84'}
+];
+const THREADS = {
+  c1:[
+    {sep:'今天 14:20'},
+    {from:'u1', text:'前端那版原型你看了吗？我这边先把会话列表的骨架搭了。'},
+    {from:'me', text:'看了。列表按你说的五件套做：头像、名字、摘要、时间、未读。'},
+    {from:'u1', text:'群聊的未读要不要跟单聊分开算？'},
+    {from:'me', text:'服务端有 read_sequence，按会话算就行，别在客户端反推。', receipt:'已读 · 14:31'},
+    {from:'u1', text:'文件传上去了，晚点看'}
+  ],
+  c2:[
+    {sep:'今天 13:58'},
+    {from:'u2', name:'周敏', text:'网关 19001 连上了，握手正常。'},
+    {from:'u2', name:'周敏', text:'但 MSG_P2P 的回包我这边收不到 ack。'},
+    {from:'me', text:'看一下 0x416 有没有下发，可能是 imei 长度不对。'},
+    {from:'u4', name:'王雪', text:'我这边抓到包了，header 里 imeiLength 写的是 0。'}
+  ],
+  c3:[
+    {sep:'今天 13:48'},
+    {from:'me', text:'我的订单 88231045 退款到哪一步了？'},
+    {from:'bot', text:'订单 88231045 的退款已于 10-26 18:22 审核通过，原路退回。微信渠道通常 1–3 个工作日到账。'},
+    {cite:'退款时效说明 · c_7712 · 0.82', from:'bot', text:''}
+  ],
+  c4:[{sep:'周二'},{from:'u2', name:'周敏', text:'好的'},{from:'me', text:'那版 UI 我周五给。'}],
+  c5:[{sep:'周二'},{from:'sys', text:'张女士已转人工（policy_judgement · Jev noul 0.86）'}],
+  c6:[{sep:'周一'},{from:'u6', name:'赵鹏', text:'收到，明天同步'}]
+};
+const FRIEND_GROUPS = [
+  {name:'同事', items:[['李航','前端 · 会话列表'],['周敏','前端 · SDK 层'],['王雪','测试'],['孙一鸣','后端']]},
+  {name:'客户', items:[['赵鹏','售后 · 二组'],['刘洋','外部对接'],['何静','渠道']]},
+  {name:'家人', items:[['陈小满','—'],['陈父','—']]}
+];
+const QUEUE = [
+  {id:'S-1042', name:'张女士', wait:'00:42', tag:'待人工', tone:'warn', sel:true},
+  {id:'S-1041', name:'李先生', wait:'02:10', tag:'待人工', tone:'warn'},
+  {id:'S-1039', name:'王女士', wait:'05:31', tag:'AI 处理中', tone:'ok'}
+];
+const TRACE_SPANS = [
+  ['rule_gate', 12, 3, ''], ['slot.fill', 22, 8, ''], ['retrieval', 96, 12, ''],
+  ['tool.get_refund', 148, 6, ''], ['cite.check', 34, 2, 'warn'], ['compose', 412, 0, ''],
+  ['persist', 18, 0, '']
+];
+const AGENT_THREAD = [
+  {sep:'14:26 · 本轮'},
+  {from:'user', text:'我买的那台手机的退款到底什么时候到？'},
+  {from:'bot', text:'订单 88231045 的退款已于 10-26 18:22 审核通过，原路退回。'},
+  {tool:{name:'get_refund', ms:'148ms', status:200, args:'order_id: 88231045', result:'status: APPROVED\nchannel: WECHAT\nfinish_at: 2026-10-26 18:22'}},
+  {cite:'退款时效说明 · c_7712 · 0.82'},
+  {from:'user', text:'已经三天了还没到，你们是不是拖我？'},
+  {handoff:'已转人工 · policy_judgement · Jev noul 0.86（非模型自述）'}
+];
+
+/* ------------------------------------------------------------------ 渲染工具 */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const qs = new URLSearchParams(location.search);
+const state = {
+  variant: ['A','B','C'].includes(qs.get('variant')) ? qs.get('variant') : 'A',
+  view: qs.get('view') || 'chat',
+  conv: qs.get('conv') || 'c1',
+  info: qs.get('info') === 'open' ? 'open' : 'closed',
+  list: qs.get('list') === 'closed' ? 'closed' : 'open'
+};
+const convOf = id => CONVS.find(c => c.id === id) || CONVS[0];
+
+function avatar(name, color, size='md'){ return `<div class="avatar ${size}" style="background:${color}">${esc(name.slice(0,1))}</div>`; }
+
+function msgRow(m){
+  if(m.sep) return `<div class="tsep">${esc(m.sep)}</div>`;
+  if(m.from === 'sys') return `<div class="tsep">${esc(m.text)}</div>`;
+  if(m.from === 'user') return `<div class="msg">${avatar('买','#C25B84','sm')}<div class="stack"><div class="bubble">${esc(m.text)}</div></div></div>`;
+  if(m.from === 'me') return `<div class="msg me"><div class="stack"><div class="bubble">${esc(m.text)}</div></div>${avatar('陈','#0B7F56','sm')}</div>` + (m.receipt ? `<div class="receipt">${esc(m.receipt)}</div>` : '');
+  if(m.from === 'bot'){
+    return `<div class="msg">${avatar('泽','#0F1720','sm')}<div class="stack">${m.text?`<div class="bubble">${esc(m.text)}</div>`:''}
+      ${m.cite?`<span class="cite">📎 ${esc(m.cite)}</span>`:''}</div></div>`;
+  }
+  const p = PEOPLE[m.from] || {n:'?', c:'#9AA4B2'};
+  const nameLine = m.name ? `<div class="who">${esc(m.name)}</div>` : '';
+  return `<div class="msg">${avatar(p.n, p.c, 'sm')}<div class="stack">${nameLine}<div class="bubble">${esc(m.text)}</div>
+    ${m.cite?`<span class="cite">📎 ${esc(m.cite)}</span>`:''}</div></div>`;
+}
+function agentRow(m){
+  if(m.sep) return `<div class="tsep">${esc(m.sep)}</div>`;
+  if(m.tool) return `<div class="msg">${avatar('AI','#0F1720','sm')}<div class="stack"><div class="toolcall">
+      <div class="th">🔧 ${esc(m.tool.name)} · ${esc(m.tool.ms)} · ${m.tool.status}</div>
+      <div class="tb"><div>args\n${esc(m.tool.args)}</div><div>result\n${esc(m.tool.result)}</div></div></div></div></div>`;
+  if(m.cite) return `<div class="msg cont">${avatar('AI','#0F1720','sm')}<div class="stack"><span class="cite">📎 ${esc(m.cite)}</span></div></div>`;
+  if(m.handoff) return `<div class="msg">${avatar('AI','#0F1720','sm')}<div class="stack"><div class="handoff">↪ ${esc(m.handoff)}</div></div></div>`;
+  return msgRow(m);
+}
+
+function convList(){
+  return `<div class="search">🔍<input placeholder="搜索" readonly /></div>
+  <div class="items">` + CONVS.map(c => `
+    <div class="crow" data-action="conv" data-id="${c.id}" data-sel="${c.id === state.conv}">
+      ${avatar(c.avatar, c.color, 'md')}
+      <div class="body">
+        <div class="l1"><b>${esc(c.name)}</b>${c.kind === 'bot' ? '<span class="tag bot">机器人</span>' : ''}${c.kind === 'group' ? '<span class="tag">群</span>' : ''}</div>
+        <div class="l2"><span>${esc(c.sub)}</span></div>
+      </div>
+      <div class="meta"><span class="tm">${esc(c.time)}</span>
+        ${c.unread ? `<span class="dot ${c.quiet ? 'quiet' : ''}">${c.unread}</span>` : (c.quiet ? '<span class="dot quiet">•</span>' : '')}
+      </div>
+    </div>`).join('') + `</div>`;
+}
+
+function infoPanel(){
+  const c = convOf(state.conv);
+  if(state.view === 'agent' || state.view === 'metrics') return agentInspector();
+  if(state.view === 'contacts') return `
+    <div class="pane">
+      <div class="sect">好友申请</div>
+      <div class="kv"><div class="k">来自</div><div>刘洋</div><div class="k">附言</div><div>我是渠道那边的，加一下</div>
+      <div class="k">来源</div><div class="mono">GROUP_JOIN</div><div class="k">状态</div><div><span class="tag warn">待审批</span></div></div>
+      <div style="display:flex;gap:8px;margin-top:12px"><button class="btn primary">同意</button><button class="btn">拒绝</button></div>
+      <div class="sect">分组管理</div>
+      ${FRIEND_GROUPS.map(g => `<div class="frow"><span class="nm">${esc(g.name)}</span><span class="sub">${g.items.length} 人</span><button class="btn ghost">⋯</button></div>`).join('')}
+    </div>`;
+  if(c.kind === 'group') return `
+    <div class="pane">
+      <div class="sect">群成员 · ${c.count}</div>
+      <div class="membergrid">${['周敏','王雪','孙一鸣','李航','赵鹏','陈松民'].map(n=>`<div class="m">${avatar(n,'#4E8F92','md')}${esc(n)}</div>`).join('')}</div>
+      <div class="sect">群公告</div>
+      <div style="font-size:12.5px;line-height:1.65;color:var(--ink-700)">联调期间消息只走 testserver；<br/>上线前把 imei 长度校验补上。</div>
+      <div class="sect">设置</div>
+      ${['消息免打扰','置顶聊天','我在本群的昵称','查找聊天记录'].map((t,i)=>`
+        <div class="frow"><span class="nm">${t}</span><span class="sub">${i===3?'':(i<2?'已关闭':'—')}</span></div>`).join('')}
+    </div>`;
+  const p = PEOPLE[Object.keys(PEOPLE).find(k => PEOPLE[k].n === c.name)] || {n:c.name, c:c.color};
+  return `
+    <div class="pane">
+      <div style="display:flex;gap:12px;align-items:center">${avatar(p.n, p.c, 'lg')}
+        <div><div style="font-size:15px;font-weight:600">${esc(p.n)}</div>
+        <div class="muted" style="font-size:12px;margin-top:2px">鲸鲨科技 · 前端</div></div></div>
+      <div class="sect">资料</div>
+      <div class="kv"><div class="k">备注</div><div>${esc(c.name)}</div><div class="k">分组</div><div>同事</div>
+        <div class="k">签名</div><div>把状态机画出来再动手</div><div class="k">user_id</div><div class="mono">100012</div></div>
+      <div class="sect">共同群聊</div>
+      <div class="frow"><span class="nm">鲸鲨 · 前端联调</span><span class="sub">5 人</span></div>
+      <div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary">发消息</button><button class="btn">删除好友</button></div>
+    </div>`;
+}
+
+function agentInspector(){
+  const total = 742;
+  return `<div class="pane">
+    <div class="sect">本轮 · 7 spans · 742ms</div>
+    ${TRACE_SPANS.map(([n, ms, , tone]) => `<div class="spanrow"><div class="nm">${esc(n)}</div>
+      <div class="bar"><i class="${tone}" style="left:${(ms / total * 100).toFixed(1)}%;width:${Math.max(ms / total * 100, 1.5).toFixed(1)}%"></i></div>
+      <div class="ms">${ms ? ms + 'ms' : '—'}</div></div>`).join('')}
+    <div class="sect">关键属性</div>
+    <div class="kv">
+      <div class="k">conversation</div><div class="mono">conv_7c1f…</div>
+      <div class="k">prompt</div><div class="mono">cs-answer@v12</div>
+      <div class="k">route</div><div class="mono">tool_first / jev 0.91</div>
+      <div class="k">retrieval</div><div>skipped（工具优先）</div>
+      <div class="k">citation</div><div>tool ×1 / kb ×0</div>
+      <div class="k">usage</div><div class="mono">in 5210 / out 318</div>
+      <div class="k">cost</div><div class="mono">¥0.0121</div>
+    </div>
+    <div class="sect">handoff</div>
+    <div class="kv"><div class="k">reason</div><div>policy_judgement</div><div class="k">by</div><div class="mono">jev noul 0.86</div></div>
+  </div>`;
+}
+
+function chatMain(){
+  const c = convOf(state.conv);
+  const list = THREADS[c.id] || [];
+  const isGroup = c.kind === 'group';
+  return `<div class="hd">
+      <div class="t">${esc(c.name)}</div>
+      ${c.kind === 'bot' ? '<span class="tag bot">机器人</span>' : ''}
+      ${isGroup ? `<span class="tag">${c.count} 人</span>` : '<span class="tag">在线</span>'}
+      <div class="spacer"></div>
+      <button class="btn ghost" title="搜索聊天记录">🔍</button>
+      <button class="btn ghost" data-action="info" title="聊天信息">⋯</button>
+    </div>
+    <div class="thread">${list.map(msgRow).join('')}</div>
+    <div class="composer">
+      <div class="tools"><button>😊</button><button>📎</button><button>✂️</button><button>🎤</button></div>
+      <div class="field">输入消息，Enter 发送</div>
+      <span class="hint">${isGroup ? '群消息' : '单聊'} · WS 19001</span>
+      <button class="btn primary">发送</button>
+    </div>`;
+}
+
+function contactsMain(){
+  return `<div class="hd"><div class="t">通讯录</div><span class="tag">8 位好友 · 3 个分组</span><div class="spacer"></div>
+      <button class="btn">+ 添加好友</button></div>
+    <div class="thread" style="background:var(--bg);padding:8px 0">
+      <div class="frow"><span class="nm" style="font-weight:600">新的朋友</span><span class="dot">2</span></div>
+      <div class="frow"><span class="nm" style="font-weight:600">群聊</span><span class="sub">3 个</span></div>
+      <div class="frow"><span class="nm" style="font-weight:600">标签 / 分组</span><span class="sub">同事 4 · 客户 3 · 家人 2</span></div>
+      ${FRIEND_GROUPS.map(g => `<div class="grouphd">${esc(g.name)}</div>
+        ${g.items.map(([n, d]) => `<div class="frow">${avatar(n, '#4E8F92', 'sm')}<span class="nm">${esc(n)}</span><span class="sub">${esc(d)}</span></div>`).join('')}`).join('')}
+    </div>`;
+}
+
+function agentMain(){
+  return `<div class="hd">
+      <div class="t">张女士 · S-1042</div>
+      <span class="tag blue">退款进度</span><span class="tag">tool_first</span><span class="tag ok">Jev 0.91</span>
+      <div class="spacer"></div>
+      <button class="btn ghost" data-action="info">trace</button>
+      <button class="btn primary">接管会话</button>
+    </div>
+    <div class="thread">${AGENT_THREAD.map(agentRow).join('')}</div>
+    <div class="composer">
+      <div class="tools"><button>😊</button><button>📎</button></div>
+      <div class="field">以坐席身份回复…</div>
+      <span class="hint">人工中 · AI 已停止发言</span>
+      <button class="btn primary">发送</button>
+    </div>`;
+}
+
+function metricsMain(){
+  const KPIS = [['解决率','71.2%','+2.4pp'],['转人工率','18.4%','-1.1pp'],['首响 P95','2.9s','-0.3s'],['单会话成本','¥0.081','+¥0.004'],['坏 case','4.1%','+0.6pp']];
+  return `<div class="hd"><div class="t">观测大盘</div><span class="tag">近 10 天</span><div class="spacer"></div>
+      <span class="muted" style="font-size:11.5px">解决率口径：未转人工且 24h 未复问</span></div>
+    <div class="thread" style="padding:14px 18px">
+      <div class="kpis">${KPIS.map(([k,v,d]) => `<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div>
+        <span class="tag ${d.startsWith('-')?'ok':(k.includes('成本')||k.includes('坏')?'warn':'ok')}" style="margin-top:4px">${d}</span></div>`).join('')}</div>
+      <div class="sect">转人工原因分布</div>
+      <div class="kv"><div class="k">政策裁量</div><div>46% · policy_judgement</div>
+        <div class="k">工具失败</div><div>23% · tool_error</div>
+        <div class="k">用户要求</div><div>19% · user_request</div>
+        <div class="k">连续未解决</div><div>12% · unresolved_2</div></div>
+      <div class="sect">坏 case 队列</div>
+      ${[['S-1041','工具返回两条矛盾时间戳，模型选了较旧的一条'],['S-1033','引用命中 0.22 < 0.35 仍给出确定性结论'],['S-1030','用户改口订单号后槽位未覆盖']]
+        .map(([id,w]) => `<div style="border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-bottom:7px;background:var(--bg)">
+          <div class="mono muted" style="font-size:10.5px;margin-bottom:3px">${id}</div><div style="font-size:12.5px">${esc(w)}</div></div>`).join('')}
+    </div>`;
+}
+
+function queueList(){
+  const c = convOf(state.conv);
+  if(state.view === 'agent' || state.view === 'metrics') return `<div class="search">🔍<input placeholder="搜索会话 / 订单号" readonly /></div>
+    <div class="items">${QUEUE.map(q => `<div class="crow" data-action="conv" data-id="${c.id}" data-sel="${q.sel}">
+        ${avatar(q.name.slice(0,1), '#4E8F92', 'md')}
+        <div class="body"><div class="l1"><b>${esc(q.name)}</b><span class="tag ${q.tone}">${q.tag}</span></div>
+          <div class="l2"><span class="mono">${q.id}</span><span>等待 ${q.wait}</span></div></div>
+      </div>`).join('')}</div>`;
+  if(state.view === 'contacts'){
+    return `<div class="hd"><b style="font-size:13px">联系人</b><span class="tag">8</span></div>
+      <div class="items">
+        <div class="frow" data-sel="true"><span class="nm">新的朋友</span><span class="dot">2</span></div>
+        <div class="frow"><span class="nm">群聊</span><span class="sub">3</span></div>
+        ${FRIEND_GROUPS.map(g => `<div class="grouphd">${esc(g.name)}</div>
+          ${g.items.map(([n]) => `<div class="frow">${avatar(n, '#4E8F92', 'sm')}<span class="nm">${esc(n)}</span></div>`).join('')}`).join('')}
+      </div>`;
+  }
+  return convList();
+}
+
+function rail(view){
+  const items = [['💬','chat','消息'],['👥','contacts','通讯录'],['🎧','agent','客服台'],['📈','metrics','观测']];
+  return `<div class="rail"><div class="me">陈</div>
+    ${items.map(([ic,k,t]) => `<button data-action="view" data-view="${k}" aria-current="${k === view}" title="${t}">${ic}
+      ${k === 'chat' ? '<span class="badge"></span>' : ''}</button>`).join('')}</div>`;
+}
+
+/* ------------------------------------------------------------------ 三种结构 */
+function layoutA(){
+  const main = state.view === 'chat' ? chatMain() : state.view === 'contacts' ? contactsMain() : state.view === 'agent' ? agentMain() : metricsMain();
+  return `<div class="shell">${rail(state.view)}
+    <div class="list">${queueList()}</div>
+    <div class="main">${main}
+      <div class="insp">${state.view === 'agent' || state.view === 'metrics' ? agentInspector() : infoPanel()}</div>
+    </div></div>`;
+}
+function layoutB(){
+  const main = state.view === 'chat' ? chatMain() : state.view === 'contacts' ? contactsMain() : state.view === 'agent' ? agentMain() : metricsMain();
+  return `<div class="shell">${rail(state.view)}
+    <div class="list">${queueList()}</div>
+    <div class="main">${main}</div>
+    <div class="insp">${state.view === 'agent' || state.view === 'metrics' ? agentInspector() : infoPanel()}</div></div>`;
+}
+function layoutC(){
+  const main = state.view === 'chat' ? chatMain() : state.view === 'contacts' ? contactsMain() : state.view === 'agent' ? agentMain() : metricsMain();
+  const tabs = [['chat','消息'],['contacts','通讯录'],['agent','客服台'],['metrics','观测']];
+  return `<div class="topbar">
+      <div class="brand"><span class="mark">鲸</span>IM-WhaleShark</div>
+      <nav>${tabs.map(([k,t]) => `<button data-action="view" data-view="${k}" aria-current="${k === state.view}">${t}</button>`).join('')}</nav>
+      <div class="search">🔍<input placeholder="搜索会话、联系人、消息" readonly /></div>
+      <div class="spacer"></div>
+      <button class="btn ghost" data-action="list">${state.list === 'open' ? '‹ 收起' : '› 会话'}</button>
+      <button class="btn ghost" data-action="info">信息</button>
+    </div>
+    <div class="shell">
+      <div class="list">${queueList()}</div>
+      <div class="main">${main}<div class="insp">${state.view === 'agent' || state.view === 'metrics' ? agentInspector() : infoPanel()}</div></div>
+    </div>`;
+}
+
+const LAYOUTS = {
+  A: {name:'微信三段 · 信息栏抽屉', render:layoutA},
+  B: {name:'四栏常驻 · D 方案同构', render:layoutB},
+  C: {name:'单列优先 · 覆盖面板', render:layoutC}
+};
+
+/* ------------------------------------------------------------------ 状态枢纽 */
+function syncURL(){
+  const p = new URLSearchParams(location.search);
+  p.set('variant', state.variant); p.set('view', state.view); p.set('conv', state.conv);
+  p.set('info', state.info); p.set('list', state.list);
+  history.replaceState(null, '', '?' + p.toString());
+}
+function render(){
+  document.body.dataset.variant = state.variant;
+  document.body.dataset.view = state.view;
+  document.body.dataset.info = state.info;
+  document.body.dataset.list = state.list;
+  document.getElementById('app').innerHTML = LAYOUTS[state.variant].render();
+  const L = LAYOUTS[state.variant];
+  document.getElementById('switcher').innerHTML =
+    `<button data-action="prev" title="上一个 (←)">‹</button>
+     <span class="lbl"><b>${state.variant}</b> · ${L.name}</span>
+     <button data-action="next" title="下一个 (→)">›</button>
+     <span class="st">view=${state.view} conv=${state.conv} info=${state.info} list=${state.list}</span>`;
+  syncURL();
+}
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action]'); if(!el) return;
+  const a = el.dataset.action;
+  if(a === 'view'){ state.view = el.dataset.view; }
+  else if(a === 'conv'){ state.conv = el.dataset.id; state.view = state.view === 'metrics' ? 'agent' : state.view; }
+  else if(a === 'info'){ state.info = state.info === 'open' ? 'closed' : 'open'; }
+  else if(a === 'list'){ state.list = state.list === 'open' ? 'closed' : 'open'; }
+  else if(a === 'prev' || a === 'next'){
+    const keys = Object.keys(LAYOUTS);
+    const i = keys.indexOf(state.variant);
+    state.variant = keys[(i + (a === 'next' ? 1 : -1) + keys.length) % keys.length];
+  }
+  render();
+});
+document.addEventListener('keydown', e => {
+  const t = e.target;
+  if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  if(e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
+    e.preventDefault();
+    const keys = Object.keys(LAYOUTS);
+    const i = keys.indexOf(state.variant);
+    state.variant = keys[(i + (e.key === 'ArrowRight' ? 1 : -1) + keys.length) % keys.length];
+    render();
+  }
+});
+render();
+</script>
+</body>
+</html>
