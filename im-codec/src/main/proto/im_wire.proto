@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package im.wire.v1;
+
+option java_package = "com.bantanger.im.codec.v1";
+option java_outer_classname = "ImWire";
+option java_multiple_files = true;
+
+// ─────────────────────────────────────────────────────────────
+// 帧头是二进制定长 20 字节（见 FrameCodec），不进 protobuf。
+// 这里只定义「帧体」：一条 command 对应这里的一个 message。
+// 迁移期取值沿用旧命令码，服务端策略表可 1:1 复用。
+// ─────────────────────────────────────────────────────────────
+
+// 系统类
+message LoginRequest {
+  int32  app_id      = 1;
+  string user_id     = 2;
+  int32  client_type = 3;   // 1 WEB 2 ANDROID 3 IOS 4 PC
+  string imei        = 4;   // 设备唯一标识，替代旧协议里变长的 imei 段
+  string user_sign   = 5;   // 鉴权签名；空表示不校验（当前后端状态）
+}
+
+message LoginResponse {
+  int32  code        = 1;   // 0 = 成功
+  string message     = 2;
+  int64  server_time = 3;   // 毫秒，客户端用它校准心跳
+  string session_id  = 4;   // 服务端会话标识，断线重连时回带
+}
+
+message LogoutRequest {
+  int32  app_id      = 1;
+  string user_id     = 2;
+  int32  client_type = 3;
+  string imei        = 4;
+}
+
+message LogoutResponse {
+  int32  code    = 1;
+  string message = 2;
+}
+
+message PingRequest {
+  int64 client_time = 1;    // 客户端单调毫秒
+}
+
+message PongResponse {
+  int64 client_time = 1;    // 原样回带，客户端算 RTT
+  int64 server_time = 2;
+}
+
+// 错误响应：任何 command 都可能收到，status != 0 时帧体按此解析
+message ErrorResponse {
+  int32  code    = 1;
+  string message = 2;
+  int32  command = 3;       // 出错的原始命令码
+}
+
+// ─────────────────────────────────────────────────────────────
+// 消息体：从「一个 VARCHAR(5000)」升级为可扩展内容树，
+// 图片/文件/撤回先占位，服务端不支持时按 text 降级。
+// ─────────────────────────────────────────────────────────────
+
+message TextContent {
+  string text = 1;
+}
+
+message ImageContent {
+  string url       = 1;
+  string thumb_url = 2;
+  int32  width     = 3;
+  int32  height    = 4;
+  int64  size      = 5;
+}
+
+message FileContent {
+  string url  = 1;
+  string name = 2;
+  int64  size = 3;
+}
+
+message RecallContent {
+  int64  message_key = 1;
+  string reason      = 2;
+}
+
+message MessageContent {
+  oneof content {
+    TextContent   text   = 1;
+    ImageContent  image  = 2;
+    FileContent   file   = 3;
+    RecallContent recall = 4;
+  }
+}
+
+message ChatMessage {
+  string         message_id        = 1;  // 客户端生成，重发不变，服务端去重
+  int64          message_key       = 2;  // 服务端分配；请求里为 0
+  int32          app_id            = 3;
+  string         from_id           = 4;
+  string         to_id             = 5;  // 单聊为对端 user_id，群聊为 group_id
+  int32          conversation_type = 6;  // 1 单聊 2 群聊 3 机器人
+  int64          sequence          = 7;  // 会话内单调递增，服务端分配
+  int64          message_time      = 8;
+  MessageContent content           = 9;
+  map<string, string> extra        = 10;
+}
+
+message SendMessageRequest {
+  ChatMessage message = 1;
+}
+
+message SendMessageResponse {
+  int32 code        = 1;
+  string message    = 2;
+  string message_id = 3;
+  int64 message_key = 4;
+  int64 sequence    = 5;
+}
+
+// 下行通知：服务端把一条消息推给接收方
+message MessageNotify {
+  ChatMessage message = 1;
+}
+
+// 送达确认（收到消息后回给服务端）
+message AckRequest {
+  int32  app_id            = 1;
+  string user_id           = 2;
+  int32  conversation_type = 3;
+  string conversation_id   = 4;
+  int64  message_key       = 5;
+  int64  sequence          = 6;
+}
+
+// 已读回执（客户端显式已读，权威位点由服务端推进）
+message ReadRequest {
+  int32  app_id            = 1;
+  string user_id           = 2;
+  int32  conversation_type = 3;
+  string conversation_id   = 4;
+  int64  read_sequence     = 5;
+}
+
+message ReadNotify {
+  int32  app_id            = 1;
+  string conversation_id   = 2;
+  int32  conversation_type = 3;
+  int64  read_sequence     = 4;
+}

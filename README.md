@@ -186,6 +186,9 @@ Docker 部署测试请访问 `localhost:19000`
 
 ## 架构设计
 ### 私有协议
+> 下面这张图描述的是**现役旧协议**，且字段顺序与代码不一致（以 `ByteBufToMessageUtils` 为准）。
+> 新的线协议（定长头 20 字节、上下行对称、protobuf 帧体）见 [docs/protocol/wire-protocol-v1.md](docs/protocol/wire-protocol-v1.md)。
+
 IM 的私有协议确立信息如下：
 ```text
 +------------------------------------------------------+
