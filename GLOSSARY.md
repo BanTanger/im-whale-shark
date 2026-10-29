@@ -28,13 +28,13 @@ _Avoid_: 路由层（曾作为未完成事项的代号，现已实现，不再�
 **Message**：
 一条用户发出的聊天内容，发出后具备四种性质：实时、有序、可靠、幂等。
 
-**MessageId**：
-客户端生成的标识，用于服务端去重。它不是消息的主键。
-_Avoid_: messageKey, sequence
+**ClientMessageId**：
+客户端生成的标识，重传不变。用于服务端去重，以及客户端定位"哪一条还没被受理"。
+_Avoid_: messageId（分不清客户端还是服务端）、messageKey、sequence
 
-**MessageKey**：
-服务端为一条已持久化的消息分配的唯一键。
-_Avoid_: messageId
+**ServerMessageId**：
+服务端为一条消息分配的全局唯一标识。它是消息被撤回、被引用、被审计时的身份，不表达顺序。
+_Avoid_: messageId、messageKey
 
 **Sequence（序号）**：
 会话内的单调递增偏序编号，由服务端分配；它是判断“消息先后”的唯一依据。
