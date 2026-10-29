@@ -79,6 +79,44 @@ services:
     networks:
       - im-network
 
+  # MinIO 容器（S3 兼容，本地替代对象存储）
+  im-minio:
+    container_name: im-minio
+    image: minio/minio:latest
+    restart: always
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: whalesharkim
+      MINIO_ROOT_PASSWORD: whalesharkim
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # 控制台
+    volumes:
+      - ./docker/minio/data:/data
+    networks:
+      - im-network
+
+  # 一次性初始化：创建 bucket
+  im-minio-init:
+    container_name: im-minio-init
+    image: minio/mc:latest
+    depends_on:
+      im-minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://im-minio:9000 whalesharkim whalesharkim &&
+      mc mb -p local/im-msg local/im-media &&
+      echo 'buckets ready: im-msg, im-media'
+      "
+    networks:
+      - im-network
+
   # IM Domain 容器
   im-domain:
     container_name: im-domain
